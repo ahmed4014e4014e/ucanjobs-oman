@@ -8,7 +8,7 @@ import {
   fetchTutorDirectory,
 } from "../lib/tutoringApi";
 import { themeImages } from "../lib/themeImages";
-import { isSupabaseConfigured } from "../lib/supabase";
+import { isSupabaseConfigured, supabase } from "../lib/supabase";
 
 function formatSubmittedAt(value) {
   if (!value) {
@@ -24,6 +24,38 @@ function formatSubmittedAt(value) {
   });
 }
 
+function AttachmentDownloadList({
+  files,
+  bucket,
+  downloadingPaths,
+  onDownload,
+}) {
+  if (!Array.isArray(files) || files.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-2">
+      {files.map((file) => {
+        const filePath = file.path || "";
+        const isDownloading = Boolean(filePath && downloadingPaths[filePath]);
+
+        return (
+          <button
+            key={filePath || file.name}
+            type="button"
+            disabled={!filePath || isDownloading}
+            onClick={() => onDownload({ bucket, path: filePath, fileName: file.name })}
+            className="rounded-full bg-[rgba(255,252,247,0.98)] px-3 py-2 text-sm font-medium text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.12)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {isDownloading ? `Downloading ${file.name || "file"}...` : `Download ${file.name || "attachment"}`}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const { user, profile } = useAuth();
   const name = profile?.full_name || user?.user_metadata?.full_name || "Admin";
@@ -36,6 +68,11 @@ export default function AdminDashboard() {
   const [contactError, setContactError] = useState("");
   const [requestError, setRequestError] = useState("");
   const [directoryError, setDirectoryError] = useState("");
+  const [attachmentFeedback, setAttachmentFeedback] = useState({
+    type: "idle",
+    message: "",
+  });
+  const [downloadingPaths, setDownloadingPaths] = useState({});
   const [directoryDiagnostics, setDirectoryDiagnostics] = useState({
     rawOfferingCount: 0,
     privateTutorCards: 0,
@@ -161,6 +198,57 @@ export default function AdminDashboard() {
     };
   }, [messages, requests]);
 
+  const handleAttachmentDownload = async ({ bucket, path, fileName }) => {
+    if (!supabase || !bucket || !path) {
+      setAttachmentFeedback({
+        type: "error",
+        message: "Attachment download is not available right now.",
+      });
+      return;
+    }
+
+    setAttachmentFeedback({
+      type: "idle",
+      message: "",
+    });
+    setDownloadingPaths((current) => ({
+      ...current,
+      [path]: true,
+    }));
+
+    try {
+      const { data, error } = await supabase.storage.from(bucket).download(path);
+
+      if (error) {
+        throw error;
+      }
+
+      const objectUrl = window.URL.createObjectURL(data);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = fileName || path.split("/").pop() || "attachment";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(objectUrl);
+
+      setAttachmentFeedback({
+        type: "success",
+        message: `Downloaded ${fileName || "attachment"} successfully.`,
+      });
+    } catch (error) {
+      setAttachmentFeedback({
+        type: "error",
+        message: error.message || "Unable to download this attachment right now.",
+      });
+    } finally {
+      setDownloadingPaths((current) => ({
+        ...current,
+        [path]: false,
+      }));
+    }
+  };
+
   return (
     <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
       <section className="mx-auto max-w-6xl">
@@ -284,6 +372,19 @@ export default function AdminDashboard() {
         </div>
 
         <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
+          {attachmentFeedback.message && (
+            <div
+              className={[
+                "mb-6 rounded-2xl px-4 py-3 text-sm leading-6",
+                attachmentFeedback.type === "error"
+                  ? "border border-[rgba(155,77,49,0.22)] bg-[rgba(255,239,232,0.95)] text-[var(--oman-terracotta-dark)]"
+                  : "border border-[rgba(82,101,74,0.22)] bg-[rgba(239,246,236,0.95)] text-[var(--oman-olive)]",
+              ].join(" ")}
+            >
+              {attachmentFeedback.message}
+            </div>
+          )}
+
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
@@ -384,18 +485,12 @@ export default function AdminDashboard() {
                           {message.attachment_notes}
                         </p>
                       )}
-                      {Array.isArray(message.attachment_files) && message.attachment_files.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {message.attachment_files.map((file) => (
-                            <span
-                              key={file.path || file.name}
-                              className="rounded-full bg-[rgba(255,252,247,0.98)] px-3 py-2 text-sm font-medium text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.12)]"
-                            >
-                              {file.name || "Attachment"}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      <AttachmentDownloadList
+                        files={message.attachment_files}
+                        bucket="contact-attachments"
+                        downloadingPaths={downloadingPaths}
+                        onDownload={handleAttachmentDownload}
+                      />
                     </div>
                   )}
                 </article>
@@ -516,18 +611,12 @@ export default function AdminDashboard() {
                           {request.attachment_notes}
                         </p>
                       )}
-                      {Array.isArray(request.attachment_files) && request.attachment_files.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {request.attachment_files.map((file) => (
-                            <span
-                              key={file.path || file.name}
-                              className="rounded-full bg-[rgba(255,252,247,0.98)] px-3 py-2 text-sm font-medium text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.12)]"
-                            >
-                              {file.name || "Attachment"}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      <AttachmentDownloadList
+                        files={request.attachment_files}
+                        bucket="tutoring-attachments"
+                        downloadingPaths={downloadingPaths}
+                        onDownload={handleAttachmentDownload}
+                      />
                     </div>
                   )}
                 </article>
