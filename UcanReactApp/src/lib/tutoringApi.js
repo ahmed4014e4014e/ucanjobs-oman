@@ -248,23 +248,7 @@ export async function updateTutoringRequestStatus(requestId, status) {
         attachment_notes,
         attachment_files,
         status,
-        created_at,
-        student:profiles!tutoring_requests_student_id_fkey (
-          id,
-          full_name,
-          email,
-          institute
-        ),
-        tutor:tutor_profiles!tutoring_requests_tutor_id_fkey (
-          id,
-          display_name,
-          institute_code
-        ),
-        course:courses!tutoring_requests_course_id_fkey (
-          id,
-          code,
-          title
-        )
+        created_at
       `
     )
     .single();

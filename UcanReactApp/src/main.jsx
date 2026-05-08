@@ -20,6 +20,7 @@ import ResetPassword from "./routes/resetPassword";
 import Account from "./routes/account";
 import StudentDashboard from "./routes/studentDashboard";
 import TutorDashboard from "./routes/tutorDashboard";
+import TutorTutoringRequests from "./routes/tutorTutoringRequests";
 import AdminDashboard from "./routes/adminDashboard";
 import AdminContactMessages from "./routes/adminContactMessages";
 import AdminTutoringRequests from "./routes/adminTutoringRequests";
@@ -88,6 +89,14 @@ const router = createBrowserRouter([
         element: (
           <RoleProtectedRoute allowedRole="tutor">
             <TutorDashboard />
+          </RoleProtectedRoute>
+        ),
+      },
+      {
+        path: "tutor-tutoring-requests",
+        element: (
+          <RoleProtectedRoute allowedRole="tutor">
+            <TutorTutoringRequests />
           </RoleProtectedRoute>
         ),
       },

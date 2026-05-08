@@ -19,8 +19,8 @@ Status guide:
 | `profiles_auth_sync.sql` | Failed / retry needed | Attempted, but Supabase returned `Failed to fetch (api.supabase.com)`. Retry after refresh/login. |
 | `profiles_self_access_policy.sql` | Pending / not confirmed | Allows users to manage their own profile row. |
 | `request_volume_indexes.sql` | confirmed applied | Adds scaling indexes for request-heavy tables on `created_at`, `status`, and `tutor_id`. |
-| `status_workflow_updates.sql` | Pending / not confirmed | Normalizes contact statuses and adds admin update policies for request workflows. |
-| `tutoring_attachments_storage.sql` | Pending / not confirmed | Needed for tutoring request attachments. |
+| `status_workflow_updates.sql` | confirmed applied  | Normalizes contact statuses and adds admin update policies for request workflows. |
+| `tutoring_attachments_storage.sql` | confirmed applied | Needed for tutoring request attachments and tutor-side attachment downloads. |
 
 ## Update rule
 
