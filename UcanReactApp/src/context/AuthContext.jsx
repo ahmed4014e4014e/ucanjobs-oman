@@ -4,7 +4,7 @@ import { getUserRole } from "../lib/authRouting";
 
 const AuthContext = createContext(null);
 
-function createMetadataProfile(authUser) {
+function createProfileSeed(authUser, fallbackRole = "student") {
   if (!authUser?.id) {
     return null;
   }
@@ -12,7 +12,7 @@ function createMetadataProfile(authUser) {
   return {
     id: authUser.id,
     full_name: authUser.user_metadata?.full_name ?? null,
-    role: getUserRole(null, authUser, null),
+    role: fallbackRole,
     institute: authUser.user_metadata?.institute ?? null,
     email: authUser.email ?? null,
   };
@@ -30,7 +30,8 @@ export function AuthProvider({ children }) {
       return null;
     }
 
-    const metadataProfile = createMetadataProfile(authUser);
+    const seededRole = authUser.user_metadata?.role || "student";
+    const profileSeed = createProfileSeed(authUser, seededRole);
 
     const { data, error } = await supabase
       .from("profiles")
@@ -39,28 +40,30 @@ export function AuthProvider({ children }) {
       .maybeSingle();
 
     if (error) {
-      setProfile(metadataProfile);
-      return metadataProfile;
+      setProfile(null);
+      return null;
     }
+
+    const profilePayload = data
+      ? {
+          id: authUser.id,
+          full_name: data.full_name || profileSeed.full_name,
+          role: data.role,
+          institute: data.institute || profileSeed.institute,
+          email: profileSeed.email || data.email,
+        }
+      : profileSeed;
 
     const shouldSyncProfile =
       !data ||
-      (!data.full_name && metadataProfile.full_name) ||
-      (!data.institute && metadataProfile.institute) ||
-      (!data.email && metadataProfile.email);
+      (!data.full_name && profileSeed.full_name) ||
+      (!data.institute && profileSeed.institute) ||
+      (!data.email && profileSeed.email);
 
     if (!shouldSyncProfile) {
       setProfile(data ?? null);
       return data ?? null;
     }
-
-    const profilePayload = {
-      id: authUser.id,
-      full_name: data?.full_name || metadataProfile.full_name,
-      role: data?.role || metadataProfile.role || "student",
-      institute: data?.institute || metadataProfile.institute,
-      email: data?.email || metadataProfile.email,
-    };
 
     const { data: syncedProfile, error: syncError } = await supabase
       .from("profiles")
@@ -69,8 +72,8 @@ export function AuthProvider({ children }) {
       .single();
 
     if (syncError) {
-      setProfile(data ?? metadataProfile);
-      return data ?? metadataProfile;
+      setProfile(data ?? null);
+      return data ?? null;
     }
 
     setProfile(syncedProfile);
@@ -96,17 +99,10 @@ export function AuthProvider({ children }) {
         setUser(currentSession?.user ?? null);
 
         if (currentSession?.user) {
-          const fallbackProfile = createMetadataProfile(currentSession.user);
-          setProfile(fallbackProfile);
-          if (mounted) {
-            setLoading(false);
-          }
-
-          loadProfile(currentSession.user).catch(() => {
-            if (mounted) {
-              setProfile(fallbackProfile);
-            }
-          });
+          const resolvedProfile = await loadProfile(currentSession.user);
+          if (!mounted) return;
+          setProfile(resolvedProfile);
+          setLoading(false);
         } else {
           setProfile(null);
           if (mounted) {
@@ -138,17 +134,10 @@ export function AuthProvider({ children }) {
         setUser(nextSession?.user ?? null);
 
         if (nextSession?.user) {
-          const fallbackProfile = createMetadataProfile(nextSession.user);
-          setProfile(fallbackProfile);
-          if (mounted) {
-            setLoading(false);
-          }
-
-          loadProfile(nextSession.user).catch(() => {
-            if (mounted) {
-              setProfile(fallbackProfile);
-            }
-          });
+          const resolvedProfile = await loadProfile(nextSession.user);
+          if (!mounted) return;
+          setProfile(resolvedProfile);
+          setLoading(false);
         } else {
           setProfile(null);
           if (mounted) {

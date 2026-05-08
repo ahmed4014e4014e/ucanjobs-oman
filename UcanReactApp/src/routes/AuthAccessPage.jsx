@@ -94,10 +94,10 @@ export default function AuthAccessPage({
   };
 
   useEffect(() => {
-    if (!loading && user && !roleCheckInProgress) {
-      navigate(getDashboardPath(getUserRole(profile, user, role)), { replace: true });
+    if (!loading && user && profile?.role && !roleCheckInProgress) {
+      navigate(getDashboardPath(profile.role), { replace: true });
     }
-  }, [loading, navigate, profile, role, roleCheckInProgress, user]);
+  }, [loading, navigate, profile, roleCheckInProgress, user]);
 
   const resolveAccountRole = async (authUser) => {
     if (!authUser) {
@@ -105,7 +105,7 @@ export default function AuthAccessPage({
     }
 
     if (!isSupabaseConfigured || !supabase) {
-      return getUserRole(null, authUser, null);
+      return null;
     }
 
     const { data } = await supabase
@@ -114,7 +114,7 @@ export default function AuthAccessPage({
       .eq("id", authUser.id)
       .maybeSingle();
 
-    return getUserRole(data, authUser, null);
+    return data?.role ?? null;
   };
 
   const handleLogin = async (event) => {
@@ -146,7 +146,18 @@ export default function AuthAccessPage({
 
     const actualRole = await resolveAccountRole(data.user);
 
-    if (actualRole && actualRole !== role) {
+    if (!actualRole) {
+      await supabase.auth.signOut();
+      showMessage(
+        "error",
+        "We could not load your account profile yet. Please try again in a moment."
+      );
+      setRoleCheckInProgress(false);
+      setLoginLoading(false);
+      return;
+    }
+
+    if (actualRole !== role) {
       await supabase.auth.signOut();
       showMessage(
         "error",
@@ -159,7 +170,7 @@ export default function AuthAccessPage({
 
     showMessage("success", "Login successful.");
     setRoleCheckInProgress(false);
-    navigate(getDashboardPath(getUserRole(null, data.user, role)), { replace: true });
+    navigate(getDashboardPath(actualRole), { replace: true });
     setLoginLoading(false);
   };
 

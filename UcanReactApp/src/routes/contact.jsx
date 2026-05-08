@@ -28,7 +28,7 @@ export default function Contact() {
     fullName: profile?.full_name || user?.user_metadata?.full_name || "",
     email: profile?.email || user?.email || "",
     institute: profile?.institute || user?.user_metadata?.institute || "",
-    role: user?.user_metadata?.role || profile?.role || "",
+    role: profile?.role || "",
     subject: "",
     message: "",
   });
