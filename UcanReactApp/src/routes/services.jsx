@@ -10,6 +10,12 @@ import {
   fetchTutorDirectory,
   uploadTutoringAttachments,
 } from "../lib/tutoringApi";
+import {
+  ACCEPTED_UPLOAD_ATTRIBUTE,
+  ACCEPTED_UPLOAD_TYPES,
+  FILE_SIZE_LIMIT_MB,
+  validateUploadSelection,
+} from "../lib/fileUploadRules";
 import { themeImages } from "../lib/themeImages";
 
 const services = [
@@ -468,7 +474,16 @@ export default function Services() {
   };
 
   const handleAttachmentChange = (event) => {
-    setSelectedAttachments(Array.from(event.target.files || []));
+    const incomingFiles = Array.from(event.target.files || []);
+    const { validFiles, errorMessage } = validateUploadSelection(incomingFiles);
+
+    setSelectedAttachments(validFiles);
+
+    if (errorMessage) {
+      event.target.value = "";
+      setRequestMessageType("error");
+      setRequestMessage(errorMessage);
+    }
   };
 
   const handleRequestSubmit = async (event) => {
@@ -818,9 +833,14 @@ export default function Services() {
                   <input
                     type="file"
                     multiple
+                    accept={ACCEPTED_UPLOAD_ATTRIBUTE}
                     onChange={handleAttachmentChange}
                     className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-sm text-[var(--oman-ink)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-[rgba(197,154,68,0.16)] file:px-4 file:py-2 file:font-semibold file:text-[var(--oman-terracotta-dark)] focus:border-[var(--oman-brass)] focus:bg-white"
                   />
+                  <p className="text-sm leading-6 text-[var(--oman-ink)]/70">
+                    Accepted files: {ACCEPTED_UPLOAD_TYPES.join(", ")}. Maximum size:{" "}
+                    {FILE_SIZE_LIMIT_MB} MB per file.
+                  </p>
                   {selectedAttachments.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">
                       {selectedAttachments.map((file) => (

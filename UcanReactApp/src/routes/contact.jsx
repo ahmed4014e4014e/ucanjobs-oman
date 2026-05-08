@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { createContactMessage, uploadContactAttachments } from "../lib/contactApi";
+import {
+  ACCEPTED_UPLOAD_ATTRIBUTE,
+  ACCEPTED_UPLOAD_TYPES,
+  FILE_SIZE_LIMIT_MB,
+  validateUploadSelection,
+} from "../lib/fileUploadRules";
 import { isSupabaseConfigured } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
 
@@ -50,7 +56,18 @@ export default function Contact() {
 
   const handleFileChange = (event) => {
     const incomingFiles = Array.from(event.target.files || []);
-    setSelectedFiles(incomingFiles);
+    const { validFiles, errorMessage } = validateUploadSelection(incomingFiles);
+
+    setSelectedFiles(validFiles);
+
+    if (errorMessage) {
+      event.target.value = "";
+      setSubmitState({
+        loading: false,
+        type: "error",
+        message: errorMessage,
+      });
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -271,9 +288,14 @@ export default function Contact() {
                   <input
                     type="file"
                     multiple
+                    accept={ACCEPTED_UPLOAD_ATTRIBUTE}
                     onChange={handleFileChange}
                     className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-sm text-[var(--oman-ink)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-[rgba(197,154,68,0.16)] file:px-4 file:py-2 file:font-semibold file:text-[var(--oman-terracotta-dark)] hover:file:bg-[rgba(197,154,68,0.24)]"
                   />
+                  <p className="text-sm leading-6 text-[var(--oman-ink)]/70">
+                    Accepted files: {ACCEPTED_UPLOAD_TYPES.join(", ")}. Maximum size:{" "}
+                    {FILE_SIZE_LIMIT_MB} MB per file.
+                  </p>
                   {selectedFiles.length > 0 && (
                     <div className="flex flex-wrap gap-2 pt-1">
                       {selectedFiles.map((file) => (
