@@ -20,6 +20,12 @@ export default function AdminDashboard() {
     groupTutorCards: 0,
     visibleInstitutes: 0,
   });
+  const noDirectoryData =
+    !directoryLoading &&
+    !directoryError &&
+    directoryDiagnostics.rawOfferingCount === 0 &&
+    directoryDiagnostics.privateTutorCards === 0 &&
+    directoryDiagnostics.groupTutorCards === 0;
 
   useEffect(() => {
     let ignore = false;
@@ -169,6 +175,14 @@ export default function AdminDashboard() {
                 <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
                   Internal status for the Services directory so you can troubleshoot offerings without showing debug data to public users.
                 </p>
+                {noDirectoryData && (
+                  <div className="mt-5 rounded-2xl border border-[rgba(197,154,68,0.24)] bg-[rgba(255,244,222,0.78)] px-4 py-4 text-sm leading-6 text-[var(--oman-terracotta-dark)]">
+                    <p className="font-semibold">No tutor directory data yet</p>
+                    <p className="mt-1">
+                      Supabase is connected, but no active tutor offerings are available to report yet.
+                    </p>
+                  </div>
+                )}
                 <div className="mt-5 grid gap-2 text-sm leading-6 text-[var(--oman-ink)]/80 sm:grid-cols-2 lg:grid-cols-3">
                   <p>
                     <span className="font-semibold">Supabase configured:</span>{" "}
