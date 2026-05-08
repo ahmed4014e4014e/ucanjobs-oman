@@ -68,6 +68,15 @@ create index if not exists tutoring_requests_student_id_idx
 create index if not exists tutoring_requests_tutor_id_idx
   on public.tutoring_requests (tutor_id);
 
+create index if not exists tutoring_requests_status_idx
+  on public.tutoring_requests (status);
+
+create index if not exists tutoring_requests_created_at_idx
+  on public.tutoring_requests (created_at desc);
+
+create index if not exists tutoring_requests_tutor_status_created_at_idx
+  on public.tutoring_requests (tutor_id, status, created_at desc);
+
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
