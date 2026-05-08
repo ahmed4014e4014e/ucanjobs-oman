@@ -6,6 +6,7 @@ import aboutUsCardImage from "../assets/campus-images/about-us-card.jpg";
 import ucfCampusImage from "../assets/campus-images/ucf-campus.jpg";
 import contactBottomCampusImage from "../assets/campus-images/contact-bottom-campus.jpg";
 import aboutBottomCampusImage from "../assets/campus-images/about-bottom-campus.jpg";
+import policiesCampusImage from "../assets/campus-images/policies-campus.jpg";
 
 export const themeImages = {
   heroFort: mcbsImage,
@@ -18,4 +19,5 @@ export const themeImages = {
   studentsLibrary: aboutBottomCampusImage,
   studentsGroup: squImage,
   studentsStudyHall: gutechImage,
+  policiesCampus: policiesCampusImage,
 };
