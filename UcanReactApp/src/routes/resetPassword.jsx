@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ActionFeedback from "../components/ActionFeedback";
+import PasswordField from "../components/PasswordField";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
 
@@ -100,19 +101,13 @@ export default function ResetPassword() {
         />
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-              New Password
-            </span>
-            <input
-              type="password"
-              placeholder="Enter your new password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-              required
-            />
-          </label>
+          <PasswordField
+            label="New Password"
+            placeholder="Enter your new password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+          />
 
           <button
             type="submit"

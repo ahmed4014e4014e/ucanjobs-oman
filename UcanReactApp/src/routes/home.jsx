@@ -4,7 +4,7 @@ import ucanLogo from "../assets/campus-images/ucan-logo.png";
 import googleMeetLogo from "../assets/tool-logos/google-meet.svg";
 import zoomLogo from "../assets/tool-logos/zoom.jpg";
 import microsoftTeamsLogo from "../assets/tool-logos/microsoft-teams.svg";
-import microsoftWhiteboardLogo from "../assets/tool-logos/microsoft-whiteboard.svg";
+import microsoftWhiteboardLogo from "../assets/tool-logos/microsoft-whiteboard.jpg";
 import clickUpLogo from "../assets/tool-logos/clickup.jpg";
 import miroLogo from "../assets/tool-logos/miro.jpg";
 

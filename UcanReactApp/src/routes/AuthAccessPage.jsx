@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ActionFeedback from "../components/ActionFeedback";
+import PasswordField from "../components/PasswordField";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { getDashboardPath, getUserRole } from "../lib/authRouting";
 import { themeImages } from "../lib/themeImages";
@@ -497,19 +498,13 @@ export default function AuthAccessPage({
 
           {recoveryMode ? (
             <form className="mt-6 space-y-4" onSubmit={handleUpdatePassword}>
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                  New Password
-                </span>
-                <input
-                  type="password"
-                  placeholder="Enter a new password"
-                  value={resetPassword}
-                  onChange={(event) => setResetPassword(event.target.value)}
-                  className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  required
-                />
-              </label>
+              <PasswordField
+                label="New Password"
+                placeholder="Enter a new password"
+                value={resetPassword}
+                onChange={(event) => setResetPassword(event.target.value)}
+                required
+              />
               <button
                 type="submit"
                 disabled={resetLoading}
@@ -531,17 +526,13 @@ export default function AuthAccessPage({
                   required
                 />
               </label>
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Password</span>
-                <input
-                  type="password"
-                  placeholder="Enter your password"
-                  value={loginPassword}
-                  onChange={(event) => setLoginPassword(event.target.value)}
-                  className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  required
-                />
-              </label>
+              <PasswordField
+                label="Password"
+                placeholder="Enter your password"
+                value={loginPassword}
+                onChange={(event) => setLoginPassword(event.target.value)}
+                required
+              />
               <button
                 type="submit"
                 disabled={loginLoading}
@@ -607,17 +598,13 @@ export default function AuthAccessPage({
                       required
                     />
                   </label>
-                  <label className="flex flex-col gap-2">
-                    <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Password</span>
-                    <input
-                      type="password"
-                      placeholder="Create a password"
-                      value={signupPassword}
-                      onChange={(event) => setSignupPassword(event.target.value)}
-                      className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                      required
-                    />
-                  </label>
+                  <PasswordField
+                    label="Password"
+                    placeholder="Create a password"
+                    value={signupPassword}
+                    onChange={(event) => setSignupPassword(event.target.value)}
+                    required
+                  />
                   {requireTermsAgreement && (
                     <label className="flex items-start gap-3 rounded-2xl bg-[rgba(244,232,214,0.34)] px-4 py-4 text-sm leading-6 text-[var(--oman-ink)]">
                       <input
