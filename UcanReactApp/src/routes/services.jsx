@@ -239,7 +239,7 @@ function TutorSection({
               </h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
                 Create an account or log in first to access the private and group tutoring
-                directory and continue with booking.
+                directory and send a tutoring request.
               </p>
             </div>
           ) : showDirectoryLoading ? (
@@ -330,11 +330,11 @@ function TutorSection({
                       : "cursor-not-allowed border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] text-[var(--oman-terracotta-dark)] opacity-70",
                   ].join(" ")}
                 >
-                  {canBook ? tutor.bookingLabel : "Log in to book tutoring"}
+                  {canBook ? "Send Tutoring Request" : "Log in to send tutoring request"}
                 </button>
                 {!canBook && (
                   <p className="mt-3 text-sm leading-6 text-[var(--oman-ink)]/70">
-                    Please log in to your student or tutor account before booking a tutoring
+                    Please log in to your student or tutor account before sending a tutoring
                     session.
                   </p>
                 )}
@@ -558,7 +558,7 @@ export default function Services() {
 
       setRequestMessageType("success");
       setRequestMessage(
-        "Your tutoring request was saved successfully. You can now continue to Calendly booking."
+        "Your tutoring request was saved successfully. The tutor can now contact you directly to arrange the session."
       );
       setRequestTitle("");
       setStudentInstitute(profile?.institute || user?.user_metadata?.institute || "");
@@ -634,13 +634,13 @@ export default function Services() {
           </div>
           <div className="rounded-[1.6rem] oman-card p-5 sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--oman-terracotta)]">
-              Student Booking
+              Student Requests
             </p>
             <p className="mt-3 text-lg font-semibold text-[var(--oman-ink)]">
-              Save a tutoring request before scheduling.
+              Send a tutoring request directly to the tutor.
             </p>
             <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/75">
-              Logged-in students can submit their request details, then continue to email and Calendly.
+              Logged-in students can submit their request details, and tutors can then follow up directly.
             </p>
           </div>
           <div className="rounded-[1.6rem] oman-card p-5 sm:p-6">
@@ -669,10 +669,10 @@ export default function Services() {
       {!canBook && (
         <section className="mx-auto max-w-6xl px-4 py-2 sm:px-6 sm:py-4">
           <div className="rounded-[1.75rem] border border-[rgba(197,154,68,0.28)] bg-[rgba(255,244,222,0.82)] px-6 py-5 text-[var(--oman-terracotta-dark)] shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em]">Booking Access</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em]">Request Access</p>
             <p className="mt-3 max-w-3xl text-base leading-7">
-              You can explore the tutor directory freely, but you need to log in before booking a
-              tutoring session or saving a tutoring request.
+              You can explore the tutor directory freely, but you need to log in before sending a
+              tutoring request.
             </p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <Link
@@ -802,16 +802,16 @@ export default function Services() {
             </button>
 
             <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              Booking Instructions
+              Tutoring Request
             </p>
             <h3 className="oman-title-accent mt-4 pr-16 text-2xl font-semibold sm:text-3xl">
-              Before booking with {activeTutor.name}
+              Send a tutoring request to {activeTutor.name}
             </h3>
 
             <div className="mt-6 rounded-3xl oman-outline-panel p-5 sm:p-6">
               <p className="text-base leading-7 text-[var(--oman-ink)]">
-                Please save your tutoring request below, attach any helpful files, and continue to
-                Calendly when you are ready.
+                Please save your tutoring request below and attach any helpful files so the tutor
+                can contact you directly and arrange the session with you.
               </p>
 
               <form className="mt-6 space-y-4" onSubmit={handleRequestSubmit}>
@@ -927,16 +927,6 @@ export default function Services() {
               </form>
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <a
-                href={activeTutor.bookingUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="oman-button-primary inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition sm:w-auto"
-              >
-                Open Calendly Booking
-              </a>
-            </div>
           </div>
         </div>
       )}

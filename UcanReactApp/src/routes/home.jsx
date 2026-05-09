@@ -306,7 +306,7 @@ export default function Home() {
             Start For Free
           </p>
           <h2 className="mt-4 text-2xl font-semibold sm:text-3xl">
-            Join a learning space where tutoring, resources, and community support cost nothing.
+            Join a learning hub where tutoring, resources, and community support cost nothing.
           </h2>
           <p className="mx-auto mt-6 max-w-3xl text-base leading-7 text-[#eadfcf] sm:text-lg sm:leading-8">
             Ucan Oman gives students free access to individualized tutoring,

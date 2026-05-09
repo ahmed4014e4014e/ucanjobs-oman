@@ -21,7 +21,6 @@ export async function fetchTutorDirectory() {
           display_name,
           institute_code,
           bio,
-          booking_url,
           is_active
         ),
         course:courses (
@@ -73,11 +72,6 @@ export function buildTutorCards(offerings, sessionType) {
           bio:
             entry.tutor.bio ||
             `Offers free ${sessionType === "private" ? "one-on-one" : "group"} tutoring sessions.`,
-          bookingUrl: entry.tutor.booking_url || "https://calendly.com/ahmed4014e/30min",
-          bookingLabel:
-            sessionType === "private"
-              ? `book tutor ${tutorName}`
-              : `book group tutoring with ${tutorName}`,
           availability:
             sessionType === "private"
               ? "Available for private tutoring"
