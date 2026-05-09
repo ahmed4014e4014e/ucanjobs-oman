@@ -44,6 +44,29 @@ const steps = [
   },
 ];
 
+const tutoringToolGroups = [
+  {
+    title: "Live Session Platforms",
+    description:
+      "Run tutoring sessions smoothly through trusted meeting tools for video, voice, and screen sharing.",
+    tools: [
+      { name: "Google Meet", short: "GM", accent: "from-[#6fa46a]/25 to-[#c7d36f]/25" },
+      { name: "Zoom", short: "ZO", accent: "from-[#77a7d8]/25 to-[#3b82f6]/20" },
+      { name: "Microsoft Teams", short: "MT", accent: "from-[#7c6fd3]/25 to-[#9b77f0]/20" },
+    ],
+  },
+  {
+    title: "Collaboration Tools",
+    description:
+      "Explain ideas visually, organize tutoring workflows, and brainstorm concepts together in real time.",
+    tools: [
+      { name: "Microsoft Whiteboard", short: "WB", accent: "from-[#f2d8b0]/35 to-[#f6eddc]/40" },
+      { name: "ClickUp", short: "CU", accent: "from-[#f59e0b]/20 to-[#ec4899]/18" },
+      { name: "Miro", short: "MI", accent: "from-[#f6d365]/30 to-[#fde68a]/35" },
+    ],
+  },
+];
+
 export default function Home() {
   return (
     <main className="oman-page min-h-screen text-slate-900">
@@ -148,6 +171,54 @@ export default function Home() {
               <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">{step.description}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-8">
+        <div className="rounded-[1.75rem] oman-card px-6 py-10 sm:px-8 sm:py-12">
+          <div className="max-w-2xl text-center lg:text-left">
+            <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+              Tutoring Tools
+            </p>
+            <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
+              Familiar platforms that make online tutoring easier to run.
+            </h2>
+            <p className="mt-4 text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
+              Ucan Oman tutoring can be supported through meeting and collaboration tools that help
+              students connect, explain concepts, and work through course material clearly.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-6 sm:mt-12 lg:grid-cols-2">
+            {tutoringToolGroups.map((group) => (
+              <article key={group.title} className="rounded-3xl oman-outline-panel p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--oman-terracotta)]">
+                  {group.title}
+                </p>
+                <p className="mt-4 text-base leading-7 text-[var(--oman-ink)]/75">
+                  {group.description}
+                </p>
+
+                <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                  {group.tools.map((tool) => (
+                    <div
+                      key={tool.name}
+                      className="rounded-[1.5rem] bg-[rgba(255,252,247,0.95)] p-4 text-center shadow-[0_14px_34px_rgba(73,39,27,0.07)] ring-1 ring-[rgba(111,49,29,0.1)]"
+                    >
+                      <div
+                        className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${tool.accent} text-lg font-bold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.08)]`}
+                      >
+                        {tool.short}
+                      </div>
+                      <h3 className="mt-4 text-sm font-semibold leading-6 text-[var(--oman-ink)] sm:text-base">
+                        {tool.name}
+                      </h3>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
