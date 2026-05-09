@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { themeImages } from "../lib/themeImages";
 import ucanLogo from "../assets/campus-images/ucan-logo.png";
 import googleMeetLogo from "../assets/tool-logos/google-meet.svg";
-import zoomLogo from "../assets/tool-logos/zoom.svg";
+import zoomLogo from "../assets/tool-logos/zoom.jpg";
 import microsoftTeamsLogo from "../assets/tool-logos/microsoft-teams.svg";
 import microsoftWhiteboardLogo from "../assets/tool-logos/microsoft-whiteboard.svg";
 import clickUpLogo from "../assets/tool-logos/clickup.svg";
