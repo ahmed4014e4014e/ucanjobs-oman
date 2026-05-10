@@ -9,6 +9,7 @@ import { downloadStorageAttachment } from "../lib/adminDownloads";
 import AdminAttachmentDownloadList from "../components/AdminAttachmentDownloadList";
 import {
   formatStatusLabel,
+  isDashboardArchivedStatus,
   normalizeStatus,
   TUTORING_STATUS_OPTIONS,
 } from "../lib/requestStatuses";
@@ -96,23 +97,30 @@ export default function AdminTutoringRequests() {
     setStatusDraft(normalizeStatus(activeRequest.status));
   }, [activeRequest]);
 
+  const visibleRequests = useMemo(
+    () => requests.filter((request) => !isDashboardArchivedStatus(request.status)),
+    [requests]
+  );
+
   const stats = useMemo(() => {
     return {
-      totalRequests: requests.length,
-      pendingRequests: requests.filter((request) => request.status === "pending").length,
+      totalRequests: visibleRequests.length,
+      pendingRequests: visibleRequests.filter(
+        (request) => normalizeStatus(request.status) === "pending"
+      ).length,
       requestInstitutes: new Set(
-        requests.map((request) => request.institute_name_snapshot).filter(Boolean)
+        visibleRequests.map((request) => request.institute_name_snapshot).filter(Boolean)
       ).size,
     };
-  }, [requests]);
+  }, [visibleRequests]);
 
   const filteredRequests = useMemo(() => {
     if (statusFilter === "all") {
-      return requests;
+      return visibleRequests;
     }
 
-    return requests.filter((request) => normalizeStatus(request.status) === statusFilter);
-  }, [requests, statusFilter]);
+    return visibleRequests.filter((request) => normalizeStatus(request.status) === statusFilter);
+  }, [statusFilter, visibleRequests]);
 
   const handleAttachmentDownload = async ({ bucket, path, fileName }) => {
     setFeedback({
@@ -161,10 +169,17 @@ export default function AdminTutoringRequests() {
         status: normalizeStatus(updatedRequest.status),
       };
 
-      setRequests((current) =>
-        current.map((request) => (request.id === normalizedRequest.id ? normalizedRequest : request))
-      );
-      setActiveRequest(normalizedRequest);
+      if (isDashboardArchivedStatus(normalizedRequest.status)) {
+        setRequests((current) =>
+          current.filter((request) => request.id !== normalizedRequest.id)
+        );
+        setActiveRequest(null);
+      } else {
+        setRequests((current) =>
+          current.map((request) => (request.id === normalizedRequest.id ? normalizedRequest : request))
+        );
+        setActiveRequest(normalizedRequest);
+      }
       setFeedback({
         type: "success",
         message: `Tutoring request marked as ${formatStatusLabel(statusDraft)}.`,
@@ -274,11 +289,11 @@ export default function AdminTutoringRequests() {
               <h3 className="text-xl font-semibold">Unable to load tutoring requests</h3>
               <p className="mt-4 leading-7">{error}</p>
             </div>
-          ) : requests.length === 0 ? (
+          ) : visibleRequests.length === 0 ? (
             <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
-              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No tutoring requests yet</h3>
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No active tutoring requests</h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Once students save booking requests, they will appear here for review.
+                Completed tutoring requests are hidden from the dashboard, but still kept in Supabase.
               </p>
             </div>
           ) : filteredRequests.length === 0 ? (

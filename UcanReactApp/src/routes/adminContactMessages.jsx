@@ -7,6 +7,7 @@ import AdminAttachmentDownloadList from "../components/AdminAttachmentDownloadLi
 import {
   CONTACT_STATUS_OPTIONS,
   formatStatusLabel,
+  isDashboardArchivedStatus,
   normalizeStatus,
 } from "../lib/requestStatuses";
 
@@ -93,23 +94,30 @@ export default function AdminContactMessages() {
     setStatusDraft(normalizeStatus(activeMessage.status));
   }, [activeMessage]);
 
+  const visibleMessages = useMemo(
+    () => messages.filter((message) => !isDashboardArchivedStatus(message.status)),
+    [messages]
+  );
+
   const stats = useMemo(() => {
     return {
-      totalMessages: messages.length,
-      pendingMessages: messages.filter(
+      totalMessages: visibleMessages.length,
+      pendingMessages: visibleMessages.filter(
         (message) => normalizeStatus(message.status) === "pending"
       ).length,
-      messageInstitutes: new Set(messages.map((message) => message.institute).filter(Boolean)).size,
+      messageInstitutes: new Set(
+        visibleMessages.map((message) => message.institute).filter(Boolean)
+      ).size,
     };
-  }, [messages]);
+  }, [visibleMessages]);
 
   const filteredMessages = useMemo(() => {
     if (statusFilter === "all") {
-      return messages;
+      return visibleMessages;
     }
 
-    return messages.filter((message) => normalizeStatus(message.status) === statusFilter);
-  }, [messages, statusFilter]);
+    return visibleMessages.filter((message) => normalizeStatus(message.status) === statusFilter);
+  }, [statusFilter, visibleMessages]);
 
   const handleAttachmentDownload = async ({ bucket, path, fileName }) => {
     setFeedback({
@@ -158,10 +166,17 @@ export default function AdminContactMessages() {
         status: normalizeStatus(updatedMessage.status),
       };
 
-      setMessages((current) =>
-        current.map((message) => (message.id === normalizedMessage.id ? normalizedMessage : message))
-      );
-      setActiveMessage(normalizedMessage);
+      if (isDashboardArchivedStatus(normalizedMessage.status)) {
+        setMessages((current) =>
+          current.filter((message) => message.id !== normalizedMessage.id)
+        );
+        setActiveMessage(null);
+      } else {
+        setMessages((current) =>
+          current.map((message) => (message.id === normalizedMessage.id ? normalizedMessage : message))
+        );
+        setActiveMessage(normalizedMessage);
+      }
       setFeedback({
         type: "success",
         message: `Contact message marked as ${formatStatusLabel(statusDraft)}.`,
@@ -271,11 +286,11 @@ export default function AdminContactMessages() {
               <h3 className="text-xl font-semibold">Unable to load messages</h3>
               <p className="mt-4 leading-7">{error}</p>
             </div>
-          ) : messages.length === 0 ? (
+          ) : visibleMessages.length === 0 ? (
             <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
-              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No contact messages yet</h3>
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No active contact messages</h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Once users submit the Contact form, their messages will appear here.
+                Completed contact messages are hidden from the dashboard, but still kept in Supabase.
               </p>
             </div>
           ) : filteredMessages.length === 0 ? (

@@ -10,6 +10,7 @@ import {
 } from "../lib/tutorApplicantsApi";
 import {
   formatStatusLabel,
+  isDashboardArchivedStatus,
   normalizeStatus,
   TUTOR_APPLICATION_STATUS_OPTIONS,
 } from "../lib/requestStatuses";
@@ -97,27 +98,32 @@ export default function AdminTutorApplications() {
     setStatusDraft(normalizeStatus(activeApplication.status));
   }, [activeApplication]);
 
+  const visibleApplications = useMemo(
+    () => applications.filter((application) => !isDashboardArchivedStatus(application.status)),
+    [applications]
+  );
+
   const stats = useMemo(() => {
     return {
-      totalApplications: applications.length,
-      pendingApplications: applications.filter(
+      totalApplications: visibleApplications.length,
+      pendingApplications: visibleApplications.filter(
         (application) => normalizeStatus(application.status) === "pending"
       ).length,
       applicationInstitutes: new Set(
-        applications.map((application) => application.university_name).filter(Boolean)
+        visibleApplications.map((application) => application.university_name).filter(Boolean)
       ).size,
     };
-  }, [applications]);
+  }, [visibleApplications]);
 
   const filteredApplications = useMemo(() => {
     if (statusFilter === "all") {
-      return applications;
+      return visibleApplications;
     }
 
-    return applications.filter(
+    return visibleApplications.filter(
       (application) => normalizeStatus(application.status) === statusFilter
     );
-  }, [applications, statusFilter]);
+  }, [statusFilter, visibleApplications]);
 
   const handleAttachmentDownload = async ({ bucket, path, fileName }) => {
     setFeedback({
@@ -166,12 +172,19 @@ export default function AdminTutorApplications() {
         status: normalizeStatus(updatedApplication.status),
       };
 
-      setApplications((current) =>
-        current.map((application) =>
-          application.id === normalizedApplication.id ? normalizedApplication : application
-        )
-      );
-      setActiveApplication(normalizedApplication);
+      if (isDashboardArchivedStatus(normalizedApplication.status)) {
+        setApplications((current) =>
+          current.filter((application) => application.id !== normalizedApplication.id)
+        );
+        setActiveApplication(null);
+      } else {
+        setApplications((current) =>
+          current.map((application) =>
+            application.id === normalizedApplication.id ? normalizedApplication : application
+          )
+        );
+        setActiveApplication(normalizedApplication);
+      }
       setFeedback({
         type: "success",
         message: `Tutor application marked as ${formatStatusLabel(statusDraft)}.`,
@@ -280,11 +293,11 @@ export default function AdminTutorApplications() {
               <h3 className="text-xl font-semibold">Unable to load tutor applications</h3>
               <p className="mt-4 leading-7">{error}</p>
             </div>
-          ) : applications.length === 0 ? (
+          ) : visibleApplications.length === 0 ? (
             <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
-              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No tutor applications yet</h3>
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No active tutor applications</h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Once someone applies to become a tutor, their application will appear here.
+                Completed tutor applications are hidden from the dashboard, but still remain available in Supabase.
               </p>
             </div>
           ) : filteredApplications.length === 0 ? (

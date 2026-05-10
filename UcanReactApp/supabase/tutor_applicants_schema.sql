@@ -24,7 +24,7 @@ create table if not exists public.tutor_applicants (
   attachment_notes text,
   attachment_files jsonb not null default '[]'::jsonb,
   status text not null default 'pending'
-    check (status in ('pending', 'reviewed', 'approved', 'rejected')),
+    check (status in ('pending', 'reviewed', 'approved', 'rejected', 'completed')),
   admin_notes text,
   submitted_at timestamptz not null default now(),
   reviewed_at timestamptz,

@@ -10,6 +10,7 @@ import {
 } from "../lib/tutoringApi";
 import {
   formatStatusLabel,
+  isDashboardArchivedStatus,
   normalizeStatus,
   TUTORING_STATUS_OPTIONS,
 } from "../lib/requestStatuses";
@@ -103,14 +104,20 @@ export default function TutorTutoringRequests() {
     setStatusDraft(normalizeStatus(activeRequest.status));
   }, [activeRequest]);
 
+  const visibleRequests = useMemo(
+    () => requests.filter((request) => !isDashboardArchivedStatus(request.status)),
+    [requests]
+  );
+
   const stats = useMemo(() => {
     return {
-      totalRequests: requests.length,
-      pendingRequests: requests.filter((request) => normalizeStatus(request.status) === "pending")
-        .length,
-      privateRequests: requests.filter((request) => request.session_type === "private").length,
+      totalRequests: visibleRequests.length,
+      pendingRequests: visibleRequests.filter(
+        (request) => normalizeStatus(request.status) === "pending"
+      ).length,
+      privateRequests: visibleRequests.filter((request) => request.session_type === "private").length,
     };
-  }, [requests]);
+  }, [visibleRequests]);
 
   const handleAttachmentDownload = async ({ bucket, path, fileName }) => {
     setFeedback({
@@ -160,10 +167,17 @@ export default function TutorTutoringRequests() {
         status: normalizeStatus(updatedRequest.status),
       };
 
-      setRequests((current) =>
-        current.map((request) => (request.id === mergedRequest.id ? mergedRequest : request))
-      );
-      setActiveRequest(mergedRequest);
+      if (isDashboardArchivedStatus(mergedRequest.status)) {
+        setRequests((current) =>
+          current.filter((request) => request.id !== mergedRequest.id)
+        );
+        setActiveRequest(null);
+      } else {
+        setRequests((current) =>
+          current.map((request) => (request.id === mergedRequest.id ? mergedRequest : request))
+        );
+        setActiveRequest(mergedRequest);
+      }
       setFeedback({
         type: "success",
         message: `Tutoring request marked as ${formatStatusLabel(statusDraft)}.`,
@@ -245,19 +259,19 @@ export default function TutorTutoringRequests() {
               <h3 className="text-xl font-semibold">Unable to load tutoring requests</h3>
               <p className="mt-4 leading-7">{error}</p>
             </div>
-          ) : requests.length === 0 ? (
+          ) : visibleRequests.length === 0 ? (
             <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
               <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
-                No tutoring requests yet
+                No active tutoring requests
               </h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                When students submit new requests for your tutoring sessions, they will appear
-                here.
+                Completed tutoring requests are hidden from the dashboard, but still remain stored
+                in Supabase.
               </p>
             </div>
           ) : (
             <div className="mt-8 grid gap-4">
-              {requests.map((request) => (
+              {visibleRequests.map((request) => (
                 <button
                   key={request.id}
                   type="button"

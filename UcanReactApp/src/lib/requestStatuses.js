@@ -5,6 +5,7 @@ export const TUTOR_APPLICATION_STATUS_OPTIONS = [
   "reviewed",
   "approved",
   "rejected",
+  "completed",
 ];
 
 export const TUTORING_STATUS_OPTIONS = [
@@ -32,4 +33,8 @@ export function formatStatusLabel(value) {
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+export function isDashboardArchivedStatus(value) {
+  return normalizeStatus(value) === "completed";
 }
