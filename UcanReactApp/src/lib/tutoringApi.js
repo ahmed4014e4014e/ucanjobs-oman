@@ -209,6 +209,12 @@ export async function fetchTutorTutoringRequests(tutorId) {
         attachment_files,
         status,
         created_at,
+        student:profiles!tutoring_requests_student_id_fkey (
+          id,
+          full_name,
+          email,
+          institute
+        ),
         course:courses!tutoring_requests_course_id_fkey (
           id,
           code,

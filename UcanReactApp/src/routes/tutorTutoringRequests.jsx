@@ -292,7 +292,11 @@ export default function TutorTutoringRequests() {
                         {getRequestHeading(request)}
                       </h3>
                       <p className="mt-2 text-sm text-[var(--oman-ink)]/70">
-                        Institute {request.institute_name_snapshot || "Not provided"}
+                        Student{" "}
+                        <span className="font-semibold">
+                          {request.student?.full_name || "Unknown student"}
+                        </span>{" "}
+                        via {request.student?.email || "No email"}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -306,6 +310,10 @@ export default function TutorTutoringRequests() {
                   </div>
 
                   <div className="mt-4 grid gap-2 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
+                    <p>
+                      <span className="font-semibold text-[var(--oman-ink)]">Student institute:</span>{" "}
+                      {request.institute_name_snapshot || request.student?.institute || "Not provided"}
+                    </p>
                     <p>
                       <span className="font-semibold text-[var(--oman-ink)]">Submitted:</span>{" "}
                       {formatSubmittedAt(request.created_at)}
@@ -347,8 +355,16 @@ export default function TutorTutoringRequests() {
 
             <div className="mt-6 grid gap-3 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">Institute:</span>{" "}
-                {activeRequest.institute_name_snapshot || "Not provided"}
+                <span className="font-semibold text-[var(--oman-ink)]">Student:</span>{" "}
+                {activeRequest.student?.full_name || "Unknown student"}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">Email:</span>{" "}
+                {activeRequest.student?.email || "No email"}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">Student institute:</span>{" "}
+                {activeRequest.institute_name_snapshot || activeRequest.student?.institute || "Not provided"}
               </p>
               <p>
                 <span className="font-semibold text-[var(--oman-ink)]">Session Type:</span>{" "}
