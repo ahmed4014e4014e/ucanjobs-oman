@@ -13,6 +13,7 @@ import {
   normalizeStatus,
   TUTORING_STATUS_OPTIONS,
 } from "../lib/requestStatuses";
+import { extractTutoringRequestTitle } from "../lib/tutoringRequestMeta";
 
 function formatSubmittedAt(value) {
   if (!value) {
@@ -121,6 +122,13 @@ export default function AdminTutoringRequests() {
 
     return visibleRequests.filter((request) => normalizeStatus(request.status) === statusFilter);
   }, [statusFilter, visibleRequests]);
+
+  const getRequestHeading = (request) => {
+    const courseCode = request.course?.code || "Course";
+    const requestTitle = extractTutoringRequestTitle(request);
+
+    return requestTitle ? `${courseCode} - ${requestTitle}` : courseCode;
+  };
 
   const handleAttachmentDownload = async ({ bucket, path, fileName }) => {
     setFeedback({
@@ -317,10 +325,7 @@ export default function AdminTutoringRequests() {
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <h3 className="text-lg font-semibold text-[var(--oman-ink)]">
-                        {request.course?.code || "Course"}{" "}
-                        <span className="text-[var(--oman-ink)]/60">
-                          - {request.course?.title || "Unknown title"}
-                        </span>
+                        {getRequestHeading(request)}
                       </h3>
                       <p className="mt-2 text-sm text-[var(--oman-ink)]/70">
                         Student{" "}
@@ -380,7 +385,7 @@ export default function AdminTutoringRequests() {
               Tutoring Request
             </p>
             <h2 className="oman-title-accent mt-4 pr-16 text-2xl font-semibold sm:text-3xl">
-              {activeRequest.course?.code || "Course"} - {activeRequest.course?.title || "Unknown title"}
+              {getRequestHeading(activeRequest)}
             </h2>
 
             <div className="mt-6 grid gap-3 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">

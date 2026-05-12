@@ -30,16 +30,16 @@ These items should be complete before inviting a limited group of real students 
 - [done] Admin dashboard is available
 - [done] Contact form submits to Supabase
 - [done] Tutoring requests submit to Supabase
-- [x] File attachments work in contact and tutoring flows
-- [x] Admin can review contact messages
-- [x] Admin can review tutoring requests
-- [x] Tutor can review assigned tutoring requests
-- [x] Platform policies page exists
-- [x] Required-field indicators are visible on important forms
-- [x] Mobile styling has been improved
+- [done] File attachments work in contact and tutoring flows
+- [done] Admin can review contact messages
+- [done] Admin can review tutoring requests
+- [done] Tutor can review assigned tutoring requests
+- [done] Platform policies page exists
+- [done] Required-field indicators are visible on important forms
+- [done] Mobile styling has been improved
 
 Recommended before pilot:
-- [ ] Test all login flows on at least 2 phones and 1 laptop
+- [done] Test all login flows on at least 2 phones and 1 laptop
 - [ ] Test student sign up with a real email confirmation
 - [ ] Test tutor application with real attachment uploads
 - [ ] Test admin review of uploaded files

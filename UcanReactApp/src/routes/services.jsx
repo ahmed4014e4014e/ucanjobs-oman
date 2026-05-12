@@ -831,7 +831,7 @@ export default function Services() {
                 </label>
 
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Student institute</RequiredLabel>
+                  <RequiredLabel>Student university name</RequiredLabel>
                   <input
                     type="text"
                     value={studentInstitute}
