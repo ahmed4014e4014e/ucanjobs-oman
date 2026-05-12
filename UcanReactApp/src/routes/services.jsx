@@ -380,6 +380,8 @@ export default function Services() {
   const [requestMessageType, setRequestMessageType] = useState("info");
   const location = useLocation();
   const canBook = Boolean(user?.id && profile?.role);
+  const studentAccountName = profile?.full_name || user?.user_metadata?.full_name || "Not available";
+  const studentAccountEmail = profile?.email || user?.email || "Not available";
 
   const instituteOptions = useMemo(() => {
     const instituteCodes = new Set();
@@ -818,6 +820,27 @@ export default function Services() {
                 <p className="text-sm leading-6 text-[var(--oman-ink)]/70">
                   Fields marked with <span className="font-semibold text-[var(--oman-terracotta)]">*</span> are required.
                 </p>
+
+                <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-4 text-sm leading-6 text-[var(--oman-ink)]/80 ring-1 ring-[rgba(111,49,29,0.1)]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
+                    Student account
+                  </p>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    <p>
+                      <span className="font-semibold text-[var(--oman-ink)]">Name:</span>{" "}
+                      {studentAccountName}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-[var(--oman-ink)]">Email:</span>{" "}
+                      {studentAccountEmail}
+                    </p>
+                  </div>
+                  <p className="mt-3 text-[var(--oman-ink)]/70">
+                    These details are pulled automatically from your logged-in student account and
+                    shown to the tutor with this request.
+                  </p>
+                </div>
+
                 <label className="flex flex-col gap-2">
                   <RequiredLabel>Title</RequiredLabel>
                   <input
