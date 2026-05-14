@@ -144,7 +144,17 @@ export default function AuthAccessPage({
     });
 
     if (error) {
-      showMessage("error", error.message);
+      const errorMessage = error.message || "";
+      const shouldSuggestSignup =
+        role === "student" &&
+        /invalid login credentials|invalid credentials|email not confirmed/i.test(errorMessage);
+
+      showMessage(
+        "error",
+        shouldSuggestSignup
+          ? "We could not find a student account with those login details. Please sign up first if you have not created an account yet."
+          : errorMessage
+      );
       setRoleCheckInProgress(false);
       setLoginLoading(false);
       return;
