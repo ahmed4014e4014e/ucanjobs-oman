@@ -12,6 +12,13 @@ const tutorActions = [
   },
 ];
 
+const requestInstructions = [
+  "Open the tutoring request.",
+  "Review the content of the request and study the attachments.",
+  "Contact the sender by email to arrange a tutoring session on Google Meet, and use a teaching tool like Microsoft Whiteboard.",
+  'Mark the tutoring request as "completed" or "cancelled" after the request is handled.',
+];
+
 export default function TutorDashboard() {
   const { user, profile } = useAuth();
   const name = profile?.full_name || user?.user_metadata?.full_name || "Tutor";
@@ -96,6 +103,27 @@ export default function TutorDashboard() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="mx-auto mt-8 max-w-6xl">
+        <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
+          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+            Tutoring Request Instructions
+          </p>
+          <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
+            How to handle student tutoring requests
+          </h2>
+          <ol className="mt-6 grid gap-4 md:grid-cols-2">
+            {requestInstructions.map((instruction, index) => (
+              <li key={instruction} className="rounded-3xl oman-outline-panel p-5">
+                <p className="oman-stat-number text-sm font-bold uppercase tracking-[0.16em]">
+                  Step {index + 1}
+                </p>
+                <p className="mt-3 leading-7 text-[var(--oman-ink)]/80">{instruction}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
     </main>
