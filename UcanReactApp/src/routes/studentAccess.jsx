@@ -11,6 +11,7 @@ export default function StudentAccess() {
       role="student"
       requireTermsAgreement
       collectSignupProfile={false}
+      enableGoogleAuth
       accessImage={middleEastCollegeImage}
       accessImageAlt="Middle East College campus in Oman"
     />

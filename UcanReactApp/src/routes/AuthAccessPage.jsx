@@ -19,6 +19,7 @@ export default function AuthAccessPage({
   signupPanel = null,
   requireTermsAgreement = false,
   collectSignupProfile = true,
+  enableGoogleAuth = false,
 }) {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
@@ -36,6 +37,7 @@ export default function AuthAccessPage({
   const [signupAcceptedTerms, setSignupAcceptedTerms] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [signupLoading, setSignupLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [roleCheckInProgress, setRoleCheckInProgress] = useState(false);
   const [message, setMessage] = useState("");
@@ -420,6 +422,53 @@ export default function AuthAccessPage({
     setSignupLoading(false);
   };
 
+  const handleGoogleAuth = async () => {
+    if (requireTermsAgreement && !signupAcceptedTerms) {
+      showMessage(
+        "error",
+        "Please read and agree to the Terms of Service before continuing with Google."
+      );
+      return;
+    }
+
+    if (!isSupabaseConfigured || !supabase) {
+      showMessage(
+        "error",
+        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+      );
+      return;
+    }
+
+    setGoogleLoading(true);
+    setMessage("");
+
+    try {
+      window.localStorage.setItem("ucan_pending_oauth_role", role);
+    } catch (_error) {
+      // If storage is unavailable, Supabase can still complete Google auth.
+    }
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}${getDashboardPath(role)}`,
+        queryParams: {
+          prompt: "select_account",
+        },
+      },
+    });
+
+    if (error) {
+      try {
+        window.localStorage.removeItem("ucan_pending_oauth_role");
+      } catch (_storageError) {
+        // Ignore storage access issues after a failed OAuth attempt.
+      }
+      showMessage("error", error.message);
+      setGoogleLoading(false);
+    }
+  };
+
   return (
     <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
       <section className="mx-auto max-w-5xl">
@@ -652,6 +701,23 @@ export default function AuthAccessPage({
                         .
                       </span>
                     </label>
+                  )}
+                  {enableGoogleAuth && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleGoogleAuth}
+                        disabled={googleLoading}
+                        className="inline-flex w-full items-center justify-center rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-6 py-3 text-center font-semibold text-[var(--oman-ink)] shadow-sm transition hover:bg-[rgba(244,232,214,0.32)] disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        {googleLoading ? "Opening Google..." : "Continue with Google"}
+                      </button>
+                      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--oman-ink)]/45">
+                        <span className="h-px flex-1 bg-[rgba(111,49,29,0.14)]" />
+                        <span>Or</span>
+                        <span className="h-px flex-1 bg-[rgba(111,49,29,0.14)]" />
+                      </div>
+                    </>
                   )}
                   <button
                     type="submit"

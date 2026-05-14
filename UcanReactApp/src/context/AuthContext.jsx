@@ -11,11 +11,27 @@ function createProfileSeed(authUser, fallbackRole = null) {
 
   return {
     id: authUser.id,
-    full_name: authUser.user_metadata?.full_name ?? null,
+    full_name: authUser.user_metadata?.full_name ?? authUser.user_metadata?.name ?? null,
     role: fallbackRole,
     institute: authUser.user_metadata?.institute ?? null,
     email: authUser.email ?? null,
   };
+}
+
+function getPendingOAuthRole() {
+  try {
+    return window.localStorage.getItem("ucan_pending_oauth_role");
+  } catch (_error) {
+    return null;
+  }
+}
+
+function clearPendingOAuthRole() {
+  try {
+    window.localStorage.removeItem("ucan_pending_oauth_role");
+  } catch (_error) {
+    // Ignore storage access issues. The profile row is already resolved by this point.
+  }
 }
 
 function withTimeout(promise, timeoutMs, timeoutMessage) {
@@ -60,7 +76,7 @@ export function AuthProvider({ children }) {
       return null;
     }
 
-    const seededRole = authUser.user_metadata?.role || null;
+    const seededRole = authUser.user_metadata?.role || getPendingOAuthRole() || null;
     const profileSeed = createProfileSeed(authUser, seededRole);
 
     const { data, error } = await withTimeout(
@@ -150,6 +166,7 @@ export function AuthProvider({ children }) {
       }
 
       setProfile(resolvedProfile);
+      clearPendingOAuthRole();
       setProfileError("");
       return resolvedProfile;
     } catch (error) {
