@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import {
   buildTutorCards,
   fetchTutorDirectory,
@@ -9,10 +10,22 @@ import { CONTACT_STATUS_OPTIONS, TUTORING_STATUS_OPTIONS } from "../lib/requestS
 import { themeImages } from "../lib/themeImages";
 import { isSupabaseConfigured } from "../lib/supabase";
 
+const adminToolTargets = [
+  "/admin-contact-messages/",
+  "/admin-tutor-applications/",
+  "/admin-tutoring-requests/",
+];
+
 export default function AdminDashboard() {
   const { user, profile } = useAuth();
-  const name = profile?.full_name || user?.user_metadata?.full_name || "Admin";
-  const institute = profile?.institute || user?.user_metadata?.institute || "Not set yet";
+  const { t } = useLanguage();
+  const copy = t("adminDashboard");
+  const name = profile?.full_name || user?.user_metadata?.full_name || copy.fallbackName;
+  const institute = profile?.institute || user?.user_metadata?.institute || copy.notSet;
+  const adminTools = copy.tools.map((item, index) => ({
+    ...item,
+    to: adminToolTargets[index],
+  }));
   const [directoryLoading, setDirectoryLoading] = useState(true);
   const [directoryError, setDirectoryError] = useState("");
   const [directoryDiagnostics, setDirectoryDiagnostics] = useState({
@@ -42,7 +55,7 @@ export default function AdminDashboard() {
           groupTutorCards: 0,
           visibleInstitutes: 0,
         });
-        setDirectoryError("Supabase is not configured.");
+        setDirectoryError(copy.supabaseNotConfigured);
         setDirectoryLoading(false);
         return;
       }
@@ -76,7 +89,7 @@ export default function AdminDashboard() {
             groupTutorCards: 0,
             visibleInstitutes: 0,
           });
-          setDirectoryError(fetchError.message || "Unable to load tutor directory diagnostics right now.");
+          setDirectoryError(fetchError.message || copy.diagnosticsError);
         }
       } finally {
         if (!ignore) {
@@ -90,7 +103,7 @@ export default function AdminDashboard() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [copy.diagnosticsError, copy.supabaseNotConfigured]);
 
   return (
     <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
@@ -102,14 +115,13 @@ export default function AdminDashboard() {
           <div className="grid items-center gap-6 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
               <p className="oman-kicker text-xs font-semibold uppercase sm:text-sm">
-                Admin Dashboard
+                {copy.heroKicker}
               </p>
               <h1 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-                Welcome, {name}
+                {copy.welcome.replace("{name}", name)}
               </h1>
               <p className="mt-5 max-w-3xl text-base leading-7 text-[#f4e8d6] sm:text-lg sm:leading-8">
-                This protected dashboard gives you a clean place to review contact form submissions,
-                tutoring requests, and the next stage of platform administration.
+                {copy.heroText}
               </p>
             </div>
             <div className="oman-card rounded-3xl p-4 text-[var(--oman-ink)]">
@@ -125,94 +137,68 @@ export default function AdminDashboard() {
         <div className="space-y-8">
           <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
             <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              Profile
+              {copy.profileKicker}
             </p>
             <div className="mt-6 space-y-4 text-[var(--oman-ink)]/80">
               <p>
-                <span className="font-semibold">Full name:</span> {name}
+                <span className="font-semibold">{copy.labels.fullName}</span> {name}
               </p>
               <p>
-                <span className="font-semibold">Email:</span> {user?.email || "Not set"}
+                <span className="font-semibold">{copy.labels.email}</span> {user?.email || copy.notSet}
               </p>
               <p>
-                <span className="font-semibold">Institute:</span> {institute}
+                <span className="font-semibold">{copy.labels.institute}</span> {institute}
               </p>
               <p>
-                <span className="font-semibold">Role:</span> Admin
+                <span className="font-semibold">{copy.labels.role}</span> {copy.role}
               </p>
             </div>
           </div>
 
           <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
             <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              Admin Tools
+              {copy.toolsKicker}
             </p>
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
-              <article className="rounded-3xl oman-outline-panel p-5">
-                <h2 className="text-lg font-semibold text-[var(--oman-ink)]">Submitted Contact Messages</h2>
-                <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
-                  Open a separate admin page to review contact submissions and download any attached files.
-                </p>
-                <Link
-                  to="/admin-contact-messages/"
-                  className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
-                >
-                  View Contact Messages
-                </Link>
-              </article>
-
-              <article className="rounded-3xl oman-outline-panel p-5">
-                <h2 className="text-lg font-semibold text-[var(--oman-ink)]">Tutor Applications</h2>
-                <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
-                  Open a separate admin page to review people applying to become tutors and check their verification documents.
-                </p>
-                <Link
-                  to="/admin-tutor-applications/"
-                  className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
-                >
-                  View Tutor Applications
-                </Link>
-              </article>
-
-              <article className="rounded-3xl oman-outline-panel p-5">
-                <h2 className="text-lg font-semibold text-[var(--oman-ink)]">Submitted Tutoring Requests</h2>
-                <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
-                  Open a separate admin page to review tutoring requests and download any submitted attachments.
-                </p>
-                <Link
-                  to="/admin-tutoring-requests/"
-                  className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
-                >
-                  View Tutoring Requests
-                </Link>
-              </article>
+              {adminTools.map((tool) => (
+                <article key={tool.title} className="rounded-3xl oman-outline-panel p-5">
+                  <h2 className="text-lg font-semibold text-[var(--oman-ink)]">{tool.title}</h2>
+                  <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
+                    {tool.description}
+                  </p>
+                  <Link
+                    to={tool.to}
+                    className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+                  >
+                    {tool.action}
+                  </Link>
+                </article>
+              ))}
 
               <article className="rounded-3xl oman-outline-panel p-5 lg:col-span-2">
-                <h2 className="text-lg font-semibold text-[var(--oman-ink)]">Simple Admin Workflow</h2>
+                <h2 className="text-lg font-semibold text-[var(--oman-ink)]">{copy.workflowTitle}</h2>
                 <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
-                  Use the same status flow for contact messages and tutoring requests so nothing gets lost.
+                  {copy.workflowText}
                 </p>
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
                   <div className="rounded-2xl bg-[rgba(255,252,247,0.92)] px-4 py-4 ring-1 ring-[rgba(111,49,29,0.1)]">
                     <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
-                      Contact Messages
+                      {copy.contactWorkflowTitle}
                     </p>
                     <ol className="mt-3 space-y-2 text-sm leading-6 text-[var(--oman-ink)]/80">
-                      <li>1. Open pending messages first.</li>
-                      <li>2. Mark as reviewed after reading and deciding the next step.</li>
-                      <li>3. Mark as scheduled if follow-up is arranged.</li>
-                      <li>4. Mark as completed once the issue is fully handled.</li>
+                      {copy.contactWorkflow.map((step) => (
+                        <li key={step}>{step}</li>
+                      ))}
                     </ol>
                   </div>
                   <div className="rounded-2xl bg-[rgba(255,252,247,0.92)] px-4 py-4 ring-1 ring-[rgba(111,49,29,0.1)]">
                     <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
-                      Tutoring Requests
+                      {copy.tutoringWorkflowTitle}
                     </p>
                     <ol className="mt-3 space-y-2 text-sm leading-6 text-[var(--oman-ink)]/80">
-                      <li>1. Review new student requests and attachments.</li>
-                      <li>2. Move to reviewed after checking the course/topic details.</li>
-                      <li>3. Use scheduled once the session is arranged.</li>
-                      <li>4. Mark completed or cancelled when the workflow ends.</li>
+                      {copy.tutoringWorkflow.map((step) => (
+                        <li key={step}>{step}</li>
+                      ))}
                     </ol>
                   </div>
                 </div>
@@ -229,46 +215,46 @@ export default function AdminDashboard() {
               </article>
 
               <article className="rounded-3xl oman-outline-panel p-5 lg:col-span-2">
-                <h2 className="text-lg font-semibold text-[var(--oman-ink)]">Tutor Directory Diagnostics</h2>
+                <h2 className="text-lg font-semibold text-[var(--oman-ink)]">{copy.diagnosticsTitle}</h2>
                 <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
-                  Internal status for the Services directory so you can troubleshoot offerings without showing debug data to public users.
+                  {copy.diagnosticsText}
                 </p>
                 {noDirectoryData && (
                   <div className="mt-5 rounded-2xl border border-[rgba(197,154,68,0.24)] bg-[rgba(255,244,222,0.78)] px-4 py-4 text-sm leading-6 text-[var(--oman-terracotta-dark)]">
-                    <p className="font-semibold">No tutor directory data yet</p>
+                    <p className="font-semibold">{copy.noDataTitle}</p>
                     <p className="mt-1">
-                      Supabase is connected, but no active tutor offerings are available to report yet.
+                      {copy.noDataText}
                     </p>
                   </div>
                 )}
                 <div className="mt-5 grid gap-2 text-sm leading-6 text-[var(--oman-ink)]/80 sm:grid-cols-2 lg:grid-cols-3">
                   <p>
-                    <span className="font-semibold">Supabase configured:</span>{" "}
-                    {isSupabaseConfigured ? "Yes" : "No"}
+                    <span className="font-semibold">{copy.diagnosticLabels.configured}</span>{" "}
+                    {isSupabaseConfigured ? copy.yes : copy.no}
                   </p>
                   <p>
-                    <span className="font-semibold">Loading:</span>{" "}
-                    {directoryLoading ? "Yes" : "No"}
+                    <span className="font-semibold">{copy.diagnosticLabels.loading}</span>{" "}
+                    {directoryLoading ? copy.yes : copy.no}
                   </p>
                   <p>
-                    <span className="font-semibold">Raw offerings:</span>{" "}
+                    <span className="font-semibold">{copy.diagnosticLabels.raw}</span>{" "}
                     {directoryDiagnostics.rawOfferingCount}
                   </p>
                   <p>
-                    <span className="font-semibold">Private tutor cards:</span>{" "}
+                    <span className="font-semibold">{copy.diagnosticLabels.privateCards}</span>{" "}
                     {directoryDiagnostics.privateTutorCards}
                   </p>
                   <p>
-                    <span className="font-semibold">Group tutor cards:</span>{" "}
+                    <span className="font-semibold">{copy.diagnosticLabels.groupCards}</span>{" "}
                     {directoryDiagnostics.groupTutorCards}
                   </p>
                   <p>
-                    <span className="font-semibold">Visible institutes:</span>{" "}
+                    <span className="font-semibold">{copy.diagnosticLabels.institutes}</span>{" "}
                     {directoryDiagnostics.visibleInstitutes}
                   </p>
                   <p className="sm:col-span-2 lg:col-span-3">
-                    <span className="font-semibold">Directory error:</span>{" "}
-                    {directoryError || "None"}
+                    <span className="font-semibold">{copy.diagnosticLabels.error}</span>{" "}
+                    {directoryError || copy.none}
                   </p>
                 </div>
               </article>

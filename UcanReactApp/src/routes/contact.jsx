@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ActionFeedback from "../components/ActionFeedback";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import { createContactMessage, uploadContactAttachments } from "../lib/contactApi";
 import {
   ACCEPTED_UPLOAD_ATTRIBUTE,
@@ -10,19 +11,6 @@ import {
 } from "../lib/fileUploadRules";
 import { isSupabaseConfigured } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
-
-const contactMethods = [
-  {
-    title: "Email",
-    value: "20258971@mcbs.edu.om",
-    description: "Reach out with questions about tutoring, study resources, or joining the Ucan Oman student community.",
-  },
-  {
-    title: "Location",
-    value: "Qurum Beach, Muscat, Oman",
-    description: "Ucan Oman serves students online while supporting a growing college learning community from Oman.",
-  },
-];
 
 function RequiredLabel({ children }) {
   return (
@@ -34,6 +22,12 @@ function RequiredLabel({ children }) {
 
 export default function Contact() {
   const { user, profile } = useAuth();
+  const { t } = useLanguage();
+  const contactMethods = t("contact.methods");
+  const acceptedFilesText = t("common.acceptedFiles")
+    .replace("{types}", ACCEPTED_UPLOAD_TYPES.join(", "))
+    .replace("{size}", FILE_SIZE_LIMIT_MB);
+  const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
   const [formValues, setFormValues] = useState({
     fullName: profile?.full_name || user?.user_metadata?.full_name || "",
     email: profile?.email || user?.email || "",
@@ -81,7 +75,7 @@ export default function Contact() {
       setSubmitState({
         loading: false,
         type: "error",
-        message: "Supabase is not configured yet, so the contact form cannot submit right now.",
+        message: t("contact.notConfigured"),
       });
       return;
     }
@@ -109,7 +103,7 @@ export default function Contact() {
       setSubmitState({
         loading: false,
         type: "success",
-        message: "Your message was submitted successfully. We will review it through Supabase.",
+        message: t("contact.success"),
       });
       setFormValues((current) => ({
         ...current,
@@ -122,7 +116,7 @@ export default function Contact() {
       setSubmitState({
         loading: false,
         type: "error",
-        message: error.message || "We could not submit your message right now.",
+        message: error.message || t("contact.error"),
       });
     }
   };
@@ -137,14 +131,13 @@ export default function Contact() {
           <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
             <div className="text-center lg:text-left">
               <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-                Contact Ucan Oman
+                {t("contact.heroKicker")}
               </p>
               <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:mx-0 lg:text-5xl">
-                Reach a support platform that feels welcoming, local, and student-centered.
+                {t("contact.heroTitle")}
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#f4e8d6] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
-                Whether you want help finding tutoring, study resources, or the
-                right course community, here are the best ways to reach Ucan Oman.
+                {t("contact.heroText")}
               </p>
             </div>
 
@@ -156,7 +149,7 @@ export default function Contact() {
                 />
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
-                We want the platform to feel as dependable and recognizable as the landmarks that shape Oman’s identity.
+                {t("contact.heroCardText")}
               </p>
             </div>
           </div>
@@ -168,24 +161,23 @@ export default function Contact() {
           <div>
             <div className="max-w-2xl text-center lg:text-left">
               <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                Contact Form
+                {t("contact.formKicker")}
               </p>
               <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-                Send your message directly to Ucan Oman.
+                {t("contact.formTitle")}
               </h2>
               <p className="mt-4 text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
-                Fill in the form below and your message will be saved in Supabase so the team can
-                review it properly.
+                {t("contact.formText")}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="mt-10 rounded-[1.75rem] oman-card p-6 sm:mt-12 sm:p-8">
               <p className="mb-5 text-sm leading-6 text-[var(--oman-ink)]/70">
-                Fields marked with <span className="font-semibold text-[var(--oman-terracotta)]">*</span> are required.
+                {t("common.fieldsRequired")}
               </p>
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Full name</RequiredLabel>
+                  <RequiredLabel>{t("contact.labels.fullName")}</RequiredLabel>
                   <input
                     type="text"
                     name="fullName"
@@ -197,7 +189,7 @@ export default function Contact() {
                 </label>
 
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Email</RequiredLabel>
+                  <RequiredLabel>{t("contact.labels.email")}</RequiredLabel>
                   <input
                     type="email"
                     name="email"
@@ -211,20 +203,20 @@ export default function Contact() {
 
               <div className="mt-4 grid gap-4">
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Institute</RequiredLabel>
+                  <RequiredLabel>{t("contact.labels.institute")}</RequiredLabel>
                   <input
                     type="text"
                     name="institute"
                     value={formValues.institute}
                     onChange={handleChange}
-                    placeholder="Example: MCBS"
+                    placeholder={t("contact.placeholders.institute")}
                     required
                     className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
                   />
                 </label>
 
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Role</RequiredLabel>
+                  <RequiredLabel>{t("contact.labels.role")}</RequiredLabel>
                   <select
                     name="role"
                     value={formValues.role}
@@ -232,54 +224,54 @@ export default function Contact() {
                     required
                     className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
                   >
-                    <option value="">Select your role</option>
-                    <option value="student">Student</option>
-                    <option value="tutor">Tutor</option>
+                    <option value="">{t("contact.placeholders.role")}</option>
+                    <option value="student">{t("contact.roleStudent")}</option>
+                    <option value="tutor">{t("contact.roleTutor")}</option>
                   </select>
                 </label>
 
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Subject</RequiredLabel>
+                  <RequiredLabel>{t("contact.labels.subject")}</RequiredLabel>
                   <input
                     type="text"
                     name="subject"
                     value={formValues.subject}
                     onChange={handleChange}
                     required
-                    placeholder="How can we help you?"
+                    placeholder={t("contact.placeholders.subject")}
                     className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
                   />
                 </label>
 
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Message</RequiredLabel>
+                  <RequiredLabel>{t("contact.labels.message")}</RequiredLabel>
                   <textarea
                     name="message"
                     value={formValues.message}
                     onChange={handleChange}
                     rows={6}
                     required
-                    placeholder="Write your message here..."
+                    placeholder={t("contact.placeholders.message")}
                     className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
                   />
                 </label>
 
                 <label className="flex flex-col gap-2">
                   <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                    Attachment Notes
+                    {t("contact.labels.attachmentNotes")}
                   </span>
                   <textarea
                     value={attachmentNotes}
                     onChange={(event) => setAttachmentNotes(event.target.value)}
                     rows={3}
-                    placeholder="Optional: add a short note about the files you attached."
+                    placeholder={t("contact.placeholders.attachmentNotes")}
                     className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
                   />
                 </label>
 
                 <label className="flex flex-col gap-2">
                   <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                    Attach Files
+                    {t("contact.labels.attachFiles")}
                   </span>
                   <input
                     type="file"
@@ -289,8 +281,7 @@ export default function Contact() {
                     className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-sm text-[var(--oman-ink)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-[rgba(197,154,68,0.16)] file:px-4 file:py-2 file:font-semibold file:text-[var(--oman-terracotta-dark)] hover:file:bg-[rgba(197,154,68,0.24)]"
                   />
                   <p className="text-sm leading-6 text-[var(--oman-ink)]/70">
-                    Accepted files: {ACCEPTED_UPLOAD_TYPES.join(", ")}. Maximum size:{" "}
-                    {FILE_SIZE_LIMIT_MB} MB per file.
+                    {acceptedFilesText}
                   </p>
                   {selectedFiles.length > 0 && (
                     <div className="flex flex-wrap gap-2 pt-1">
@@ -310,7 +301,7 @@ export default function Contact() {
               <ActionFeedback
                 type={submitState.type}
                 message={submitState.message}
-                title="Contact form update"
+                title={t("contact.feedbackTitle")}
                 className="mt-5"
               />
 
@@ -319,7 +310,7 @@ export default function Contact() {
                 disabled={submitState.loading}
                 className="oman-button-primary mt-6 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
               >
-                {submitState.loading ? "Submitting..." : "Submit Contact Form"}
+                {submitState.loading ? t("contact.submitting") : t("contact.submit")}
               </button>
             </form>
           </div>
@@ -327,10 +318,10 @@ export default function Contact() {
           <div>
             <div className="max-w-2xl text-center lg:text-left">
               <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                Other Ways to Reach Us
+                {t("contact.methodsKicker")}
               </p>
               <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-                Clear ways to connect with the Ucan Oman team.
+                {t("contact.methodsTitle")}
               </h2>
             </div>
 
@@ -353,14 +344,13 @@ export default function Contact() {
         <div className="grid items-center gap-6 rounded-[1.75rem] oman-dark-panel px-6 py-10 text-white sm:px-8 sm:py-12 lg:grid-cols-[1fr_0.88fr]">
           <div className="text-center lg:text-left">
             <p className="oman-kicker text-xs font-semibold uppercase sm:text-sm">
-              We Are Here to Help
+              {t("contact.ctaKicker")}
             </p>
             <h2 className="mt-4 text-2xl font-semibold sm:text-3xl">
-              Reach out whenever you need better support for your college courses.
+              {t("contact.ctaTitle")}
             </h2>
             <p className="mt-6 max-w-3xl text-base leading-7 text-[#eadfcf] sm:text-lg sm:leading-8">
-              Ucan Oman is here to help students connect with free tutoring,
-              stronger learning resources, and course communities that make studying easier.
+              {t("contact.ctaText")}
             </p>
           </div>
           <div className="oman-photo-frame aspect-[5/4]">
@@ -373,7 +363,7 @@ export default function Contact() {
       </section>
 
       <footer className="border-t border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.9)] px-4 py-8 text-center text-sm text-[var(--oman-ink)]/70 sm:px-6">
-        Copyright {new Date().getFullYear()} Ucan Oman. Free learning support for everyone.
+        {footerText}
       </footer>
     </main>
   );

@@ -1,28 +1,25 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import { themeImages } from "../lib/themeImages";
 
-const tutorActions = [
+const tutorActionTargets = [
   {
-    title: "Submitted Tutoring Requests",
-    description:
-      "Open a separate tutor page to review your assigned requests, update their status, and download attached files.",
     to: "/tutor-tutoring-requests/",
-    action: "View Tutoring Requests",
   },
-];
-
-const requestInstructions = [
-  "Open the tutoring request.",
-  "Review the content of the request and study the attachments.",
-  "Contact the sender by email to arrange a tutoring session on Google Meet, and use a teaching tool like Microsoft Whiteboard.",
-  'Mark the tutoring request as "completed" or "cancelled" after the request is handled.',
 ];
 
 export default function TutorDashboard() {
   const { user, profile } = useAuth();
-  const name = profile?.full_name || user?.user_metadata?.full_name || "Tutor";
-  const institute = profile?.institute || user?.user_metadata?.institute || "Not set yet";
+  const { t } = useLanguage();
+  const copy = t("tutorDashboard");
+  const name = profile?.full_name || user?.user_metadata?.full_name || copy.fallbackName;
+  const institute = profile?.institute || user?.user_metadata?.institute || copy.notSet;
+  const tutorActions = copy.actions.map((item, index) => ({
+    ...item,
+    to: tutorActionTargets[index]?.to || "/",
+  }));
+  const requestInstructions = copy.instructions;
 
   return (
     <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
@@ -34,14 +31,13 @@ export default function TutorDashboard() {
           <div className="grid items-center gap-6 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
               <p className="oman-kicker text-xs font-semibold uppercase sm:text-sm">
-                Tutor Dashboard
+                {copy.heroKicker}
               </p>
               <h1 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-                Welcome, {name}
+                {copy.welcome.replace("{name}", name)}
               </h1>
               <p className="mt-5 max-w-3xl text-base leading-7 text-[#f4e8d6] sm:text-lg sm:leading-8">
-                This protected dashboard gives you a clean place to manage your tutoring request
-                workflow, review how your tutoring appears, and coordinate platform updates.
+                {copy.heroText}
               </p>
             </div>
             <div className="oman-card rounded-3xl p-4 text-[var(--oman-ink)]">
@@ -56,35 +52,35 @@ export default function TutorDashboard() {
       <section className="mx-auto mt-10 grid max-w-6xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Profile
+            {copy.profileKicker}
           </p>
           <div className="mt-6 space-y-4 text-[var(--oman-ink)]/80">
             <p>
-              <span className="font-semibold">Full name:</span> {name}
+              <span className="font-semibold">{copy.labels.fullName}</span> {name}
             </p>
             <p>
-              <span className="font-semibold">Email:</span> {user?.email || "Not set"}
+              <span className="font-semibold">{copy.labels.email}</span> {user?.email || copy.notSet}
             </p>
             <p>
-              <span className="font-semibold">Institute:</span> {institute}
+              <span className="font-semibold">{copy.labels.institute}</span> {institute}
             </p>
             <p>
-              <span className="font-semibold">Role:</span> Tutor
+              <span className="font-semibold">{copy.labels.role}</span> {copy.role}
             </p>
           </div>
         </div>
 
         <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Tutor Actions
+            {copy.actionsKicker}
           </p>
           {tutorActions.length === 0 ? (
             <div className="mt-6 rounded-3xl oman-outline-panel p-6 text-center">
               <h2 className="text-lg font-semibold text-[var(--oman-ink)]">
-                No tutor actions available yet
+                {copy.emptyTitle}
               </h2>
               <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
-                Tutor tools will appear here as your dashboard expands.
+                {copy.emptyText}
               </p>
             </div>
           ) : (
@@ -109,16 +105,16 @@ export default function TutorDashboard() {
       <section className="mx-auto mt-8 max-w-6xl">
         <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Tutoring Request Instructions
+            {copy.instructionsKicker}
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
-            How to handle student tutoring requests
+            {copy.instructionsTitle}
           </h2>
           <ol className="mt-6 grid gap-4 md:grid-cols-2">
             {requestInstructions.map((instruction, index) => (
               <li key={instruction} className="rounded-3xl oman-outline-panel p-5">
                 <p className="oman-stat-number text-sm font-bold uppercase tracking-[0.16em]">
-                  Step {index + 1}
+                  {copy.step.replace("{number}", index + 1)}
                 </p>
                 <p className="mt-3 leading-7 text-[var(--oman-ink)]/80">{instruction}</p>
               </li>

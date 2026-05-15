@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ActionFeedback from "../components/ActionFeedback";
 import PasswordField from "../components/PasswordField";
+import { useLanguage } from "../context/LanguageContext";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const copy = t("resetPasswordPage");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -26,23 +29,23 @@ export default function ResetPassword() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
-        showMessage("success", "Enter your new password below to complete the reset.");
+        showMessage("success", copy.recoveryPrompt);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [copy.recoveryPrompt]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!isSupabaseConfigured || !supabase) {
-      showMessage("error", "Supabase is not configured yet.");
+      showMessage("error", copy.supabaseMissing);
       return;
     }
 
     if (password.length < 6) {
-      showMessage("error", "Your new password must be at least 6 characters.");
+      showMessage("error", copy.shortPassword);
       return;
     }
 
@@ -57,7 +60,7 @@ export default function ResetPassword() {
       return;
     }
 
-    showMessage("success", "Your password was updated successfully. You can now log in.");
+    showMessage("success", copy.success);
     setPassword("");
     setLoading(false);
 
@@ -74,36 +77,36 @@ export default function ResetPassword() {
           style={{ backgroundImage: `url(${themeImages.studentsGroup})` }}
         >
           <p className="oman-kicker text-xs font-semibold uppercase sm:text-sm">
-            Password Reset
+            {copy.heroKicker}
           </p>
           <h1 className="mt-4 max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-            Create a new password for your Ucan Oman account.
+            {copy.heroTitle}
           </h1>
           <p className="mt-5 max-w-3xl text-base leading-7 text-[#f4e8d6] sm:text-lg sm:leading-8">
-            Use this page after opening the Supabase password recovery email.
+            {copy.heroText}
           </p>
         </div>
       </section>
 
       <section className="mx-auto mt-10 max-w-2xl rounded-[1.75rem] oman-card p-6 sm:p-8">
         <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-          New Password
+          {copy.formKicker}
         </p>
         <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
-          Reset your password
+          {copy.formTitle}
         </h2>
 
         <ActionFeedback
           type={messageType}
           message={message}
-          title="Password reset update"
+          title={copy.feedbackTitle}
           className="mt-6 rounded-3xl px-5 py-4"
         />
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
           <PasswordField
-            label="New Password"
-            placeholder="Enter your new password"
+            label={copy.label}
+            placeholder={copy.placeholder}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
@@ -114,7 +117,7 @@ export default function ResetPassword() {
             disabled={loading}
             className="oman-button-primary inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? "Updating Password..." : "Update Password"}
+            {loading ? copy.updating : copy.update}
           </button>
         </form>
 
@@ -122,7 +125,7 @@ export default function ResetPassword() {
           to="/admin-access/"
           className="oman-button-secondary mt-4 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition"
         >
-          Back to Login
+          {copy.back}
         </Link>
       </section>
     </main>

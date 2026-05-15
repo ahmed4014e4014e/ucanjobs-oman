@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import ActionFeedback from "../components/ActionFeedback";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import {
   ACCEPTED_UPLOAD_ATTRIBUTE,
   ACCEPTED_UPLOAD_TYPES,
@@ -15,11 +16,12 @@ import {
 } from "../lib/tutorApplicantsApi";
 import { themeImages } from "../lib/themeImages";
 
-const requiredAttachments = [
-  "Academic transcript proving a minimum grade of B+ in the selected course(s) to tutor in",
-  "Copy of your Omani ID card",
-  "Copy of your university ID card",
-];
+function formatCopy(template, values) {
+  return Object.entries(values).reduce(
+    (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+    template
+  );
+}
 
 function RequiredLabel({ children }) {
   return (
@@ -31,6 +33,12 @@ function RequiredLabel({ children }) {
 
 export default function TutorApplication() {
   const { user } = useAuth();
+  const { t } = useLanguage();
+  const copy = t("tutorApplicationPage");
+  const requiredAttachments = copy.attachments;
+  const acceptedFilesText = t("common.acceptedFiles")
+    .replace("{types}", ACCEPTED_UPLOAD_TYPES.join(", "))
+    .replace("{size}", FILE_SIZE_LIMIT_MB);
   const [formValues, setFormValues] = useState({
     fullName: "",
     universityName: "",
@@ -79,7 +87,7 @@ export default function TutorApplication() {
       setSubmitState({
         loading: false,
         type: "error",
-        message: "Please read and agree to the Ucan Oman Platform Policies before submitting your tutor application.",
+        message: copy.messages.terms,
       });
       return;
     }
@@ -88,7 +96,7 @@ export default function TutorApplication() {
       setSubmitState({
         loading: false,
         type: "error",
-        message: "Supabase is not configured yet, so the tutor application cannot submit right now.",
+        message: copy.messages.notConfigured,
       });
       return;
     }
@@ -97,7 +105,7 @@ export default function TutorApplication() {
       setSubmitState({
         loading: false,
         type: "error",
-        message: "Please attach the required supporting documents before submitting your tutor application.",
+        message: copy.messages.files,
       });
       return;
     }
@@ -121,9 +129,9 @@ export default function TutorApplication() {
         university_email: formValues.universityEmail.trim(),
         phone_number: formValues.phoneNumber.trim(),
         application_message: [
-          `Tutor application submitted by ${formValues.fullName.trim()}.`,
-          `University: ${formValues.universityName.trim()}`,
-          `Desired tutoring courses: ${formValues.desiredTutoringCourses.trim()}`,
+          formatCopy(copy.messages.applicationSubmittedBy, { name: formValues.fullName.trim() }),
+          formatCopy(copy.messages.university, { university: formValues.universityName.trim() }),
+          formatCopy(copy.messages.desired, { courses: formValues.desiredTutoringCourses.trim() }),
         ].join("\n"),
         attachment_notes: requiredAttachments.join("\n"),
         attachment_files: uploadedFiles,
@@ -133,7 +141,7 @@ export default function TutorApplication() {
         loading: false,
         type: "success",
         message:
-          "Your tutor application was submitted successfully. The Ucan Oman team can now review your form and attachments. You will recieve a reply in less than 24 hours",
+          copy.messages.success,
       });
       setFormValues({
         fullName: "",
@@ -149,7 +157,7 @@ export default function TutorApplication() {
       setSubmitState({
         loading: false,
         type: "error",
-        message: error.message || "We could not submit your tutor application right now.",
+        message: error.message || copy.messages.error,
       });
     }
   };
@@ -164,14 +172,13 @@ export default function TutorApplication() {
           <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
             <div className="text-center lg:text-left">
               <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-                Tutor Application
+                {copy.heroKicker}
               </p>
               <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:mx-0 lg:text-5xl">
-                Apply separately before joining the Ucan Oman tutor team.
+                {copy.heroTitle}
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#f4e8d6] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
-                Complete this form with your university details, tutoring courses, and supporting
-                documents so the platform can review your tutor application properly.
+                {copy.heroText}
               </p>
             </div>
 
@@ -183,8 +190,7 @@ export default function TutorApplication() {
                 />
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
-                Tutor applications are reviewed using your academic information and required
-                supporting documents.
+                {copy.heroCardText}
               </p>
             </div>
           </div>
@@ -196,33 +202,33 @@ export default function TutorApplication() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                Application Form
+                {copy.formKicker}
               </p>
               <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-                Submit your tutor application
+                {copy.formTitle}
               </h2>
             </div>
             <Link
               to="/tutor-access/"
               className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
             >
-              Back to Tutor Access
+              {copy.back}
             </Link>
           </div>
 
           <ActionFeedback
             type={submitState.type}
             message={submitState.message}
-            title="Tutor application update"
+            title={copy.feedbackTitle}
             className="mt-6"
           />
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-4">
             <p className="text-sm leading-6 text-[var(--oman-ink)]/70">
-              Fields marked with <span className="font-semibold text-[var(--oman-terracotta)]">*</span> are required.
+              {t("common.fieldsRequired")}
             </p>
             <label className="flex flex-col gap-2">
-              <RequiredLabel>Full name</RequiredLabel>
+              <RequiredLabel>{copy.fullName}</RequiredLabel>
               <input
                 type="text"
                 name="fullName"
@@ -234,7 +240,7 @@ export default function TutorApplication() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <RequiredLabel>University Name</RequiredLabel>
+              <RequiredLabel>{copy.universityName}</RequiredLabel>
               <input
                 type="text"
                 name="universityName"
@@ -246,7 +252,7 @@ export default function TutorApplication() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <RequiredLabel>University ID</RequiredLabel>
+              <RequiredLabel>{copy.universityId}</RequiredLabel>
               <input
                 type="text"
                 name="universityId"
@@ -258,7 +264,7 @@ export default function TutorApplication() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <RequiredLabel>Major Name</RequiredLabel>
+              <RequiredLabel>{copy.majorName}</RequiredLabel>
               <input
                 type="text"
                 name="majorName"
@@ -270,9 +276,9 @@ export default function TutorApplication() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <RequiredLabel>Desired Tutoring Courses</RequiredLabel>
+              <RequiredLabel>{copy.desiredCourses}</RequiredLabel>
               <p className="text-sm leading-6 text-[var(--oman-ink)]/70">
-                Please highlight course code (for example: CPT 220)
+                {copy.courseNote}
               </p>
               <textarea
                 name="desiredTutoringCourses"
@@ -280,13 +286,13 @@ export default function TutorApplication() {
                 onChange={handleChange}
                 rows={4}
                 required
-                placeholder="List the courses you want to become a tutor in."
+                placeholder={copy.coursePlaceholder}
                 className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
               />
             </label>
 
             <label className="flex flex-col gap-2">
-              <RequiredLabel>University Email</RequiredLabel>
+              <RequiredLabel>{copy.universityEmail}</RequiredLabel>
               <input
                 type="email"
                 name="universityEmail"
@@ -298,7 +304,7 @@ export default function TutorApplication() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <RequiredLabel>Phone number (WhatsApp)</RequiredLabel>
+              <RequiredLabel>{copy.phoneNumber}</RequiredLabel>
               <input
                 type="text"
                 name="phoneNumber"
@@ -311,7 +317,7 @@ export default function TutorApplication() {
 
             <div className="rounded-2xl bg-[rgba(244,232,214,0.34)] px-4 py-4 text-[var(--oman-ink)]">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
-                Required Attachments
+                {copy.requiredAttachments}
               </p>
               <ol className="mt-3 space-y-2 text-sm leading-6 text-[var(--oman-ink)]/80">
                 {requiredAttachments.map((item, index) => (
@@ -323,7 +329,7 @@ export default function TutorApplication() {
             </div>
 
             <label className="flex flex-col gap-2">
-              <RequiredLabel>Attach files</RequiredLabel>
+              <RequiredLabel>{copy.attachFiles}</RequiredLabel>
               <input
                 type="file"
                 multiple
@@ -333,8 +339,7 @@ export default function TutorApplication() {
                 className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-sm text-[var(--oman-ink)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-[rgba(197,154,68,0.16)] file:px-4 file:py-2 file:font-semibold file:text-[var(--oman-terracotta-dark)] hover:file:bg-[rgba(197,154,68,0.24)]"
               />
               <p className="text-sm leading-6 text-[var(--oman-ink)]/70">
-                Accepted files: {ACCEPTED_UPLOAD_TYPES.join(", ")}. Maximum size:{" "}
-                {FILE_SIZE_LIMIT_MB} MB per file.
+                {acceptedFilesText}
               </p>
               {selectedFiles.length > 0 && (
                 <div className="flex flex-wrap gap-2 pt-1">
@@ -359,14 +364,14 @@ export default function TutorApplication() {
                 required
               />
               <span>
-                I have read and agree to the{" "}
+                {copy.termsPrefix}{" "}
                 <Link
                   to="/terms/"
                   target="_blank"
                   rel="noreferrer"
                   className="font-semibold text-[var(--oman-terracotta)] underline"
                 >
-                  Ucan Oman Platform Policies
+                  {copy.termsLink}
                 </Link>
                 .
               </span>
@@ -377,7 +382,7 @@ export default function TutorApplication() {
               disabled={submitState.loading}
               className="oman-button-primary mt-2 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {submitState.loading ? "Submitting Application..." : "Submit Tutor Application"}
+              {submitState.loading ? copy.submitting : copy.submit}
             </button>
           </form>
         </div>

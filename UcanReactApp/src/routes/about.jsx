@@ -1,31 +1,13 @@
+import { useLanguage } from "../context/LanguageContext";
 import { themeImages } from "../lib/themeImages";
 import founderPhoto from "../assets/founder/ahmed-founder-optimized.jpg";
 
-const values = [
-  {
-    title: "Free Access",
-    description:
-      "Everything on Ucan Oman is designed to be free of charge so every student can reach support more easily.",
-  },
-  {
-    title: "Students Helping Students",
-    description:
-      "The platform is built around an online community of college students helping each other in college courses.",
-  },
-  {
-    title: "Practical Support",
-    description:
-      "We focus on tutoring, study resources, useful videos, and course communities that improve understanding.",
-  },
-];
-
-const highlights = [
-  { number: "Free", label: "individual and group tutoring" },
-  { number: "Shared", label: "documents and useful videos" },
-  { number: "Connected", label: "course-based WhatsApp groups" },
-];
-
 export default function About() {
+  const { t } = useLanguage();
+  const values = t("about.values");
+  const highlights = t("about.highlights");
+  const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
+
   return (
     <main className="oman-page min-h-screen text-slate-900">
       <section
@@ -36,15 +18,13 @@ export default function About() {
           <div className="grid items-center gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12">
             <div className="text-center lg:text-left">
               <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-                About Ucan Oman
+                {t("about.heroKicker")}
               </p>
               <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:mx-0 lg:text-5xl">
-                A learning platform inspired by Omani generosity, heritage, and student ambition.
+                {t("about.heroTitle")}
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#f4e8d6] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
-                Ucan Oman hosts an online community where college students help
-                each other understand course material, prepare for classes, and
-                stay supported throughout the semester.
+                {t("about.heroText")}
               </p>
             </div>
 
@@ -56,10 +36,10 @@ export default function About() {
                 />
               </div>
               <p className="mt-4 text-center text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta-dark)]">
-                University of Central Florida
+                {t("about.ucf")}
               </p>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
-                We imagine academic support as something warm, dignified, and shared across a real community.
+                {t("about.ucfText")}
               </p>
             </div>
           </div>
@@ -77,22 +57,19 @@ export default function About() {
 
           <div className="text-center lg:text-left">
             <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              Meet Our Founder
+              {t("about.founderKicker")}
             </p>
             <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-              Ahmed Mohammed Al Ruqaishi
+              {t("about.founderName")}
             </h2>
             <p className="mt-5 text-base leading-7 text-[var(--oman-ink)]/80 sm:text-lg sm:leading-8">
-              Grew up in UK... Migrated to USA... and now in Oman. You know the rest of the
-              story ... LETS GO EVERYONE!!
+              {t("about.founderTextOne")}
             </p>
             <p className="mt-5 text-base leading-7 text-[var(--oman-ink)]/80 sm:text-lg sm:leading-8">
-              Ahmed is a 25 year old beginner software developer who was inspired
-              by the movie "The Social Network" to create this platform to better enhance the
-              college experience academically, socially, and most importantly psychologically.
+              {t("about.founderTextTwo")}
             </p>
             <p className="mt-5 rounded-2xl bg-[rgba(197,154,68,0.12)] px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--oman-terracotta-dark)]">
-              Qurum Beach, Muscat, Oman.
+              {t("about.founderLocation")}
             </p>
           </div>
         </div>
@@ -112,22 +89,19 @@ export default function About() {
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-4 sm:px-6 sm:py-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10">
         <div className="text-center lg:text-left">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Our Mission
+            {t("about.missionKicker")}
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-            Make course help free and community-driven for every college student.
+            {t("about.missionTitle")}
           </h2>
         </div>
 
         <div className="space-y-5 rounded-[1.75rem] oman-card p-6 text-base leading-7 text-[var(--oman-ink)]/80 sm:p-8 sm:text-lg sm:leading-8">
           <p>
-            Ucan Oman exists to give students a free place to find support for
-            their college courses through community help, tutoring, and better study resources.
+            {t("about.missionTextOne")}
           </p>
           <p>
-            The platform combines free individualized tutoring sessions, free
-            group tutoring sessions, a library of documents and useful videos,
-            and collections of course-based WhatsApp group chats.
+            {t("about.missionTextTwo")}
           </p>
         </div>
       </section>
@@ -136,10 +110,10 @@ export default function About() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="max-w-2xl text-center lg:text-left">
             <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              Core Values
+              {t("about.valuesKicker")}
             </p>
             <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-              The ideas shaping how Ucan Oman supports students.
+              {t("about.valuesTitle")}
             </h2>
           </div>
 
@@ -158,14 +132,13 @@ export default function About() {
         <div className="grid items-center gap-6 rounded-[1.75rem] oman-dark-panel px-6 py-10 text-white sm:px-8 sm:py-12 lg:grid-cols-[1fr_0.82fr]">
           <div className="text-center lg:text-left">
             <p className="oman-kicker text-xs font-semibold uppercase sm:text-sm">
-              Our Community
+              {t("about.communityKicker")}
             </p>
             <h2 className="mt-4 text-2xl font-semibold sm:text-3xl">
-              Students, tutors, and course communities working together to make learning easier.
+              {t("about.communityTitle")}
             </h2>
             <p className="mt-6 max-w-3xl text-base leading-7 text-[#eadfcf] sm:text-lg sm:leading-8">
-              Ucan Oman is built for college students who want better explanations,
-              free support, and stronger connections around the courses they are taking.
+              {t("about.communityText")}
             </p>
           </div>
           <div className="oman-photo-frame aspect-[5/4]">
@@ -178,7 +151,7 @@ export default function About() {
       </section>
 
       <footer className="border-t border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.9)] px-4 py-8 text-center text-sm text-[var(--oman-ink)]/70 sm:px-6">
-        Copyright {new Date().getFullYear()} Ucan Oman. Free learning support for everyone.
+        {footerText}
       </footer>
     </main>
   );

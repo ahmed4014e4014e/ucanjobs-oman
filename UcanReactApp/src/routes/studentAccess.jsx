@@ -1,19 +1,23 @@
 import AuthAccessPage from "./AuthAccessPage";
+import { useLanguage } from "../context/LanguageContext";
 import middleEastCollegeImage from "../assets/auth-images/middle-east-college.jpg";
 
 export default function StudentAccess() {
+  const { t } = useLanguage();
+  const copy = t("accessPages.student");
+
   return (
     <AuthAccessPage
-      audienceLabel="Student Access"
-      title="Log in or sign up to access student support on Ucan Oman."
-      description="This page is designed for students who want to create an account, log in, and access tutoring, course support, and the wider learning community."
-      signupHeading="Create a student account"
+      audienceLabel={copy.audienceLabel}
+      title={copy.title}
+      description={copy.description}
+      signupHeading={copy.signupHeading}
       role="student"
       requireTermsAgreement
       collectSignupProfile={false}
       enableGoogleAuth
       accessImage={middleEastCollegeImage}
-      accessImageAlt="Middle East College campus in Oman"
+      accessImageAlt={copy.imageAlt}
     />
   );
 }

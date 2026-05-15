@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import ActionFeedback from "../components/ActionFeedback";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import { isSupabaseConfigured } from "../lib/supabase";
 import {
   buildTutorCards,
@@ -90,6 +91,13 @@ function RequiredLabel({ children }) {
   );
 }
 
+function formatCopy(template, values) {
+  return Object.entries(values).reduce(
+    (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+    template
+  );
+}
+
 function TutorSection({
   id,
   label,
@@ -106,6 +114,7 @@ function TutorSection({
   loading,
   authLoading,
   requiresProfileCompletion,
+  copy,
 }) {
   const hasSelectedInstitute = Boolean(selectedInstitute);
   const availableCourses = useMemo(() => {
@@ -181,7 +190,7 @@ function TutorSection({
         <div className="grid gap-4 md:grid-cols-2">
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-              Institute
+              {copy.institute}
             </span>
             <select
               value={selectedInstitute}
@@ -191,7 +200,7 @@ function TutorSection({
               }}
               className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
             >
-              <option value="">Select university</option>
+              <option value="">{copy.selectUniversity}</option>
               {institutes.map((institute) => (
                 <option key={institute} value={institute}>
                   {institute}
@@ -202,7 +211,7 @@ function TutorSection({
 
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-              Course
+              {copy.course}
             </span>
             <select
               value={selectedCourse}
@@ -211,15 +220,15 @@ function TutorSection({
               className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
             >
               {!hasSelectedInstitute ? (
-                <option value="">Select a university first</option>
+                <option value="">{copy.selectUniversityFirst}</option>
               ) : hasCourseOptions ? (
                 availableCourses.map((course) => (
                   <option key={course} value={course}>
-                    {course}
+                    {course === "All Courses" ? copy.allCourses : course}
                   </option>
                 ))
               ) : (
-                <option value="All Courses">No courses available yet</option>
+                <option value="All Courses">{copy.noCourses}</option>
               )}
             </select>
           </label>
@@ -228,15 +237,20 @@ function TutorSection({
         {hasSelectedInstitute && !loading && filteredTutors.length > 0 && (
           <div className="mt-6 rounded-3xl border border-[rgba(197,154,68,0.24)] bg-[rgba(255,244,222,0.74)] p-5 text-[var(--oman-ink)] shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--oman-terracotta)]">
-              Available Now
+              {copy.availableNow}
             </p>
             <p className="mt-3 text-lg font-semibold sm:text-xl">
-              {filteredTutors.length} tutor{filteredTutors.length === 1 ? "" : "s"} available for{" "}
-              {title.toLowerCase()}
+              {formatCopy(copy.tutorsAvailable, {
+                count: filteredTutors.length,
+                plural: filteredTutors.length === 1 ? "" : "s",
+                title: title.toLowerCase(),
+              })}
             </p>
             <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/75 sm:text-base">
-              {totalCoursesAvailable} course offering
-              {totalCoursesAvailable === 1 ? "" : "s"} currently match your selected filters.
+              {formatCopy(copy.courseOfferings, {
+                count: totalCoursesAvailable,
+                plural: totalCoursesAvailable === 1 ? "" : "s",
+              })}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {filteredTutors.map((tutor) => (
@@ -260,27 +274,25 @@ function TutorSection({
               {requiresProfileCompletion ? (
                 <>
                   <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
-                    Complete your student profile to view available tutors
+                    {copy.profileRequiredTitle}
                   </h3>
                   <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                    Add your student name and university name in your dashboard before sending a
-                    tutoring request.
+                    {copy.profileRequiredText}
                   </p>
                   <Link
                     to="/student-dashboard/"
                     className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
                   >
-                    Complete Student Profile
+                    {copy.profileRequiredButton}
                   </Link>
                 </>
               ) : (
                 <>
                   <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
-                    Please login / sign up to view available tutors
+                    {copy.loginTitle}
                   </h3>
                   <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                    Create an account or log in first to access the private and group tutoring
-                    directory and send a tutoring request.
+                    {copy.loginText}
                   </p>
                 </>
               )}
@@ -288,19 +300,19 @@ function TutorSection({
           ) : showDirectoryLoading ? (
             <div className="rounded-3xl oman-outline-panel p-6 text-center sm:p-8 lg:col-span-2">
               <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
-                Loading tutor directory...
+                {copy.loadingTitle}
               </h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Fetching tutors, courses, and available session types from Supabase.
+                {copy.loadingText}
               </p>
             </div>
           ) : !hasSelectedInstitute ? (
             <div className="rounded-3xl oman-outline-panel p-6 text-center sm:p-8 lg:col-span-2">
               <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
-                Select a university to view courses
+                {copy.selectInstituteTitle}
               </h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Course options and tutor cards will appear only after a university is selected.
+                {copy.selectInstituteText}
               </p>
             </div>
           ) : filteredTutors.length > 0 ? (
@@ -319,13 +331,13 @@ function TutorSection({
                         {tutor.name}
                       </h3>
                       <p className="mt-2 text-sm font-medium uppercase tracking-[0.18em] text-[var(--oman-brass)]">
-                        Free tutoring tutor profile
+                        {copy.profileLabel}
                       </p>
                     </div>
                   </div>
 
                   <span className="oman-chip self-start rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]">
-                    {tutor.institutes.length === 1 ? tutor.institutes[0] : "Multi Institute"}
+                    {tutor.institutes.length === 1 ? tutor.institutes[0] : copy.multiInstitute}
                   </span>
                 </div>
 
@@ -334,17 +346,17 @@ function TutorSection({
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--oman-terracotta)]/80">
-                      Session Type
+                      {copy.sessionType}
                     </p>
                     <p className="mt-2 text-sm font-semibold text-[var(--oman-ink)]">
                       {tutor.sessionType === "private"
-                        ? "Private one-on-one tutoring"
-                        : "Group tutoring session"}
+                        ? copy.privateSession
+                        : copy.groupSession}
                     </p>
                   </div>
                   <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--oman-terracotta)]/80">
-                      Availability
+                      {copy.availability}
                     </p>
                     <p className="mt-2 text-sm font-semibold text-[var(--oman-olive)]">
                       {tutor.availability}
@@ -354,10 +366,10 @@ function TutorSection({
 
                 <div className="mt-5 flex items-center justify-between gap-3">
                   <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--oman-terracotta)]/80">
-                    Courses
+                    {copy.courses}
                   </p>
                   <span className="rounded-full bg-[rgba(197,154,68,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)]">
-                    {tutor.courses.length} offered
+                    {formatCopy(copy.offered, { count: tutor.courses.length })}
                   </span>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -382,12 +394,11 @@ function TutorSection({
                       : "cursor-not-allowed border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] text-[var(--oman-terracotta-dark)] opacity-70",
                   ].join(" ")}
                 >
-                  {canBook ? "Send Tutoring Request" : "Log in to send tutoring request"}
+                  {canBook ? copy.sendRequest : copy.loginToSend}
                 </button>
                 {!canBook && (
                   <p className="mt-3 text-sm leading-6 text-[var(--oman-ink)]/70">
-                    Please log in to your student or tutor account before sending a tutoring
-                    session.
+                    {copy.loginNote}
                   </p>
                 )}
               </article>
@@ -395,11 +406,10 @@ function TutorSection({
           ) : (
             <div className="rounded-3xl oman-outline-panel p-6 text-center sm:p-8 lg:col-span-2">
               <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
-                No tutor listed yet for this selection
+                {copy.emptyTitle}
               </h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Once more tutors and course offerings are added in Supabase, this directory will
-                update automatically.
+                {copy.emptyText}
               </p>
             </div>
           )}
@@ -411,6 +421,17 @@ function TutorSection({
 
 export default function Services() {
   const { user, profile, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
+  const page = t("servicesPage");
+  const tutorSectionCopy = page.tutorSection;
+  const requestModalCopy = page.requestModal;
+  const servicesCopy = page.services;
+  const serviceHighlightsCopy = page.highlights;
+  const serviceCardsCopy = page.cards;
+  const acceptedFilesText = t("common.acceptedFiles")
+    .replace("{types}", ACCEPTED_UPLOAD_TYPES.join(", "))
+    .replace("{size}", FILE_SIZE_LIMIT_MB);
+  const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
   const [privateInstitute, setPrivateInstitute] = useState("");
   const [privateCourse, setPrivateCourse] = useState("");
   const [groupInstitute, setGroupInstitute] = useState("");
@@ -437,8 +458,8 @@ export default function Services() {
       (!profile?.full_name?.trim() || !profile?.institute?.trim())
   );
   const canBook = Boolean(user?.id && profile?.role && !needsStudentProfileCompletion);
-  const studentAccountName = profile?.full_name || user?.user_metadata?.full_name || "Not available";
-  const studentAccountEmail = profile?.email || user?.email || "Not available";
+  const studentAccountName = profile?.full_name || user?.user_metadata?.full_name || t("common.notAvailable");
+  const studentAccountEmail = profile?.email || user?.email || t("common.notAvailable");
 
   const instituteOptions = useMemo(() => {
     const instituteCodes = new Set();
@@ -476,9 +497,7 @@ export default function Services() {
 
     const loadDirectory = async () => {
       if (!isSupabaseConfigured) {
-        setDirectoryError(
-          "Supabase is not configured yet. Add your environment variables before using the live tutor directory."
-        );
+        setDirectoryError(page.messages.directoryNotConfigured);
         setDirectoryLoading(false);
         return;
       }
@@ -563,19 +582,19 @@ export default function Services() {
 
     if (!user || !activeTutor || !selectedCourseId) {
       setRequestMessageType("error");
-      setRequestMessage("Please log in and choose a course before submitting a request.");
+      setRequestMessage(page.messages.loginAndCourse);
       return;
     }
 
     if (!requestTitle.trim() || !studentInstitute.trim()) {
       setRequestMessageType("error");
-      setRequestMessage("Please complete the required title and student institute fields.");
+      setRequestMessage(page.messages.requiredTitleInstitute);
       return;
     }
 
     if (selectedAttachments.length === 0) {
       setRequestMessageType("error");
-      setRequestMessage("Please attach at least one file before submitting your tutoring request.");
+      setRequestMessage(page.messages.attachmentRequired);
       return;
     }
 
@@ -583,7 +602,7 @@ export default function Services() {
 
     if (!selectedCourse) {
       setRequestMessageType("error");
-      setRequestMessage("Please choose a valid course for this tutor.");
+      setRequestMessage(page.messages.validCourse);
       return;
     }
 
@@ -617,7 +636,7 @@ export default function Services() {
 
       setRequestMessageType("success");
       setRequestMessage(
-        "Your tutoring request was saved successfully. The tutor can now contact you directly to arrange the session."
+        page.messages.requestSuccess
       );
       setRequestTitle("");
       setStudentInstitute(profile?.institute || user?.user_metadata?.institute || "");
@@ -626,7 +645,7 @@ export default function Services() {
       setSelectedAttachments([]);
     } catch (error) {
       setRequestMessageType("error");
-      setRequestMessage(error.message || "We could not save your tutoring request.");
+      setRequestMessage(error.message || page.messages.requestError);
     } finally {
       setRequestLoading(false);
     }
@@ -642,13 +661,13 @@ export default function Services() {
           <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
             <div className="text-center lg:text-left">
               <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-                Our Services
+                {page.heroKicker}
               </p>
               <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:mx-0 lg:text-5xl">
-                Free tutoring and student support presented through a full-stack learning hub.
+                {page.heroTitle}
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#f4e8d6] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
-                Ucan Oman now loads tutor offerings from the community - based platform updated regularely with our rapid increasing fan base!
+                {page.heroText}
               </p>
             </div>
 
@@ -660,7 +679,7 @@ export default function Services() {
                 />
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
-                Explore private tutoring, group sessions, and live course offerings to enhance your understanding and get better grades confidentely.
+                {page.heroCardText}
               </p>
             </div>
           </div>
@@ -669,7 +688,7 @@ export default function Services() {
 
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="grid gap-4 rounded-[1.75rem] oman-card p-5 sm:gap-6 sm:p-8 md:grid-cols-3">
-          {serviceHighlights.map((item) => (
+          {serviceHighlightsCopy.map((item) => (
             <div key={item.label} className="rounded-2xl oman-outline-panel p-5 text-center sm:p-6">
               <p className="oman-stat-number text-2xl font-bold sm:text-3xl">{item.number}</p>
               <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/75">{item.label}</p>
@@ -680,46 +699,26 @@ export default function Services() {
 
       <section className="mx-auto max-w-6xl px-4 py-2 sm:px-6 sm:py-4">
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-[1.6rem] oman-card p-5 sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--oman-terracotta)]">
-              Tutor Directory
-            </p>
-            <p className="mt-3 text-lg font-semibold text-[var(--oman-ink)]">
-              Browse live tutors by institute and course.
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/75">
-              Every tutor card below is regularely updated depending the new tutors on every institute.
-            </p>
-          </div>
-          <div className="rounded-[1.6rem] oman-card p-5 sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--oman-terracotta)]">
-              Student Requests
-            </p>
-            <p className="mt-3 text-lg font-semibold text-[var(--oman-ink)]">
-              Send a tutoring request directly to the tutor.
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/75">
-              Logged-in students can submit their request details, and tutors can then follow up directly.
-            </p>
-          </div>
-          <div className="rounded-[1.6rem] oman-card p-5 sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--oman-terracotta)]">
-              Dynamic Environment
-            </p>
-            <p className="mt-3 text-lg font-semibold text-[var(--oman-ink)]">
-              Adding more tutors from different institutes covering a wide range of diversified courses collection.
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/75">
-              New tutors, institutes, and courses will slot directly into this directory structure.
-            </p>
-          </div>
+          {serviceCardsCopy.map((card) => (
+            <div key={card.kicker} className="rounded-[1.6rem] oman-card p-5 sm:p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--oman-terracotta)]">
+                {card.kicker}
+              </p>
+              <p className="mt-3 text-lg font-semibold text-[var(--oman-ink)]">
+                {card.title}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/75">
+                {card.text}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
       {directoryError && (
         <section className="mx-auto max-w-6xl px-4 py-2 sm:px-6 sm:py-4">
           <div className="rounded-[1.75rem] border border-[rgba(155,77,49,0.2)] bg-[rgba(255,239,232,0.92)] px-6 py-5 text-[var(--oman-terracotta-dark)] shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em]">Directory Status</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em]">{page.directoryStatus}</p>
             <p className="mt-3 max-w-3xl text-base leading-7">{directoryError}</p>
           </div>
         </section>
@@ -728,23 +727,22 @@ export default function Services() {
       {!canBook && (
         <section className="mx-auto max-w-6xl px-4 py-2 sm:px-6 sm:py-4">
           <div className="rounded-[1.75rem] border border-[rgba(197,154,68,0.28)] bg-[rgba(255,244,222,0.82)] px-6 py-5 text-[var(--oman-terracotta-dark)] shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em]">Request Access</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em]">{page.requestAccess}</p>
             <p className="mt-3 max-w-3xl text-base leading-7">
-              You can explore the tutor directory freely, but you need to log in before sending a
-              tutoring request.
+              {page.requestAccessText}
             </p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <Link
                 to="/student-access/"
                 className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
               >
-                Student Login
+                {page.studentLogin}
               </Link>
               <Link
                 to="/tutor-access/"
                 className="oman-button-primary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
               >
-                Tutor Login
+                {page.tutorLogin}
               </Link>
             </div>
           </div>
@@ -753,9 +751,9 @@ export default function Services() {
 
       <TutorSection
         id="tutor-directory"
-        label="Private Tutoring"
-        title="Find available tutors for private one-on-one support."
-        description="Select an institute and course to see which private tutors are currently available."
+        label={page.private.label}
+        title={page.private.title}
+        description={page.private.description}
         tutors={privateTutors}
         selectedInstitute={privateInstitute}
         setSelectedInstitute={setPrivateInstitute}
@@ -767,13 +765,14 @@ export default function Services() {
         loading={directoryLoading}
         authLoading={authLoading}
         requiresProfileCompletion={needsStudentProfileCompletion}
+        copy={tutorSectionCopy}
       />
 
       <TutorSection
         id="group-tutoring"
-        label="Group Tutoring"
-        title="Find available tutors for free group tutoring sessions."
-        description="Use the same filters to explore group tutoring options for supported institutes and courses."
+        label={page.group.label}
+        title={page.group.title}
+        description={page.group.description}
         tutors={groupTutors}
         selectedInstitute={groupInstitute}
         setSelectedInstitute={setGroupInstitute}
@@ -785,20 +784,21 @@ export default function Services() {
         loading={directoryLoading}
         authLoading={authLoading}
         requiresProfileCompletion={needsStudentProfileCompletion}
+        copy={tutorSectionCopy}
       />
 
       <section className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-8">
         <div className="max-w-2xl text-center lg:text-left">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            What Else We Offer
+            {page.otherKicker}
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-            More free ways for students to study better and support each other.
+            {page.otherTitle}
           </h2>
         </div>
 
         <div className="mt-10 grid gap-6 sm:mt-12 sm:gap-8 md:grid-cols-2 xl:grid-cols-3">
-          {services.map((service) => (
+          {servicesCopy.map((service) => (
             <article key={service.title} className="rounded-3xl oman-card p-6 sm:p-8">
               <h3 className="text-xl font-semibold text-[var(--oman-ink)]">{service.title}</h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">{service.description}</p>
@@ -810,20 +810,19 @@ export default function Services() {
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10">
         <div className="text-center lg:text-left">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Why It Matters
+            {page.whyKicker}
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-            Students need support that is free, practical, and connected to real coursework.
+            {page.whyTitle}
           </h2>
         </div>
 
         <div className="space-y-5 rounded-[1.75rem] oman-card p-6 text-base leading-7 text-[var(--oman-ink)]/75 sm:p-8 sm:text-lg sm:leading-8">
           <p>
-            Our tutor directory can grow from the database as new
-            tutors, institutes, and courses are added.
+            {page.whyTextOne}
           </p>
           <p>
-            Student tutoring requests are submited, tracked, and returned.
+            {page.whyTextTwo}
           </p>
         </div>
       </section>
@@ -831,23 +830,22 @@ export default function Services() {
       <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20">
         <div className="rounded-[1.75rem] oman-dark-panel px-6 py-10 text-center text-white sm:px-8 sm:py-12">
           <p className="oman-kicker text-xs font-semibold uppercase sm:text-sm">
-            Start Your Journey
+            {page.ctaKicker}
           </p>
           <h2 className="mt-4 text-2xl font-semibold sm:text-3xl">
-            Explore free tutoring, resources, and course communities today.
+            {page.ctaTitle}
           </h2>
           <p className="mx-auto mt-6 max-w-3xl text-base leading-7 text-[#eadfcf] sm:text-lg sm:leading-8">
-            Ucan Oman is built to help students find support faster and improve their
-            understanding across the courses they are taking.
+            {page.ctaText}
           </p>
           <button className="oman-button-primary mt-8 w-full rounded-2xl px-8 py-3 font-semibold transition sm:w-auto">
-            Explore Courses
+            {page.ctaButton}
           </button>
         </div>
       </section>
 
       <footer className="border-t border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.9)] px-4 py-8 text-center text-sm text-[var(--oman-ink)]/70 sm:px-6">
-        Copyright {new Date().getFullYear()} Ucan Oman. Free learning support for everyone.
+        {footerText}
       </footer>
 
       {activeTutor && (
@@ -857,75 +855,73 @@ export default function Services() {
               type="button"
               onClick={() => setActiveTutor(null)}
               className="absolute right-4 top-4 rounded-full bg-[rgba(197,154,68,0.12)] px-3 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] transition hover:bg-[rgba(197,154,68,0.2)]"
-              aria-label="Close popup"
+              aria-label={t("common.close")}
             >
-              Close
+              {t("common.close")}
             </button>
 
             <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              Tutoring Request
+              {requestModalCopy.kicker}
             </p>
             <h3 className="oman-title-accent mt-4 pr-16 text-2xl font-semibold sm:text-3xl">
-              Send a tutoring request to {activeTutor.name}
+              {formatCopy(requestModalCopy.title, { name: activeTutor.name })}
             </h3>
 
             <div className="mt-6 rounded-3xl oman-outline-panel p-5 sm:p-6">
               <p className="text-base leading-7 text-[var(--oman-ink)]">
-                Please save your tutoring request below and attach any helpful files so the tutor
-                can contact you directly and arrange the session with you.
+                {requestModalCopy.intro}
               </p>
 
               <form className="mt-6 space-y-4" onSubmit={handleRequestSubmit}>
                 <p className="text-sm leading-6 text-[var(--oman-ink)]/70">
-                  Fields marked with <span className="font-semibold text-[var(--oman-terracotta)]">*</span> are required.
+                  {t("common.fieldsRequired")}
                 </p>
 
                 <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-4 text-sm leading-6 text-[var(--oman-ink)]/80 ring-1 ring-[rgba(111,49,29,0.1)]">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
-                    Student account
+                    {requestModalCopy.studentAccount}
                   </p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     <p>
-                      <span className="font-semibold text-[var(--oman-ink)]">Name:</span>{" "}
+                      <span className="font-semibold text-[var(--oman-ink)]">{requestModalCopy.name}</span>{" "}
                       {studentAccountName}
                     </p>
                     <p>
-                      <span className="font-semibold text-[var(--oman-ink)]">Email:</span>{" "}
+                      <span className="font-semibold text-[var(--oman-ink)]">{requestModalCopy.email}</span>{" "}
                       {studentAccountEmail}
                     </p>
                   </div>
                   <p className="mt-3 text-[var(--oman-ink)]/70">
-                    These details are pulled automatically from your logged-in student account and
-                    shown to the tutor with this request.
+                    {requestModalCopy.accountNote}
                   </p>
                 </div>
 
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Title</RequiredLabel>
+                  <RequiredLabel>{requestModalCopy.titleLabel}</RequiredLabel>
                   <input
                     type="text"
                     value={requestTitle}
                     onChange={(event) => setRequestTitle(event.target.value)}
-                    placeholder="Example: Help with MAT255 midterm review"
+                    placeholder={requestModalCopy.titlePlaceholder}
                     required
                     className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
                   />
                 </label>
 
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Student university name</RequiredLabel>
+                  <RequiredLabel>{requestModalCopy.instituteLabel}</RequiredLabel>
                   <input
                     type="text"
                     value={studentInstitute}
                     onChange={(event) => setStudentInstitute(event.target.value)}
-                    placeholder="Example: MCBS"
+                    placeholder={requestModalCopy.institutePlaceholder}
                     required
                     className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
                   />
                 </label>
 
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Course</RequiredLabel>
+                  <RequiredLabel>{requestModalCopy.courseLabel}</RequiredLabel>
                   <select
                     value={selectedCourseId}
                     onChange={(event) => setSelectedCourseId(event.target.value)}
@@ -941,19 +937,19 @@ export default function Services() {
                 </label>
 
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Topics need help with</RequiredLabel>
+                  <RequiredLabel>{requestModalCopy.topicsLabel}</RequiredLabel>
                   <textarea
                     value={topicsNeededHelpWith}
                     onChange={(event) => setTopicsNeededHelpWith(event.target.value)}
                     rows={4}
                     className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                    placeholder="Describe the topics, concepts, assignments, or exam areas you need help with."
+                    placeholder={requestModalCopy.topicsPlaceholder}
                     required
                   />
                 </label>
 
                 <label className="flex flex-col gap-2">
-                  <RequiredLabel>Attach files</RequiredLabel>
+                  <RequiredLabel>{requestModalCopy.attachFiles}</RequiredLabel>
                   <input
                     type="file"
                     multiple
@@ -963,8 +959,7 @@ export default function Services() {
                     className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-sm text-[var(--oman-ink)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-[rgba(197,154,68,0.16)] file:px-4 file:py-2 file:font-semibold file:text-[var(--oman-terracotta-dark)] focus:border-[var(--oman-brass)] focus:bg-white"
                   />
                   <p className="text-sm leading-6 text-[var(--oman-ink)]/70">
-                    Accepted files: {ACCEPTED_UPLOAD_TYPES.join(", ")}. Maximum size:{" "}
-                    {FILE_SIZE_LIMIT_MB} MB per file.
+                    {acceptedFilesText}
                   </p>
                   {selectedAttachments.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">
@@ -982,21 +977,21 @@ export default function Services() {
 
                 <label className="flex flex-col gap-2">
                   <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                    Attachment notes
+                    {requestModalCopy.attachmentNotes}
                   </span>
                   <textarea
                     value={attachmentNotes}
                     onChange={(event) => setAttachmentNotes(event.target.value)}
                     rows={3}
                     className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                    placeholder="Mention any files, screenshots, or notes you plan to include in your email."
+                    placeholder={requestModalCopy.attachmentPlaceholder}
                   />
                 </label>
 
                 <ActionFeedback
                   type={requestMessageType}
                   message={requestMessage}
-                  title="Tutoring request update"
+                  title={requestModalCopy.feedbackTitle}
                 />
 
                 <button
@@ -1004,7 +999,7 @@ export default function Services() {
                   disabled={requestLoading}
                   className="oman-button-secondary inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {requestLoading ? "Saving Request..." : "Save Tutoring Request"}
+                  {requestLoading ? requestModalCopy.saving : requestModalCopy.save}
                 </button>
               </form>
             </div>

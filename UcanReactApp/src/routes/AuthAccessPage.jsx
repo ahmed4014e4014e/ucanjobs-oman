@@ -1,11 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import ActionFeedback from "../components/ActionFeedback";
 import PasswordField from "../components/PasswordField";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { getDashboardPath, getUserRole } from "../lib/authRouting";
 import { themeImages } from "../lib/themeImages";
+
+function formatCopy(template, values) {
+  return Object.entries(values).reduce(
+    (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+    template
+  );
+}
 
 export default function AuthAccessPage({
   audienceLabel,
@@ -23,6 +31,8 @@ export default function AuthAccessPage({
 }) {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
+  const { t } = useLanguage();
+  const copy = t("authAccess");
   const loginSectionRef = useRef(null);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -56,7 +66,7 @@ export default function AuthAccessPage({
 
     if (urlHasRecoveryToken) {
       setRecoveryMode(true);
-      showMessage("success", "Enter a new password below to finish resetting your account.");
+      showMessage("success", copy.recoveryStart);
     }
 
     if (!isSupabaseConfigured || !supabase) {
@@ -68,12 +78,12 @@ export default function AuthAccessPage({
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setRecoveryMode(true);
-        showMessage("success", "Enter a new password below to finish resetting your account.");
+        showMessage("success", copy.recoveryStart);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [copy.recoveryStart]);
 
   useEffect(() => {
     if (resetCooldownSeconds <= 0) {
@@ -131,7 +141,7 @@ export default function AuthAccessPage({
     if (!isSupabaseConfigured || !supabase) {
       showMessage(
         "error",
-        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+        copy.supabaseMissing
       );
       return;
     }
@@ -154,7 +164,7 @@ export default function AuthAccessPage({
       showMessage(
         "error",
         shouldSuggestSignup
-          ? "We could not find a student account with those login details. Please sign up first if you have not created an account yet."
+          ? copy.studentSignupFirst
           : errorMessage
       );
       setRoleCheckInProgress(false);
@@ -168,7 +178,7 @@ export default function AuthAccessPage({
       await supabase.auth.signOut();
       showMessage(
         "error",
-        "We could not load your account profile yet. Please try again in a moment."
+        copy.profileLoadError
       );
       setRoleCheckInProgress(false);
       setLoginLoading(false);
@@ -179,14 +189,14 @@ export default function AuthAccessPage({
       await supabase.auth.signOut();
       showMessage(
         "error",
-        `This account is registered as a ${actualRole}. Please use the ${actualRole} access page instead.`
+        formatCopy(copy.wrongRole, { role: actualRole })
       );
       setRoleCheckInProgress(false);
       setLoginLoading(false);
       return;
     }
 
-    showMessage("success", "Login successful.");
+    showMessage("success", copy.loginSuccess);
     setRoleCheckInProgress(false);
     navigate(getDashboardPath(actualRole), { replace: true });
     setLoginLoading(false);
@@ -196,20 +206,20 @@ export default function AuthAccessPage({
     if (resetCooldownSeconds > 0) {
       showMessage(
         "error",
-        `Please wait ${resetCooldownSeconds} seconds before requesting another reset email.`
+        formatCopy(copy.resetCooldown, { seconds: resetCooldownSeconds })
       );
       return;
     }
 
     if (!loginEmail) {
-      showMessage("error", "Enter your email first, then click forgot password again.");
+      showMessage("error", copy.enterEmailFirst);
       return;
     }
 
     if (!isSupabaseConfigured || !supabase) {
       showMessage(
         "error",
-        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+        copy.supabaseMissing
       );
       return;
     }
@@ -229,7 +239,7 @@ export default function AuthAccessPage({
 
     showMessage(
       "success",
-      `A password reset link was sent to ${loginEmail}. Please check your email and spam folder.`
+      formatCopy(copy.resetSent, { email: loginEmail })
     );
     setResetCooldownSeconds(60);
     setResetLoading(false);
@@ -239,14 +249,14 @@ export default function AuthAccessPage({
     event.preventDefault();
 
     if (!resetPassword || resetPassword.length < 6) {
-      showMessage("error", "Your new password must be at least 6 characters.");
+      showMessage("error", copy.shortPassword);
       return;
     }
 
     if (!isSupabaseConfigured || !supabase) {
       showMessage(
         "error",
-        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+        copy.supabaseMissing
       );
       return;
     }
@@ -266,7 +276,7 @@ export default function AuthAccessPage({
 
     setResetPassword("");
     setRecoveryMode(false);
-    showMessage("success", "Your password was updated successfully. You can now log in.");
+    showMessage("success", copy.passwordUpdated);
     navigate(getDashboardPath(role), { replace: true });
     setResetLoading(false);
   };
@@ -275,14 +285,14 @@ export default function AuthAccessPage({
     const emailToConfirm = pendingConfirmationEmail || signupEmail || loginEmail;
 
     if (!emailToConfirm) {
-      showMessage("error", "Enter your email first so we can resend the confirmation link.");
+      showMessage("error", copy.confirmationEmailFirst);
       return;
     }
 
     if (!isSupabaseConfigured || !supabase) {
       showMessage(
         "error",
-        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+        copy.supabaseMissing
       );
       return;
     }
@@ -306,7 +316,7 @@ export default function AuthAccessPage({
     setPendingConfirmationEmail(emailToConfirm);
     showMessage(
       "success",
-      `A new confirmation email was sent to ${emailToConfirm}. Please also check your spam folder.`
+      formatCopy(copy.confirmationResent, { email: emailToConfirm })
     );
     setResendLoading(false);
   };
@@ -317,7 +327,7 @@ export default function AuthAccessPage({
     if (requireTermsAgreement && !signupAcceptedTerms) {
       showMessage(
         "error",
-        "Please read and agree to the Terms of Service before creating your account."
+        copy.termsRequired
       );
       return;
     }
@@ -325,7 +335,7 @@ export default function AuthAccessPage({
     if (!isSupabaseConfigured || !supabase) {
       showMessage(
         "error",
-        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+        copy.supabaseMissing
       );
       return;
     }
@@ -353,7 +363,7 @@ export default function AuthAccessPage({
       if (error.message?.toLowerCase().includes("already registered")) {
         sendUserToLogin(
           signupEmail,
-          `An account with ${signupEmail} already exists. Please log in with your existing account instead.`
+          formatCopy(copy.existingAccount, { email: signupEmail })
         );
         setSignupLoading(false);
         return;
@@ -373,7 +383,7 @@ export default function AuthAccessPage({
     if (isExistingConfirmedAccount) {
       sendUserToLogin(
         signupEmail,
-        `An account with ${signupEmail} already exists. Please log in with your existing account instead.`
+        formatCopy(copy.existingAccount, { email: signupEmail })
       );
       setSignupLoading(false);
       return;
@@ -402,7 +412,7 @@ export default function AuthAccessPage({
       if (profileError) {
         showMessage(
           "error",
-          `Account created, but profile sync failed: ${profileError.message}`
+          formatCopy(copy.profileSyncFailed, { message: profileError.message })
         );
         setSignupLoading(false);
         return;
@@ -410,12 +420,12 @@ export default function AuthAccessPage({
     }
 
     if (data.session) {
-      showMessage("success", "Account created successfully.");
+      showMessage("success", copy.accountCreated);
       navigate(getDashboardPath(role), { replace: true });
     } else {
       showMessage(
         "success",
-        `Account created. Check ${signupEmail} for your confirmation email before logging in.`
+        formatCopy(copy.accountCreatedConfirm, { email: signupEmail })
       );
     }
 
@@ -426,7 +436,7 @@ export default function AuthAccessPage({
     if (requireTermsAgreement && !signupAcceptedTerms) {
       showMessage(
         "error",
-        "Please read and agree to the Terms of Service before continuing with Google."
+        copy.termsRequiredGoogle
       );
       return;
     }
@@ -434,7 +444,7 @@ export default function AuthAccessPage({
     if (!isSupabaseConfigured || !supabase) {
       showMessage(
         "error",
-        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+        copy.supabaseMissing
       );
       return;
     }
@@ -513,8 +523,7 @@ export default function AuthAccessPage({
       <section className="mx-auto mt-10 max-w-5xl">
         {!isSupabaseConfigured && (
           <div className="rounded-3xl border border-[rgba(197,154,68,0.28)] bg-[rgba(255,244,222,0.9)] px-5 py-4 text-sm leading-6 text-[var(--oman-terracotta-dark)]">
-            Supabase is not configured yet. Add `VITE_SUPABASE_URL` and
-            `VITE_SUPABASE_ANON_KEY` to `.env.local` before testing auth.
+            {copy.supabaseNotice}
           </div>
         )}
 
@@ -523,10 +532,10 @@ export default function AuthAccessPage({
           message={message}
           title={
             messageType === "error"
-              ? "Authentication update"
+              ? copy.feedbackErrorTitle
               : recoveryMode
-                ? "Password recovery update"
-                : "Account access update"
+                ? copy.feedbackRecoveryTitle
+                : copy.feedbackAccessTitle
           }
           className="mt-6 rounded-3xl px-5 py-4"
         />
@@ -534,7 +543,7 @@ export default function AuthAccessPage({
         {!loading && !user && pendingConfirmationEmail && (
           <div className="mt-4 rounded-3xl oman-card px-5 py-4">
             <p className="text-sm leading-6 text-[var(--oman-ink)]/75">
-              Did not receive the confirmation email for{" "}
+              {copy.confirmationQuestion}{" "}
               <span className="font-semibold text-[var(--oman-ink)]">{pendingConfirmationEmail}</span>?
             </p>
             <button
@@ -543,7 +552,7 @@ export default function AuthAccessPage({
               disabled={resendLoading}
               className="oman-button-secondary mt-4 inline-flex items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {resendLoading ? "Resending..." : "Resend Confirmation Email"}
+              {resendLoading ? copy.resending : copy.resendConfirmation}
             </button>
           </div>
         )}
@@ -560,17 +569,17 @@ export default function AuthAccessPage({
           className="rounded-[1.75rem] oman-card p-6 sm:p-8"
         >
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            {recoveryMode ? "Reset Password" : "Log In"}
+            {recoveryMode ? copy.resetPassword : copy.logIn}
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
-            {recoveryMode ? "Create a new password" : "Welcome back"}
+            {recoveryMode ? copy.createNewPassword : copy.welcomeBack}
           </h2>
 
           {recoveryMode ? (
             <form className="mt-6 space-y-4" onSubmit={handleUpdatePassword}>
               <PasswordField
-                label="New Password"
-                placeholder="Enter a new password"
+                label={copy.newPassword}
+                placeholder={copy.newPasswordPlaceholder}
                 value={resetPassword}
                 onChange={(event) => setResetPassword(event.target.value)}
                 required
@@ -580,16 +589,16 @@ export default function AuthAccessPage({
                 disabled={resetLoading}
                 className="oman-button-primary mt-2 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {resetLoading ? "Updating Password..." : "Update Password"}
+                {resetLoading ? copy.updatingPassword : copy.updatePassword}
               </button>
             </form>
           ) : (
             <form className="mt-6 space-y-4" onSubmit={handleLogin}>
               <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Email</span>
+                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">{copy.email}</span>
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={copy.emailPlaceholder}
                   value={loginEmail}
                   onChange={(event) => setLoginEmail(event.target.value)}
                   className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
@@ -597,8 +606,8 @@ export default function AuthAccessPage({
                 />
               </label>
               <PasswordField
-                label="Password"
-                placeholder="Enter your password"
+                label={copy.password}
+                placeholder={copy.passwordPlaceholder}
                 value={loginPassword}
                 onChange={(event) => setLoginPassword(event.target.value)}
                 required
@@ -608,7 +617,7 @@ export default function AuthAccessPage({
                 disabled={loginLoading}
                 className="oman-button-secondary mt-2 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {loginLoading ? "Logging In..." : "Log In"}
+                {loginLoading ? copy.loggingIn : copy.logIn}
               </button>
               <button
                 type="button"
@@ -617,10 +626,10 @@ export default function AuthAccessPage({
                 className="w-full rounded-2xl px-4 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] transition hover:bg-[rgba(197,154,68,0.08)] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {resetLoading
-                  ? "Sending Reset Link..."
+                  ? copy.sendingReset
                   : resetCooldownSeconds > 0
-                    ? `Try again in ${resetCooldownSeconds}s`
-                    : "Forgot password?"}
+                    ? formatCopy(copy.tryAgain, { seconds: resetCooldownSeconds })
+                    : copy.forgotPassword}
               </button>
             </form>
           )}
@@ -631,17 +640,17 @@ export default function AuthAccessPage({
             {signupPanel || (
               <>
                 <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                  Sign Up
+                  {copy.signUp}
                 </p>
                 <h2 className="oman-title-accent mt-4 text-2xl font-semibold">{signupHeading}</h2>
                 <form className="mt-6 space-y-4" onSubmit={handleSignup}>
                   {collectSignupProfile && (
                     <>
                       <label className="flex flex-col gap-2">
-                        <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Full Name</span>
+                        <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">{copy.fullName}</span>
                         <input
                           type="text"
-                          placeholder="Enter your full name"
+                          placeholder={copy.fullNamePlaceholder}
                           value={signupName}
                           onChange={(event) => setSignupName(event.target.value)}
                           className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
@@ -649,10 +658,10 @@ export default function AuthAccessPage({
                         />
                       </label>
                       <label className="flex flex-col gap-2">
-                        <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Institute</span>
+                        <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">{copy.institute}</span>
                         <input
                           type="text"
-                          placeholder="Enter your institute name"
+                          placeholder={copy.institutePlaceholder}
                           value={signupInstitute}
                           onChange={(event) => setSignupInstitute(event.target.value)}
                           className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
@@ -662,10 +671,10 @@ export default function AuthAccessPage({
                     </>
                   )}
                   <label className="flex flex-col gap-2">
-                    <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Email</span>
+                    <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">{copy.email}</span>
                     <input
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder={copy.emailPlaceholder}
                       value={signupEmail}
                       onChange={(event) => setSignupEmail(event.target.value)}
                       className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
@@ -673,8 +682,8 @@ export default function AuthAccessPage({
                     />
                   </label>
                   <PasswordField
-                    label="Password"
-                    placeholder="Create a password"
+                    label={copy.password}
+                    placeholder={copy.createPasswordPlaceholder}
                     value={signupPassword}
                     onChange={(event) => setSignupPassword(event.target.value)}
                     required
@@ -689,14 +698,14 @@ export default function AuthAccessPage({
                         required
                       />
                       <span>
-                        I have read and agree to the{" "}
+                        {copy.termsAgreementPrefix}{" "}
                         <a
                           href="/terms/"
                           target="_blank"
                           rel="noreferrer"
                           className="font-semibold text-[var(--oman-terracotta)] underline"
                         >
-                          Ucan Oman Platform Policies
+                          {copy.termsAgreementLink}
                         </a>
                         .
                       </span>
@@ -710,11 +719,11 @@ export default function AuthAccessPage({
                         disabled={googleLoading}
                         className="inline-flex w-full items-center justify-center rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-6 py-3 text-center font-semibold text-[var(--oman-ink)] shadow-sm transition hover:bg-[rgba(244,232,214,0.32)] disabled:cursor-not-allowed disabled:opacity-70"
                       >
-                        {googleLoading ? "Opening Google..." : "Continue with Google"}
+                        {googleLoading ? copy.openingGoogle : copy.continueWithGoogle}
                       </button>
                       <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--oman-ink)]/45">
                         <span className="h-px flex-1 bg-[rgba(111,49,29,0.14)]" />
-                        <span>Or</span>
+                        <span>{copy.or}</span>
                         <span className="h-px flex-1 bg-[rgba(111,49,29,0.14)]" />
                       </div>
                     </>
@@ -724,7 +733,7 @@ export default function AuthAccessPage({
                     disabled={signupLoading}
                     className="oman-button-primary mt-2 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
                   >
-                    {signupLoading ? "Creating Account..." : "Create Account"}
+                    {signupLoading ? copy.creatingAccount : copy.createAccount}
                   </button>
                 </form>
               </>
