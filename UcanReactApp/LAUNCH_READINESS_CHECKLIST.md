@@ -40,12 +40,12 @@ These items should be complete before inviting a limited group of real students 
 
 Recommended before pilot:
 - [done] Test all login flows on at least 2 phones and 1 laptop
-- [ ] Test student sign up with a real email confirmation
-- [ ] Test tutor application with real attachment uploads
-- [ ] Test admin review of uploaded files
-- [ ] Test logout from student, tutor, and admin accounts
-- [ ] Confirm Vercel production link is stable and publicly accessible
-- [ ] Confirm no hidden debug text is visible to normal users
+- [done] Test student sign up with a real email confirmation
+- [done] Test tutor application with real attachment uploads
+- [ done] Test admin review of uploaded files
+- [ done] Test logout from student, tutor, and admin accounts
+- [ done] Confirm Vercel production link is stable and publicly accessible
+- [ done] Confirm no hidden debug text is visible to normal users
 
 ---
 
