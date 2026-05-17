@@ -22,6 +22,7 @@ Status guide:
 | `status_workflow_updates.sql` | confirmed applied  | Normalizes contact statuses and adds admin update policies for request workflows. |
 | `tutoring_attachments_storage.sql` | confirmed applied | Needed for tutoring request attachments and tutor-side attachment downloads. |
 | `tutor_applicants_schema.sql` | Pending / not confirmed | Creates the dedicated tutor applicants table, indexes, RLS policies, and separate storage bucket policies. |
+| `ucan_course_marketplace_schema.sql` | Pending / not confirmed | Phase 3 course marketplace tables, public course read policies, learner enrollments, and starter course seed data. |
 
 ## Update rule
 
