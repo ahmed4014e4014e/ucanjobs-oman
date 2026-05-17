@@ -12,6 +12,8 @@ import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import Root from "./routes/Root";
 import Home from "./routes/home";
 import About from "./routes/about";
+import Courses from "./routes/courses";
+import CourseDetail from "./routes/courseDetail";
 import Services from "./routes/services";
 import Contact from "./routes/contact";
 import Terms from "./routes/terms";
@@ -50,7 +52,19 @@ const router = createBrowserRouter([
         element: <About />,
       },
       {
+        path: "courses",
+        element: <Courses />,
+      },
+      {
+        path: "courses/:slug",
+        element: <CourseDetail />,
+      },
+      {
         path: "services",
+        element: <Courses />,
+      },
+      {
+        path: "legacy-services",
         element: <Services />,
       },
       {

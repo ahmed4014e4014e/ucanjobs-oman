@@ -46,7 +46,7 @@ export default function Navbar() {
   const baseLinks = [
     { name: t("nav.home"), to: "/home/" },
     { name: t("nav.about"), to: "/about/" },
-    { name: t("nav.services"), to: "/services/" },
+    { name: t("nav.services"), to: "/courses/" },
     { name: t("nav.contact"), to: "/contact/" },
     { name: t("nav.policies"), to: "/terms/" },
   ];

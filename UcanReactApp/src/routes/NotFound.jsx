@@ -30,7 +30,7 @@ export default function NotFound() {
                   Go to Home
                 </Link>
                 <Link
-                  to="/services/"
+                  to="/courses/"
                   className="oman-button-secondary w-full rounded-2xl px-6 py-3 text-center font-semibold transition sm:w-auto"
                 >
                   View Courses

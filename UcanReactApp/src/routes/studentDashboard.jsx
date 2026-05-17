@@ -8,7 +8,7 @@ import { themeImages } from "../lib/themeImages";
 
 const quickLinkTargets = [
   {
-    to: "/services/#tutor-directory",
+    to: "/courses/",
   },
   {
     to: "/contact/",

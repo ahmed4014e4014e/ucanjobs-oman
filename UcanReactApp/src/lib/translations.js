@@ -711,9 +711,9 @@ export const translations = {
       },
       quickLinks: [
         {
-          title: "Explore Tutoring",
-          description: "Browse private and group tutoring options available on the platform.",
-          action: "Open Services",
+          title: "Explore Courses",
+          description: "Browse career-focused learning paths planned for Oman tech graduates.",
+          action: "Open Courses",
         },
         {
           title: "Contact Support",

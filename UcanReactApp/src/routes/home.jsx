@@ -58,7 +58,7 @@ export default function Home() {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:justify-start">
                 <Link
-                  to="/services#tutor-directory"
+                  to="/courses/"
                   className="oman-button-primary w-full rounded-2xl px-6 py-3 text-center font-semibold transition sm:w-auto"
                 >
                   {t("home.exploreServices")}
@@ -274,7 +274,7 @@ export default function Home() {
             {t("home.ctaText")}
           </p>
           <Link
-            to="/services#tutor-directory"
+            to="/courses/"
             className="oman-button-primary mt-8 inline-flex rounded-2xl px-8 py-3 text-center font-semibold transition"
           >
             {t("home.ctaButton")}
