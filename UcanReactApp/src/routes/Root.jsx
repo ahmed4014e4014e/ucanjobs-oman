@@ -125,7 +125,7 @@ export default function Navbar() {
           <div className="hidden items-center gap-4 lg:flex xl:gap-6">
             {user && (
               <div className="rounded-full border border-[rgba(197,154,68,0.24)] bg-[rgba(197,154,68,0.12)] px-4 py-2 text-sm font-medium capitalize text-[var(--oman-terracotta-dark)]">
-                {getVisibleRoleLabel(profile?.role, t)}
+                {getVisibleRoleLabel(role, t)}
               </div>
             )}
 

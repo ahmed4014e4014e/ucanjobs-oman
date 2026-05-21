@@ -139,13 +139,43 @@ export default function AuthAccessPage({
       return null;
     }
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("profiles")
-      .select("role")
+      .select("id, role, email")
       .eq("id", authUser.id)
       .maybeSingle();
 
-    return normalizeRole(data?.role ?? null);
+    if (error) {
+      throw error;
+    }
+
+    const resolvedRole = normalizeRole(data?.role ?? authUser.user_metadata?.role ?? role);
+
+    if (!data || !data.role || !data.email) {
+      const profilePayload = {
+        id: authUser.id,
+        role: resolvedRole,
+        email: authUser.email || loginEmail,
+        full_name: authUser.user_metadata?.full_name || authUser.user_metadata?.name || null,
+        institute: authUser.user_metadata?.institute || null,
+      };
+
+      const { error: upsertError } = await supabase.from("profiles").upsert(profilePayload);
+
+      if (upsertError) {
+        throw upsertError;
+      }
+
+      await supabase.auth.updateUser({
+        data: {
+          role: resolvedRole,
+          ...(profilePayload.full_name ? { full_name: profilePayload.full_name } : {}),
+          ...(profilePayload.institute ? { institute: profilePayload.institute } : {}),
+        },
+      });
+    }
+
+    return resolvedRole;
   };
 
   const handleLogin = async (event) => {

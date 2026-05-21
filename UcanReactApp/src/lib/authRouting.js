@@ -1,5 +1,9 @@
-export function getUserRole(profile, _user, fallbackRole = null) {
-  const role = profile?.role ?? fallbackRole;
+export function getUserRole(profile, user, fallbackRole = null) {
+  const role =
+    profile?.role ??
+    user?.user_metadata?.role ??
+    user?.app_metadata?.role ??
+    fallbackRole;
 
   if (role === "student") {
     return "learner";
