@@ -110,7 +110,7 @@ export default function AdminInstructorApplications() {
         (application) => normalizeStatus(application.status) === "pending"
       ).length,
       applicationInstitutes: new Set(
-        visibleApplications.map((application) => application.university_name).filter(Boolean)
+        visibleApplications.map((application) => application.course_topic_proposal).filter(Boolean)
       ).size,
     };
   }, [visibleApplications]);
@@ -245,7 +245,7 @@ export default function AdminInstructorApplications() {
             </div>
             <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-3 py-3">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-                Universities
+                Topics
               </p>
               <p className="mt-2 text-xl font-bold text-[var(--oman-ink)]">{stats.applicationInstitutes}</p>
             </div>
@@ -322,7 +322,7 @@ export default function AdminInstructorApplications() {
                     <div>
                       <h3 className="text-lg font-semibold text-[var(--oman-ink)]">{application.full_name}</h3>
                       <p className="mt-2 text-sm text-[var(--oman-ink)]/70">
-                        {application.university_name || "University not provided"} via {application.university_email}
+                        {application.course_topic_proposal || "Topic not provided"} via {application.email}
                       </p>
                     </div>
                     <span className="rounded-full bg-[rgba(197,154,68,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta-dark)]">
@@ -332,12 +332,12 @@ export default function AdminInstructorApplications() {
 
                   <div className="mt-4 grid gap-2 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
                     <p>
-                      <span className="font-semibold text-[var(--oman-ink)]">University ID:</span>{" "}
-                      {application.university_id || "Not provided"}
+                      <span className="font-semibold text-[var(--oman-ink)]">Portfolio:</span>{" "}
+                      {application.portfolio_url || "Not provided"}
                     </p>
                     <p>
-                      <span className="font-semibold text-[var(--oman-ink)]">Major:</span>{" "}
-                      {application.major_name || "Not provided"}
+                      <span className="font-semibold text-[var(--oman-ink)]">Teaching Experience:</span>{" "}
+                      {application.teaching_experience || "Not provided"}
                     </p>
                     <p>
                       <span className="font-semibold text-[var(--oman-ink)]">Submitted:</span>{" "}
@@ -375,28 +375,28 @@ export default function AdminInstructorApplications() {
 
             <div className="mt-6 grid gap-3 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">University:</span>{" "}
-                {activeApplication.university_name || "Not provided"}
-              </p>
-              <p>
                 <span className="font-semibold text-[var(--oman-ink)]">Email:</span>{" "}
-                {activeApplication.university_email}
+                {activeApplication.email || "No email"}
               </p>
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">University ID:</span>{" "}
-                {activeApplication.university_id || "Not provided"}
+                <span className="font-semibold text-[var(--oman-ink)]">Portfolio:</span>{" "}
+                {activeApplication.portfolio_url || "Not provided"}
               </p>
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">Major:</span>{" "}
-                {activeApplication.major_name || "Not provided"}
+                <span className="font-semibold text-[var(--oman-ink)]">Course Topic:</span>{" "}
+                {activeApplication.course_topic_proposal || "Not provided"}
               </p>
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">Desired Courses:</span>{" "}
-                {activeApplication.desired_courses || "Not provided"}
+                <span className="font-semibold text-[var(--oman-ink)]">Teaching Experience:</span>{" "}
+                {activeApplication.teaching_experience || "Not provided"}
               </p>
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">WhatsApp:</span>{" "}
-                {activeApplication.phone_number || "Not provided"}
+                <span className="font-semibold text-[var(--oman-ink)]">Payment Details:</span>{" "}
+                {activeApplication.payment_details || "To be added later"}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">Professional Background:</span>{" "}
+                {activeApplication.professional_background || "Not provided"}
               </p>
               <p>
                 <span className="font-semibold text-[var(--oman-ink)]">Status:</span>{" "}

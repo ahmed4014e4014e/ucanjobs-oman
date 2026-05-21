@@ -41,12 +41,12 @@ export default function InstructorApplication() {
     .replace("{size}", FILE_SIZE_LIMIT_MB);
   const [formValues, setFormValues] = useState({
     fullName: "",
-    universityName: "",
-    universityId: "",
-    majorName: "",
-    desiredCourses: "",
-    universityEmail: "",
-    phoneNumber: "",
+    email: "",
+    professionalBackground: "",
+    portfolioUrl: "",
+    courseTopicProposal: "",
+    teachingExperience: "",
+    paymentDetails: "",
   });
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -122,16 +122,17 @@ export default function InstructorApplication() {
       await createInstructorApplicant({
         applicant_profile_id: user?.id || null,
         full_name: formValues.fullName.trim(),
-        university_name: formValues.universityName.trim(),
-        university_id: formValues.universityId.trim(),
-        major_name: formValues.majorName.trim(),
-        desired_courses: formValues.desiredCourses.trim(),
-        university_email: formValues.universityEmail.trim(),
-        phone_number: formValues.phoneNumber.trim(),
+        email: formValues.email.trim(),
+        professional_background: formValues.professionalBackground.trim(),
+        portfolio_url: formValues.portfolioUrl.trim(),
+        course_topic_proposal: formValues.courseTopicProposal.trim(),
+        teaching_experience: formValues.teachingExperience.trim(),
+        payment_details: formValues.paymentDetails.trim() || null,
         application_message: [
           formatCopy(copy.messages.applicationSubmittedBy, { name: formValues.fullName.trim() }),
-          formatCopy(copy.messages.university, { university: formValues.universityName.trim() }),
-          formatCopy(copy.messages.desired, { courses: formValues.desiredCourses.trim() }),
+          formatCopy(copy.messages.email, { email: formValues.email.trim() }),
+          formatCopy(copy.messages.courseTopic, { topic: formValues.courseTopicProposal.trim() }),
+          formatCopy(copy.messages.portfolio, { portfolio: formValues.portfolioUrl.trim() }),
         ].join("\n"),
         attachment_notes: requiredAttachments.join("\n"),
         attachment_files: uploadedFiles,
@@ -145,12 +146,12 @@ export default function InstructorApplication() {
       });
       setFormValues({
         fullName: "",
-        universityName: "",
-        universityId: "",
-        majorName: "",
-        desiredCourses: "",
-        universityEmail: "",
-        phoneNumber: "",
+        email: "",
+        professionalBackground: "",
+        portfolioUrl: "",
+        courseTopicProposal: "",
+        teachingExperience: "",
+        paymentDetails: "",
       });
       setSelectedFiles([]);
     } catch (error) {
@@ -240,11 +241,11 @@ export default function InstructorApplication() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <RequiredLabel>{copy.universityName}</RequiredLabel>
+              <RequiredLabel>{copy.email}</RequiredLabel>
               <input
-                type="text"
-                name="universityName"
-                value={formValues.universityName}
+                type="email"
+                name="email"
+                value={formValues.email}
                 onChange={handleChange}
                 required
                 className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
@@ -252,66 +253,68 @@ export default function InstructorApplication() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <RequiredLabel>{copy.universityId}</RequiredLabel>
-              <input
-                type="text"
-                name="universityId"
-                value={formValues.universityId}
-                onChange={handleChange}
-                required
-                className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-              />
-            </label>
-
-            <label className="flex flex-col gap-2">
-              <RequiredLabel>{copy.majorName}</RequiredLabel>
-              <input
-                type="text"
-                name="majorName"
-                value={formValues.majorName}
-                onChange={handleChange}
-                required
-                className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-              />
-            </label>
-
-            <label className="flex flex-col gap-2">
-              <RequiredLabel>{copy.desiredCourses}</RequiredLabel>
-              <p className="text-sm leading-6 text-[var(--oman-ink)]/70">
-                {copy.courseNote}
-              </p>
+              <RequiredLabel>{copy.professionalBackground}</RequiredLabel>
               <textarea
-                name="desiredCourses"
-                value={formValues.desiredCourses}
+                name="professionalBackground"
+                value={formValues.professionalBackground}
                 onChange={handleChange}
                 rows={4}
                 required
-                placeholder={copy.coursePlaceholder}
+                placeholder={copy.professionalBackgroundPlaceholder}
                 className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
               />
             </label>
 
             <label className="flex flex-col gap-2">
-              <RequiredLabel>{copy.universityEmail}</RequiredLabel>
+              <RequiredLabel>{copy.portfolioUrl}</RequiredLabel>
               <input
-                type="email"
-                name="universityEmail"
-                value={formValues.universityEmail}
+                type="url"
+                name="portfolioUrl"
+                value={formValues.portfolioUrl}
                 onChange={handleChange}
                 required
+                placeholder={copy.portfolioUrlPlaceholder}
                 className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
               />
             </label>
 
             <label className="flex flex-col gap-2">
-              <RequiredLabel>{copy.phoneNumber}</RequiredLabel>
-              <input
-                type="text"
-                name="phoneNumber"
-                value={formValues.phoneNumber}
+              <RequiredLabel>{copy.courseTopicProposal}</RequiredLabel>
+              <textarea
+                name="courseTopicProposal"
+                value={formValues.courseTopicProposal}
                 onChange={handleChange}
+                rows={4}
                 required
-                className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
+                placeholder={copy.courseTopicPlaceholder}
+                className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
+              />
+            </label>
+
+            <label className="flex flex-col gap-2">
+              <RequiredLabel>{copy.teachingExperience}</RequiredLabel>
+              <textarea
+                name="teachingExperience"
+                value={formValues.teachingExperience}
+                onChange={handleChange}
+                rows={4}
+                required
+                placeholder={copy.teachingExperiencePlaceholder}
+                className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
+              />
+            </label>
+
+            <label className="flex flex-col gap-2">
+              <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
+                {copy.paymentDetails}
+              </span>
+              <textarea
+                name="paymentDetails"
+                value={formValues.paymentDetails}
+                onChange={handleChange}
+                rows={3}
+                placeholder={copy.paymentDetailsPlaceholder}
+                className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
               />
             </label>
 
