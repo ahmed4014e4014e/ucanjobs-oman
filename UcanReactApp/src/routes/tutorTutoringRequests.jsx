@@ -1,0 +1,457 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import ActionFeedback from "../components/ActionFeedback";
+import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
+import { downloadStorageAttachment } from "../lib/adminDownloads";
+import AdminAttachmentDownloadList from "../components/AdminAttachmentDownloadList";
+import {
+  fetchTutorTutoringRequests,
+  updateTutoringRequestStatus,
+} from "../lib/tutoringApi";
+import {
+  formatStatusLabel,
+  isDashboardArchivedStatus,
+  normalizeStatus,
+  TUTORING_STATUS_OPTIONS,
+} from "../lib/requestStatuses";
+import { extractTutoringRequestTitle } from "../lib/tutoringRequestMeta";
+
+function formatSubmittedAt(value) {
+  if (!value) {
+    return null;
+  }
+
+  return new Date(value).toLocaleString("en-OM", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function formatCopy(template, values) {
+  return Object.entries(values).reduce(
+    (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+    template
+  );
+}
+
+export default function TutorTutoringRequests() {
+  const { user } = useAuth();
+  const { t } = useLanguage();
+  const copy = t("records");
+  const page = copy.tutoring;
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [activeRequest, setActiveRequest] = useState(null);
+  const [feedback, setFeedback] = useState({
+    type: "idle",
+    message: "",
+  });
+  const [downloadingPaths, setDownloadingPaths] = useState({});
+  const [statusDraft, setStatusDraft] = useState("pending");
+  const [statusSaving, setStatusSaving] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadRequests = async () => {
+      if (!user?.id) {
+        setRequests([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError("");
+
+      try {
+        const results = await fetchTutorTutoringRequests(user.id);
+
+        if (!ignore) {
+          setRequests(results);
+        }
+      } catch (fetchError) {
+        if (!ignore) {
+          setError(fetchError.message || page.fetchError);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadRequests();
+
+    return () => {
+      ignore = true;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!activeRequest) {
+      return undefined;
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setActiveRequest(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [activeRequest]);
+
+  useEffect(() => {
+    if (!activeRequest) {
+      setStatusDraft("pending");
+      return;
+    }
+
+    setStatusDraft(normalizeStatus(activeRequest.status));
+  }, [activeRequest]);
+
+  const visibleRequests = useMemo(
+    () => requests.filter((request) => !isDashboardArchivedStatus(request.status)),
+    [requests]
+  );
+
+  const stats = useMemo(() => {
+    return {
+      totalRequests: visibleRequests.length,
+      pendingRequests: visibleRequests.filter(
+        (request) => normalizeStatus(request.status) === "pending"
+      ).length,
+      privateRequests: visibleRequests.filter((request) => request.session_type === "private").length,
+    };
+  }, [visibleRequests]);
+
+  const getRequestHeading = (request) => {
+    const courseCode = request.course?.code || page.courseFallback;
+    const requestTitle = extractTutoringRequestTitle(request);
+
+    return requestTitle ? `${courseCode} - ${requestTitle}` : courseCode;
+  };
+
+  const handleAttachmentDownload = async ({ bucket, path, fileName }) => {
+    setFeedback({
+      type: "idle",
+      message: "",
+    });
+    setDownloadingPaths((current) => ({
+      ...current,
+      [path]: true,
+    }));
+
+    try {
+      await downloadStorageAttachment({ bucket, path, fileName });
+      setFeedback({
+        type: "success",
+        message: formatCopy(copy.downloaded, { fileName: fileName || copy.attachment }),
+      });
+    } catch (downloadError) {
+      setFeedback({
+        type: "error",
+        message: downloadError.message || copy.downloadError,
+      });
+    } finally {
+      setDownloadingPaths((current) => ({
+        ...current,
+        [path]: false,
+      }));
+    }
+  };
+
+  const handleStatusSave = async () => {
+    if (!activeRequest) {
+      return;
+    }
+
+    setStatusSaving(true);
+    setFeedback({
+      type: "idle",
+      message: "",
+    });
+
+    try {
+      const updatedRequest = await updateTutoringRequestStatus(activeRequest.id, statusDraft);
+      const mergedRequest = {
+        ...activeRequest,
+        ...updatedRequest,
+        status: normalizeStatus(updatedRequest.status),
+      };
+
+      if (isDashboardArchivedStatus(mergedRequest.status)) {
+        setRequests((current) =>
+          current.filter((request) => request.id !== mergedRequest.id)
+        );
+        setActiveRequest(null);
+      } else {
+        setRequests((current) =>
+          current.map((request) => (request.id === mergedRequest.id ? mergedRequest : request))
+        );
+        setActiveRequest(mergedRequest);
+      }
+      setFeedback({
+        type: "success",
+        message: formatCopy(page.statusSaved, { status: formatStatusLabel(statusDraft) }),
+      });
+    } catch (statusError) {
+      setFeedback({
+        type: "error",
+        message: statusError.message || page.statusError,
+      });
+    } finally {
+      setStatusSaving(false);
+    }
+  };
+
+  return (
+    <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
+      <section className="mx-auto max-w-6xl">
+        <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+                {page.kicker}
+              </p>
+              <h1 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
+                {page.title}
+              </h1>
+              <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
+                {page.description}
+              </p>
+            </div>
+            <Link
+              to="/tutor-dashboard/"
+              className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+            >
+              {page.back}
+            </Link>
+          </div>
+
+          <ActionFeedback
+            type={feedback.type}
+            message={feedback.message}
+            title={page.feedbackTitle}
+            className="mt-6"
+          />
+
+          <div className="mt-8 grid grid-cols-3 gap-3 text-center">
+            <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-3 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                {copy.total}
+              </p>
+              <p className="mt-2 text-xl font-bold text-[var(--oman-ink)]">{stats.totalRequests}</p>
+            </div>
+            <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-3 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                {copy.pending}
+              </p>
+              <p className="mt-2 text-xl font-bold text-[var(--oman-ink)]">{stats.pendingRequests}</p>
+            </div>
+            <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-3 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                {copy.private}
+              </p>
+              <p className="mt-2 text-xl font-bold text-[var(--oman-ink)]">{stats.privateRequests}</p>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
+                {page.loadingTitle}
+              </h3>
+              <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
+                {page.loadingText}
+              </p>
+            </div>
+          ) : error ? (
+            <div className="mt-8 rounded-3xl border border-[rgba(155,77,49,0.22)] bg-[rgba(255,239,232,0.95)] p-6 text-[var(--oman-terracotta-dark)]">
+              <h3 className="text-xl font-semibold">{page.errorTitle}</h3>
+              <p className="mt-4 leading-7">{error}</p>
+            </div>
+          ) : visibleRequests.length === 0 ? (
+            <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
+                {page.emptyTitle}
+              </h3>
+              <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
+                {page.emptyText}
+              </p>
+            </div>
+          ) : (
+            <div className="mt-8 grid gap-4">
+              {visibleRequests.map((request) => (
+                <button
+                  key={request.id}
+                  type="button"
+                  onClick={() => setActiveRequest(request)}
+                  className="rounded-3xl oman-outline-panel p-5 text-left transition hover:-translate-y-0.5 hover:shadow-[0_16px_38px_rgba(73,39,27,0.08)] sm:p-6"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-[var(--oman-ink)]">
+                        {getRequestHeading(request)}
+                      </h3>
+                      <p className="mt-2 text-sm text-[var(--oman-ink)]/70">
+                        {formatCopy(page.studentLine, {
+                          name: request.student?.full_name || copy.notProvidedStudent,
+                          email: request.student?.email || copy.noEmail,
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="rounded-full bg-[rgba(197,154,68,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta-dark)]">
+                        {request.session_type}
+                      </span>
+                      <span className="rounded-full bg-[rgba(155,77,49,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta-dark)]">
+                        {formatStatusLabel(request.status)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-2 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
+                    <p>
+                      <span className="font-semibold text-[var(--oman-ink)]">{page.studentInstitute}</span>{" "}
+                      {request.institute_name_snapshot || request.student?.institute || copy.notProvided}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-[var(--oman-ink)]">{copy.submitted}</span>{" "}
+                      {formatSubmittedAt(request.created_at) || copy.unknown}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-[var(--oman-ink)]">{copy.attachments}</span>{" "}
+                      {Array.isArray(request.attachment_files) ? request.attachment_files.length : 0}
+                    </p>
+                  </div>
+
+                  <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
+                    {page.openHint}
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {activeRequest && (
+        <div className="oman-overlay fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/65 px-4 py-6">
+          <div className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-[1.75rem] oman-card p-6 sm:p-8">
+            <button
+              type="button"
+              onClick={() => setActiveRequest(null)}
+              className="absolute right-4 top-4 rounded-full bg-[rgba(197,154,68,0.12)] px-3 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] transition hover:bg-[rgba(197,154,68,0.2)]"
+              aria-label={copy.close}
+            >
+              {copy.close}
+            </button>
+
+            <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+              {page.popupKicker}
+            </p>
+            <h2 className="oman-title-accent mt-4 pr-16 text-2xl font-semibold sm:text-3xl">
+              {getRequestHeading(activeRequest)}
+            </h2>
+
+            <div className="mt-6 grid gap-3 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">{page.student}</span>{" "}
+                {activeRequest.student?.full_name || copy.notProvidedStudent}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">{copy.email}</span>{" "}
+                {activeRequest.student?.email || copy.noEmail}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">{page.studentInstitute}</span>{" "}
+                {activeRequest.institute_name_snapshot || activeRequest.student?.institute || copy.notProvided}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">{page.sessionType}</span>{" "}
+                {activeRequest.session_type}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">{copy.status}</span>{" "}
+                {formatStatusLabel(activeRequest.status)}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">{copy.submitted}</span>{" "}
+                {formatSubmittedAt(activeRequest.created_at) || copy.unknown}
+              </p>
+            </div>
+
+            <div className="mt-6 rounded-2xl bg-[rgba(255,252,247,0.92)] px-4 py-4 text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.1)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
+                {copy.statusWorkflow}
+              </p>
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+                <label className="flex-1">
+                  <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
+                    {copy.updateStatus}
+                  </span>
+                  <select
+                    value={statusDraft}
+                    onChange={(event) => setStatusDraft(event.target.value)}
+                    className="mt-2 min-h-12 w-full rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
+                  >
+                    {TUTORING_STATUS_OPTIONS.map((statusOption) => (
+                      <option key={statusOption} value={statusOption}>
+                        {formatStatusLabel(statusOption)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  onClick={handleStatusSave}
+                  disabled={statusSaving || statusDraft === normalizeStatus(activeRequest.status)}
+                  className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {statusSaving ? copy.saving : copy.saveStatus}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-2xl bg-[rgba(255,252,247,0.92)] px-4 py-4 text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.1)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
+                {page.topics}
+              </p>
+              <p className="mt-3 whitespace-pre-wrap leading-7 text-[var(--oman-ink)]/80">
+                {activeRequest.topics_needed_help_with}
+              </p>
+            </div>
+
+            {(activeRequest.attachment_notes ||
+              (Array.isArray(activeRequest.attachment_files) &&
+                activeRequest.attachment_files.length > 0)) && (
+              <div className="mt-4 rounded-2xl bg-[rgba(244,232,214,0.34)] px-4 py-4 text-[var(--oman-ink)]">
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
+                  {copy.attachments}
+                </p>
+                {activeRequest.attachment_notes && (
+                  <p className="mt-3 whitespace-pre-wrap leading-7 text-[var(--oman-ink)]/80">
+                    {activeRequest.attachment_notes}
+                  </p>
+                )}
+                <AdminAttachmentDownloadList
+                  files={activeRequest.attachment_files}
+                  bucket="tutoring-attachments"
+                  downloadingPaths={downloadingPaths}
+                  onDownload={handleAttachmentDownload}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </main>
+  );
+}

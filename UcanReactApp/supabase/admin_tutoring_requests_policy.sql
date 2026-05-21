@@ -26,3 +26,10 @@ create policy "Admins can read tutoring requests"
 on public.tutoring_requests
 for select
 using (public.is_admin_user());
+
+drop policy if exists "Admins can update tutoring requests" on public.tutoring_requests;
+create policy "Admins can update tutoring requests"
+on public.tutoring_requests
+for update
+using (public.is_admin_user())
+with check (public.is_admin_user());

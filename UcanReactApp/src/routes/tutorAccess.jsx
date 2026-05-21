@@ -1,16 +1,22 @@
 import AuthAccessPage from "./AuthAccessPage";
+import TutorApplicationSignupPanel from "../components/TutorApplicationSignupPanel";
+import { useLanguage } from "../context/LanguageContext";
 import soharUniversityImage from "../assets/auth-images/sohar-university.jpg";
 
 export default function TutorAccess() {
+  const { t } = useLanguage();
+  const copy = t("accessPages.tutor");
+
   return (
     <AuthAccessPage
-      audienceLabel="Tutor Access"
-      title="Log in or sign up to join the Ucan Oman tutor team."
-      description="This page is designed for tutors who want to create an account, access the platform, and become part of the Ucan Oman support network."
-      signupHeading="Create a tutor account"
+      audienceLabel={copy.audienceLabel}
+      title={copy.title}
+      description={copy.description}
+      signupHeading={copy.signupHeading}
       role="tutor"
       accessImage={soharUniversityImage}
-      accessImageAlt="Sohar University campus in Oman"
+      accessImageAlt={copy.imageAlt}
+      signupPanel={<TutorApplicationSignupPanel />}
     />
   );
 }

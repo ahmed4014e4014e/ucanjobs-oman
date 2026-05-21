@@ -25,6 +25,16 @@ using (
   and (storage.foldername(name))[1] = auth.uid()::text
 );
 
+drop policy if exists "Tutors can read assigned tutoring attachments" on storage.objects;
+create policy "Tutors can read assigned tutoring attachments"
+on storage.objects
+for select
+to authenticated
+using (
+  bucket_id = 'tutoring-attachments'
+  and (storage.foldername(name))[2] = auth.uid()::text
+);
+
 drop policy if exists "Users can update own tutoring attachments" on storage.objects;
 create policy "Users can update own tutoring attachments"
 on storage.objects

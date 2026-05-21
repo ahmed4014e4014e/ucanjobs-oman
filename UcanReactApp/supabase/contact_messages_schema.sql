@@ -6,9 +6,18 @@ create table if not exists public.contact_messages (
   institute text,
   subject text not null,
   message text not null,
-  status text not null default 'new',
+  status text not null default 'pending' check (status in ('pending', 'reviewed', 'scheduled', 'completed', 'cancelled')),
   created_at timestamptz not null default timezone('utc', now())
 );
+
+create index if not exists contact_messages_status_idx
+  on public.contact_messages (status);
+
+create index if not exists contact_messages_created_at_idx
+  on public.contact_messages (created_at desc);
+
+create index if not exists contact_messages_status_created_at_idx
+  on public.contact_messages (status, created_at desc);
 
 alter table public.contact_messages enable row level security;
 

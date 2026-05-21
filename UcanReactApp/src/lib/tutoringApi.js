@@ -2,7 +2,7 @@ import { isSupabaseConfigured, supabase } from "./supabase";
 
 function ensureSupabase() {
   if (!isSupabaseConfigured || !supabase) {
-    throw new Error("Supabase is not configured yet.");
+    throw new Error("database is not configured yet.");
   }
 }
 
@@ -21,7 +21,6 @@ export async function fetchTutorDirectory() {
           display_name,
           institute_code,
           bio,
-          booking_url,
           is_active
         ),
         course:courses (
@@ -73,11 +72,6 @@ export function buildTutorCards(offerings, sessionType) {
           bio:
             entry.tutor.bio ||
             `Offers free ${sessionType === "private" ? "one-on-one" : "group"} tutoring sessions.`,
-          bookingUrl: entry.tutor.booking_url || "https://calendly.com/ahmed4014e/30min",
-          bookingLabel:
-            sessionType === "private"
-              ? `book tutor ${tutorName}`
-              : `book group tutoring with ${tutorName}`,
           availability:
             sessionType === "private"
               ? "Available for private tutoring"
@@ -215,6 +209,12 @@ export async function fetchTutorTutoringRequests(tutorId) {
         attachment_files,
         status,
         created_at,
+        student:profiles!tutoring_requests_student_id_fkey (
+          id,
+          full_name,
+          email,
+          institute
+        ),
         course:courses!tutoring_requests_course_id_fkey (
           id,
           code,
@@ -230,4 +230,32 @@ export async function fetchTutorTutoringRequests(tutorId) {
   }
 
   return data ?? [];
+}
+
+export async function updateTutoringRequestStatus(requestId, status) {
+  ensureSupabase();
+
+  const { data, error } = await supabase
+    .from("tutoring_requests")
+    .update({ status })
+    .eq("id", requestId)
+    .select(
+      `
+        id,
+        session_type,
+        institute_name_snapshot,
+        topics_needed_help_with,
+        attachment_notes,
+        attachment_files,
+        status,
+        created_at
+      `
+    )
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }

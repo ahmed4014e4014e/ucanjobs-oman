@@ -1,9 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
+import ActionFeedback from "../components/ActionFeedback";
+import PasswordField from "../components/PasswordField";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { getDashboardPath, getUserRole } from "../lib/authRouting";
 import { themeImages } from "../lib/themeImages";
+
+function formatCopy(template, values) {
+  return Object.entries(values).reduce(
+    (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+    template
+  );
+}
 
 export default function AuthAccessPage({
   audienceLabel,
@@ -14,9 +24,15 @@ export default function AuthAccessPage({
   allowSignup = true,
   accessImage,
   accessImageAlt,
+  signupPanel = null,
+  requireTermsAgreement = false,
+  collectSignupProfile = true,
+  enableGoogleAuth = false,
 }) {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
+  const { t } = useLanguage();
+  const copy = t("authAccess");
   const loginSectionRef = useRef(null);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -28,8 +44,10 @@ export default function AuthAccessPage({
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupInstitute, setSignupInstitute] = useState("");
+  const [signupAcceptedTerms, setSignupAcceptedTerms] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [signupLoading, setSignupLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [roleCheckInProgress, setRoleCheckInProgress] = useState(false);
   const [message, setMessage] = useState("");
@@ -48,7 +66,7 @@ export default function AuthAccessPage({
 
     if (urlHasRecoveryToken) {
       setRecoveryMode(true);
-      showMessage("success", "Enter a new password below to finish resetting your account.");
+      showMessage("success", copy.recoveryStart);
     }
 
     if (!isSupabaseConfigured || !supabase) {
@@ -60,12 +78,12 @@ export default function AuthAccessPage({
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setRecoveryMode(true);
-        showMessage("success", "Enter a new password below to finish resetting your account.");
+        showMessage("success", copy.recoveryStart);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [copy.recoveryStart]);
 
   useEffect(() => {
     if (resetCooldownSeconds <= 0) {
@@ -94,10 +112,10 @@ export default function AuthAccessPage({
   };
 
   useEffect(() => {
-    if (!loading && user && !roleCheckInProgress) {
-      navigate(getDashboardPath(getUserRole(profile, user, role)), { replace: true });
+    if (!loading && user && profile?.role && !roleCheckInProgress) {
+      navigate(getDashboardPath(profile.role), { replace: true });
     }
-  }, [loading, navigate, profile, role, roleCheckInProgress, user]);
+  }, [loading, navigate, profile, roleCheckInProgress, user]);
 
   const resolveAccountRole = async (authUser) => {
     if (!authUser) {
@@ -105,7 +123,7 @@ export default function AuthAccessPage({
     }
 
     if (!isSupabaseConfigured || !supabase) {
-      return getUserRole(null, authUser, null);
+      return null;
     }
 
     const { data } = await supabase
@@ -114,7 +132,7 @@ export default function AuthAccessPage({
       .eq("id", authUser.id)
       .maybeSingle();
 
-    return getUserRole(data, authUser, null);
+    return data?.role ?? null;
   };
 
   const handleLogin = async (event) => {
@@ -123,7 +141,7 @@ export default function AuthAccessPage({
     if (!isSupabaseConfigured || !supabase) {
       showMessage(
         "error",
-        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+        copy.supabaseMissing
       );
       return;
     }
@@ -138,7 +156,17 @@ export default function AuthAccessPage({
     });
 
     if (error) {
-      showMessage("error", error.message);
+      const errorMessage = error.message || "";
+      const shouldSuggestSignup =
+        role === "student" &&
+        /invalid login credentials|invalid credentials|email not confirmed/i.test(errorMessage);
+
+      showMessage(
+        "error",
+        shouldSuggestSignup
+          ? copy.studentSignupFirst
+          : errorMessage
+      );
       setRoleCheckInProgress(false);
       setLoginLoading(false);
       return;
@@ -146,20 +174,31 @@ export default function AuthAccessPage({
 
     const actualRole = await resolveAccountRole(data.user);
 
-    if (actualRole && actualRole !== role) {
+    if (!actualRole) {
       await supabase.auth.signOut();
       showMessage(
         "error",
-        `This account is registered as a ${actualRole}. Please use the ${actualRole} access page instead.`
+        copy.profileLoadError
       );
       setRoleCheckInProgress(false);
       setLoginLoading(false);
       return;
     }
 
-    showMessage("success", "Login successful.");
+    if (actualRole !== role) {
+      await supabase.auth.signOut();
+      showMessage(
+        "error",
+        formatCopy(copy.wrongRole, { role: actualRole })
+      );
+      setRoleCheckInProgress(false);
+      setLoginLoading(false);
+      return;
+    }
+
+    showMessage("success", copy.loginSuccess);
     setRoleCheckInProgress(false);
-    navigate(getDashboardPath(getUserRole(null, data.user, role)), { replace: true });
+    navigate(getDashboardPath(actualRole), { replace: true });
     setLoginLoading(false);
   };
 
@@ -167,20 +206,20 @@ export default function AuthAccessPage({
     if (resetCooldownSeconds > 0) {
       showMessage(
         "error",
-        `Please wait ${resetCooldownSeconds} seconds before requesting another reset email.`
+        formatCopy(copy.resetCooldown, { seconds: resetCooldownSeconds })
       );
       return;
     }
 
     if (!loginEmail) {
-      showMessage("error", "Enter your email first, then click forgot password again.");
+      showMessage("error", copy.enterEmailFirst);
       return;
     }
 
     if (!isSupabaseConfigured || !supabase) {
       showMessage(
         "error",
-        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+        copy.supabaseMissing
       );
       return;
     }
@@ -200,7 +239,7 @@ export default function AuthAccessPage({
 
     showMessage(
       "success",
-      `A password reset link was sent to ${loginEmail}. Please check your email and spam folder.`
+      formatCopy(copy.resetSent, { email: loginEmail })
     );
     setResetCooldownSeconds(60);
     setResetLoading(false);
@@ -210,14 +249,14 @@ export default function AuthAccessPage({
     event.preventDefault();
 
     if (!resetPassword || resetPassword.length < 6) {
-      showMessage("error", "Your new password must be at least 6 characters.");
+      showMessage("error", copy.shortPassword);
       return;
     }
 
     if (!isSupabaseConfigured || !supabase) {
       showMessage(
         "error",
-        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+        copy.supabaseMissing
       );
       return;
     }
@@ -237,7 +276,7 @@ export default function AuthAccessPage({
 
     setResetPassword("");
     setRecoveryMode(false);
-    showMessage("success", "Your password was updated successfully. You can now log in.");
+    showMessage("success", copy.passwordUpdated);
     navigate(getDashboardPath(role), { replace: true });
     setResetLoading(false);
   };
@@ -246,14 +285,14 @@ export default function AuthAccessPage({
     const emailToConfirm = pendingConfirmationEmail || signupEmail || loginEmail;
 
     if (!emailToConfirm) {
-      showMessage("error", "Enter your email first so we can resend the confirmation link.");
+      showMessage("error", copy.confirmationEmailFirst);
       return;
     }
 
     if (!isSupabaseConfigured || !supabase) {
       showMessage(
         "error",
-        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+        copy.supabaseMissing
       );
       return;
     }
@@ -277,7 +316,7 @@ export default function AuthAccessPage({
     setPendingConfirmationEmail(emailToConfirm);
     showMessage(
       "success",
-      `A new confirmation email was sent to ${emailToConfirm}. Please also check your spam folder.`
+      formatCopy(copy.confirmationResent, { email: emailToConfirm })
     );
     setResendLoading(false);
   };
@@ -285,10 +324,18 @@ export default function AuthAccessPage({
   const handleSignup = async (event) => {
     event.preventDefault();
 
+    if (requireTermsAgreement && !signupAcceptedTerms) {
+      showMessage(
+        "error",
+        copy.termsRequired
+      );
+      return;
+    }
+
     if (!isSupabaseConfigured || !supabase) {
       showMessage(
         "error",
-        "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local."
+        copy.supabaseMissing
       );
       return;
     }
@@ -301,9 +348,13 @@ export default function AuthAccessPage({
       password: signupPassword,
       options: {
         data: {
-          full_name: signupName,
           role,
-          institute: signupInstitute,
+          ...(collectSignupProfile
+            ? {
+                full_name: signupName,
+                institute: signupInstitute,
+              }
+            : {}),
         },
       },
     });
@@ -312,7 +363,7 @@ export default function AuthAccessPage({
       if (error.message?.toLowerCase().includes("already registered")) {
         sendUserToLogin(
           signupEmail,
-          `An account with ${signupEmail} already exists. Please log in with your existing account instead.`
+          formatCopy(copy.existingAccount, { email: signupEmail })
         );
         setSignupLoading(false);
         return;
@@ -332,7 +383,7 @@ export default function AuthAccessPage({
     if (isExistingConfirmedAccount) {
       sendUserToLogin(
         signupEmail,
-        `An account with ${signupEmail} already exists. Please log in with your existing account instead.`
+        formatCopy(copy.existingAccount, { email: signupEmail })
       );
       setSignupLoading(false);
       return;
@@ -344,18 +395,24 @@ export default function AuthAccessPage({
     const hasSession = Boolean(data.session);
 
     if (userId && hasSession) {
-      const { error: profileError } = await supabase.from("profiles").upsert({
+      const profilePayload = {
         id: userId,
-        full_name: signupName,
         role,
-        institute: signupInstitute,
         email: signupEmail,
-      });
+        ...(collectSignupProfile
+          ? {
+              full_name: signupName,
+              institute: signupInstitute,
+            }
+          : {}),
+      };
+
+      const { error: profileError } = await supabase.from("profiles").upsert(profilePayload);
 
       if (profileError) {
         showMessage(
           "error",
-          `Account created, but profile sync failed: ${profileError.message}`
+          formatCopy(copy.profileSyncFailed, { message: profileError.message })
         );
         setSignupLoading(false);
         return;
@@ -363,16 +420,63 @@ export default function AuthAccessPage({
     }
 
     if (data.session) {
-      showMessage("success", "Account created successfully.");
+      showMessage("success", copy.accountCreated);
       navigate(getDashboardPath(role), { replace: true });
     } else {
       showMessage(
         "success",
-        `Account created. Check ${signupEmail} for your confirmation email before logging in.`
+        formatCopy(copy.accountCreatedConfirm, { email: signupEmail })
       );
     }
 
     setSignupLoading(false);
+  };
+
+  const handleGoogleAuth = async () => {
+    if (requireTermsAgreement && !signupAcceptedTerms) {
+      showMessage(
+        "error",
+        copy.termsRequiredGoogle
+      );
+      return;
+    }
+
+    if (!isSupabaseConfigured || !supabase) {
+      showMessage(
+        "error",
+        copy.supabaseMissing
+      );
+      return;
+    }
+
+    setGoogleLoading(true);
+    setMessage("");
+
+    try {
+      window.localStorage.setItem("ucan_pending_oauth_role", role);
+    } catch (_error) {
+      // If storage is unavailable, the database auth flow can still complete Google auth.
+    }
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}${getDashboardPath(role)}`,
+        queryParams: {
+          prompt: "select_account",
+        },
+      },
+    });
+
+    if (error) {
+      try {
+        window.localStorage.removeItem("ucan_pending_oauth_role");
+      } catch (_storageError) {
+        // Ignore storage access issues after a failed OAuth attempt.
+      }
+      showMessage("error", error.message);
+      setGoogleLoading(false);
+    }
   };
 
   return (
@@ -419,28 +523,27 @@ export default function AuthAccessPage({
       <section className="mx-auto mt-10 max-w-5xl">
         {!isSupabaseConfigured && (
           <div className="rounded-3xl border border-[rgba(197,154,68,0.28)] bg-[rgba(255,244,222,0.9)] px-5 py-4 text-sm leading-6 text-[var(--oman-terracotta-dark)]">
-            Supabase is not configured yet. Add `VITE_SUPABASE_URL` and
-            `VITE_SUPABASE_ANON_KEY` to `.env.local` before testing auth.
+            {copy.supabaseNotice}
           </div>
         )}
 
-        {message && (
-          <div
-            className={[
-              "mt-6 rounded-3xl px-5 py-4 text-sm leading-6",
-              messageType === "error"
-                ? "border border-[rgba(155,77,49,0.22)] bg-[rgba(255,239,232,0.95)] text-[var(--oman-terracotta-dark)]"
-                : "border border-[rgba(82,101,74,0.22)] bg-[rgba(239,246,236,0.95)] text-[var(--oman-olive)]",
-            ].join(" ")}
-          >
-            {message}
-          </div>
-        )}
+        <ActionFeedback
+          type={messageType}
+          message={message}
+          title={
+            messageType === "error"
+              ? copy.feedbackErrorTitle
+              : recoveryMode
+                ? copy.feedbackRecoveryTitle
+                : copy.feedbackAccessTitle
+          }
+          className="mt-6 rounded-3xl px-5 py-4"
+        />
 
         {!loading && !user && pendingConfirmationEmail && (
           <div className="mt-4 rounded-3xl oman-card px-5 py-4">
             <p className="text-sm leading-6 text-[var(--oman-ink)]/75">
-              Did not receive the confirmation email for{" "}
+              {copy.confirmationQuestion}{" "}
               <span className="font-semibold text-[var(--oman-ink)]">{pendingConfirmationEmail}</span>?
             </p>
             <button
@@ -449,7 +552,7 @@ export default function AuthAccessPage({
               disabled={resendLoading}
               className="oman-button-secondary mt-4 inline-flex items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {resendLoading ? "Resending..." : "Resend Confirmation Email"}
+              {resendLoading ? copy.resending : copy.resendConfirmation}
             </button>
           </div>
         )}
@@ -466,65 +569,55 @@ export default function AuthAccessPage({
           className="rounded-[1.75rem] oman-card p-6 sm:p-8"
         >
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            {recoveryMode ? "Reset Password" : "Log In"}
+            {recoveryMode ? copy.resetPassword : copy.logIn}
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
-            {recoveryMode ? "Create a new password" : "Welcome back"}
+            {recoveryMode ? copy.createNewPassword : copy.welcomeBack}
           </h2>
 
           {recoveryMode ? (
             <form className="mt-6 space-y-4" onSubmit={handleUpdatePassword}>
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                  New Password
-                </span>
-                <input
-                  type="password"
-                  placeholder="Enter a new password"
-                  value={resetPassword}
-                  onChange={(event) => setResetPassword(event.target.value)}
-                  className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  required
-                />
-              </label>
+              <PasswordField
+                label={copy.newPassword}
+                placeholder={copy.newPasswordPlaceholder}
+                value={resetPassword}
+                onChange={(event) => setResetPassword(event.target.value)}
+                required
+              />
               <button
                 type="submit"
                 disabled={resetLoading}
                 className="oman-button-primary mt-2 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {resetLoading ? "Updating Password..." : "Update Password"}
+                {resetLoading ? copy.updatingPassword : copy.updatePassword}
               </button>
             </form>
           ) : (
             <form className="mt-6 space-y-4" onSubmit={handleLogin}>
               <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Email</span>
+                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">{copy.email}</span>
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={copy.emailPlaceholder}
                   value={loginEmail}
                   onChange={(event) => setLoginEmail(event.target.value)}
                   className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
                   required
                 />
               </label>
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Password</span>
-                <input
-                  type="password"
-                  placeholder="Enter your password"
-                  value={loginPassword}
-                  onChange={(event) => setLoginPassword(event.target.value)}
-                  className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  required
-                />
-              </label>
+              <PasswordField
+                label={copy.password}
+                placeholder={copy.passwordPlaceholder}
+                value={loginPassword}
+                onChange={(event) => setLoginPassword(event.target.value)}
+                required
+              />
               <button
                 type="submit"
                 disabled={loginLoading}
                 className="oman-button-secondary mt-2 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {loginLoading ? "Logging In..." : "Log In"}
+                {loginLoading ? copy.loggingIn : copy.logIn}
               </button>
               <button
                 type="button"
@@ -533,10 +626,10 @@ export default function AuthAccessPage({
                 className="w-full rounded-2xl px-4 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] transition hover:bg-[rgba(197,154,68,0.08)] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {resetLoading
-                  ? "Sending Reset Link..."
+                  ? copy.sendingReset
                   : resetCooldownSeconds > 0
-                    ? `Try again in ${resetCooldownSeconds}s`
-                    : "Forgot password?"}
+                    ? formatCopy(copy.tryAgain, { seconds: resetCooldownSeconds })
+                    : copy.forgotPassword}
               </button>
             </form>
           )}
@@ -544,63 +637,107 @@ export default function AuthAccessPage({
 
         {allowSignup && (
           <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
-            <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              Sign Up
-            </p>
-            <h2 className="oman-title-accent mt-4 text-2xl font-semibold">{signupHeading}</h2>
-            <form className="mt-6 space-y-4" onSubmit={handleSignup}>
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Full Name</span>
-                <input
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={signupName}
-                  onChange={(event) => setSignupName(event.target.value)}
-                  className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  required
-                />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Institute</span>
-                <input
-                  type="text"
-                  placeholder="Enter your institute name"
-                  value={signupInstitute}
-                  onChange={(event) => setSignupInstitute(event.target.value)}
-                  className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  required
-                />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Email</span>
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={signupEmail}
-                  onChange={(event) => setSignupEmail(event.target.value)}
-                  className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  required
-                />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">Password</span>
-                <input
-                  type="password"
-                  placeholder="Create a password"
-                  value={signupPassword}
-                  onChange={(event) => setSignupPassword(event.target.value)}
-                  className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  required
-                />
-              </label>
-              <button
-                type="submit"
-                disabled={signupLoading}
-                className="oman-button-primary mt-2 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {signupLoading ? "Creating Account..." : "Create Account"}
-              </button>
-            </form>
+            {signupPanel || (
+              <>
+                <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+                  {copy.signUp}
+                </p>
+                <h2 className="oman-title-accent mt-4 text-2xl font-semibold">{signupHeading}</h2>
+                <form className="mt-6 space-y-4" onSubmit={handleSignup}>
+                  {collectSignupProfile && (
+                    <>
+                      <label className="flex flex-col gap-2">
+                        <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">{copy.fullName}</span>
+                        <input
+                          type="text"
+                          placeholder={copy.fullNamePlaceholder}
+                          value={signupName}
+                          onChange={(event) => setSignupName(event.target.value)}
+                          className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
+                          required
+                        />
+                      </label>
+                      <label className="flex flex-col gap-2">
+                        <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">{copy.institute}</span>
+                        <input
+                          type="text"
+                          placeholder={copy.institutePlaceholder}
+                          value={signupInstitute}
+                          onChange={(event) => setSignupInstitute(event.target.value)}
+                          className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
+                          required
+                        />
+                      </label>
+                    </>
+                  )}
+                  <label className="flex flex-col gap-2">
+                    <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">{copy.email}</span>
+                    <input
+                      type="email"
+                      placeholder={copy.emailPlaceholder}
+                      value={signupEmail}
+                      onChange={(event) => setSignupEmail(event.target.value)}
+                      className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
+                      required
+                    />
+                  </label>
+                  <PasswordField
+                    label={copy.password}
+                    placeholder={copy.createPasswordPlaceholder}
+                    value={signupPassword}
+                    onChange={(event) => setSignupPassword(event.target.value)}
+                    required
+                  />
+                  {requireTermsAgreement && (
+                    <label className="flex items-start gap-3 rounded-2xl bg-[rgba(244,232,214,0.34)] px-4 py-4 text-sm leading-6 text-[var(--oman-ink)]">
+                      <input
+                        type="checkbox"
+                        checked={signupAcceptedTerms}
+                        onChange={(event) => setSignupAcceptedTerms(event.target.checked)}
+                        className="mt-1 h-4 w-4 rounded border-[rgba(111,49,29,0.24)] text-[var(--oman-terracotta)] focus:ring-[var(--oman-brass)]"
+                        required
+                      />
+                      <span>
+                        {copy.termsAgreementPrefix}{" "}
+                        <a
+                          href="/terms/"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-semibold text-[var(--oman-terracotta)] underline"
+                        >
+                          {copy.termsAgreementLink}
+                        </a>
+                        .
+                      </span>
+                    </label>
+                  )}
+                  {enableGoogleAuth && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleGoogleAuth}
+                        disabled={googleLoading}
+                        className="inline-flex w-full items-center justify-center rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-6 py-3 text-center font-semibold text-[var(--oman-ink)] shadow-sm transition hover:bg-[rgba(244,232,214,0.32)] disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        {googleLoading ? copy.openingGoogle : copy.continueWithGoogle}
+                      </button>
+                      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--oman-ink)]/45">
+                        <span className="h-px flex-1 bg-[rgba(111,49,29,0.14)]" />
+                        <span>{copy.or}</span>
+                        <span className="h-px flex-1 bg-[rgba(111,49,29,0.14)]" />
+                      </div>
+                    </>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={signupLoading}
+                    className="oman-button-primary mt-2 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {signupLoading ? copy.creatingAccount : copy.createAccount}
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         )}
       </section>

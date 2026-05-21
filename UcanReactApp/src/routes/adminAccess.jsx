@@ -1,16 +1,20 @@
 import AuthAccessPage from "./AuthAccessPage";
+import { useLanguage } from "../context/LanguageContext";
 import adminLoginImage from "../assets/auth-images/admin-login-photo.jpg";
 
 export default function AdminAccess() {
+  const { t } = useLanguage();
+  const copy = t("accessPages.admin");
+
   return (
     <AuthAccessPage
-      audienceLabel="Admin Access"
-      title="Log in to manage Ucan Oman as an administrator."
-      description="This page is for platform administrators who need access to contact submissions, account oversight, and future admin tools."
+      audienceLabel={copy.audienceLabel}
+      title={copy.title}
+      description={copy.description}
       role="admin"
       allowSignup={false}
       accessImage={adminLoginImage}
-      accessImageAlt="Admin access card for platform administrators"
+      accessImageAlt={copy.imageAlt}
     />
   );
 }

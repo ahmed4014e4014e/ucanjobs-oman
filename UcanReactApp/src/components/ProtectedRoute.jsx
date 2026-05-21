@@ -8,7 +8,7 @@ export default function ProtectedRoute({ children }) {
     return (
       <main className="min-h-screen bg-slate-50 px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
         <div className="mx-auto max-w-4xl rounded-3xl border border-amber-200 bg-amber-50 px-6 py-5 text-amber-900">
-          Supabase is not configured yet. Add your environment variables before
+          database is not configured yet. Add your environment variables before
           using protected pages.
         </div>
       </main>

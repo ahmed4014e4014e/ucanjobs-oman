@@ -1,0 +1,477 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import ActionFeedback from "../components/ActionFeedback";
+import AdminAttachmentDownloadList from "../components/AdminAttachmentDownloadList";
+import { downloadStorageAttachment } from "../lib/adminDownloads";
+import {
+  fetchTutorApplicants,
+  TUTOR_APPLICANT_BUCKET,
+  updateTutorApplicantStatus,
+} from "../lib/tutorApplicantsApi";
+import {
+  formatStatusLabel,
+  isDashboardArchivedStatus,
+  normalizeStatus,
+  TUTOR_APPLICATION_STATUS_OPTIONS,
+} from "../lib/requestStatuses";
+
+function formatSubmittedAt(value) {
+  if (!value) {
+    return "Unknown";
+  }
+
+  return new Date(value).toLocaleString("en-OM", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+export default function AdminTutorApplications() {
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [activeApplication, setActiveApplication] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [feedback, setFeedback] = useState({
+    type: "idle",
+    message: "",
+  });
+  const [downloadingPaths, setDownloadingPaths] = useState({});
+  const [statusDraft, setStatusDraft] = useState("pending");
+  const [statusSaving, setStatusSaving] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadApplications = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const results = await fetchTutorApplicants();
+
+        if (!ignore) {
+          setApplications(results);
+        }
+      } catch (fetchError) {
+        if (!ignore) {
+          setError(fetchError.message || "Unable to load tutor applications right now.");
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadApplications();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!activeApplication) {
+      return undefined;
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setActiveApplication(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [activeApplication]);
+
+  useEffect(() => {
+    if (!activeApplication) {
+      setStatusDraft("pending");
+      return;
+    }
+
+    setStatusDraft(normalizeStatus(activeApplication.status));
+  }, [activeApplication]);
+
+  const visibleApplications = useMemo(
+    () => applications.filter((application) => !isDashboardArchivedStatus(application.status)),
+    [applications]
+  );
+
+  const stats = useMemo(() => {
+    return {
+      totalApplications: visibleApplications.length,
+      pendingApplications: visibleApplications.filter(
+        (application) => normalizeStatus(application.status) === "pending"
+      ).length,
+      applicationInstitutes: new Set(
+        visibleApplications.map((application) => application.university_name).filter(Boolean)
+      ).size,
+    };
+  }, [visibleApplications]);
+
+  const filteredApplications = useMemo(() => {
+    if (statusFilter === "all") {
+      return visibleApplications;
+    }
+
+    return visibleApplications.filter(
+      (application) => normalizeStatus(application.status) === statusFilter
+    );
+  }, [statusFilter, visibleApplications]);
+
+  const handleAttachmentDownload = async ({ bucket, path, fileName }) => {
+    setFeedback({
+      type: "idle",
+      message: "",
+    });
+    setDownloadingPaths((current) => ({
+      ...current,
+      [path]: true,
+    }));
+
+    try {
+      await downloadStorageAttachment({ bucket, path, fileName });
+      setFeedback({
+        type: "success",
+        message: `Downloaded ${fileName || "attachment"} successfully.`,
+      });
+    } catch (downloadError) {
+      setFeedback({
+        type: "error",
+        message: downloadError.message || "Unable to download this attachment right now.",
+      });
+    } finally {
+      setDownloadingPaths((current) => ({
+        ...current,
+        [path]: false,
+      }));
+    }
+  };
+
+  const handleStatusSave = async () => {
+    if (!activeApplication) {
+      return;
+    }
+
+    setStatusSaving(true);
+    setFeedback({
+      type: "idle",
+      message: "",
+    });
+
+    try {
+      const updatedApplication = await updateTutorApplicantStatus(activeApplication.id, statusDraft);
+      const normalizedApplication = {
+        ...updatedApplication,
+        status: normalizeStatus(updatedApplication.status),
+      };
+
+      if (isDashboardArchivedStatus(normalizedApplication.status)) {
+        setApplications((current) =>
+          current.filter((application) => application.id !== normalizedApplication.id)
+        );
+        setActiveApplication(null);
+      } else {
+        setApplications((current) =>
+          current.map((application) =>
+            application.id === normalizedApplication.id ? normalizedApplication : application
+          )
+        );
+        setActiveApplication(normalizedApplication);
+      }
+      setFeedback({
+        type: "success",
+        message: `Tutor application marked as ${formatStatusLabel(statusDraft)}.`,
+      });
+    } catch (statusError) {
+      setFeedback({
+        type: "error",
+        message: statusError.message || "Unable to update this tutor application right now.",
+      });
+    } finally {
+      setStatusSaving(false);
+    }
+  };
+
+  return (
+    <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
+      <section className="mx-auto max-w-6xl">
+        <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+                Admin Records
+              </p>
+              <h1 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
+                Tutor Applications
+              </h1>
+              <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
+                Review applications from students who want to become tutors and download their supporting documents separately from the public contact inbox.
+              </p>
+            </div>
+            <Link
+              to="/admin-dashboard/"
+              className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+            >
+              Back to Admin Dashboard
+            </Link>
+          </div>
+
+          <ActionFeedback
+            type={feedback.type}
+            message={feedback.message}
+            title="Tutor application update"
+            className="mt-6"
+          />
+
+          <div className="mt-8 grid grid-cols-3 gap-3 text-center">
+            <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-3 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                Total
+              </p>
+              <p className="mt-2 text-xl font-bold text-[var(--oman-ink)]">{stats.totalApplications}</p>
+            </div>
+            <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-3 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                Pending
+              </p>
+              <p className="mt-2 text-xl font-bold text-[var(--oman-ink)]">{stats.pendingApplications}</p>
+            </div>
+            <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-3 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                Universities
+              </p>
+              <p className="mt-2 text-xl font-bold text-[var(--oman-ink)]">{stats.applicationInstitutes}</p>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-3xl oman-outline-panel p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
+                  Application Workflow
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/75">
+                  Start with pending tutor applications, review the documents carefully, then move them through reviewed, approved, or rejected based on your onboarding process.
+                </p>
+              </div>
+              <label className="flex flex-col gap-2 lg:min-w-56">
+                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
+                  Filter by status
+                </span>
+                <select
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value)}
+                  className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
+                >
+                  <option value="all">All statuses</option>
+                  {TUTOR_APPLICATION_STATUS_OPTIONS.map((statusOption) => (
+                    <option key={statusOption} value={statusOption}>
+                      {formatStatusLabel(statusOption)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">Loading tutor applications...</h3>
+              <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
+                Fetching the latest tutor applications from database.
+              </p>
+            </div>
+          ) : error ? (
+            <div className="mt-8 rounded-3xl border border-[rgba(155,77,49,0.22)] bg-[rgba(255,239,232,0.95)] p-6 text-[var(--oman-terracotta-dark)]">
+              <h3 className="text-xl font-semibold">Unable to load tutor applications</h3>
+              <p className="mt-4 leading-7">{error}</p>
+            </div>
+          ) : visibleApplications.length === 0 ? (
+            <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No active tutor applications</h3>
+              <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
+                Completed tutor applications are hidden from the dashboard, but still remain available in database.
+              </p>
+            </div>
+          ) : filteredApplications.length === 0 ? (
+            <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
+                No {formatStatusLabel(statusFilter).toLowerCase()} applications
+              </h3>
+              <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
+                Try another status filter to continue processing tutor applications.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-8 grid gap-4">
+              {filteredApplications.map((application) => (
+                <button
+                  key={application.id}
+                  type="button"
+                  onClick={() => setActiveApplication(application)}
+                  className="rounded-3xl oman-outline-panel p-5 text-left transition hover:-translate-y-0.5 hover:shadow-[0_16px_38px_rgba(73,39,27,0.08)] sm:p-6"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-[var(--oman-ink)]">{application.full_name}</h3>
+                      <p className="mt-2 text-sm text-[var(--oman-ink)]/70">
+                        {application.university_name || "University not provided"} via {application.university_email}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-[rgba(197,154,68,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta-dark)]">
+                      {formatStatusLabel(application.status)}
+                    </span>
+                  </div>
+
+                  <div className="mt-4 grid gap-2 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
+                    <p>
+                      <span className="font-semibold text-[var(--oman-ink)]">University ID:</span>{" "}
+                      {application.university_id || "Not provided"}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-[var(--oman-ink)]">Major:</span>{" "}
+                      {application.major_name || "Not provided"}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-[var(--oman-ink)]">Submitted:</span>{" "}
+                      {formatSubmittedAt(application.submitted_at || application.created_at)}
+                    </p>
+                  </div>
+                  <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
+                    Click to open this tutor application in a separate popup window.
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {activeApplication && (
+        <div className="oman-overlay fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/65 px-4 py-6">
+          <div className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-[1.75rem] oman-card p-6 sm:p-8">
+            <button
+              type="button"
+              onClick={() => setActiveApplication(null)}
+              className="absolute right-4 top-4 rounded-full bg-[rgba(197,154,68,0.12)] px-3 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] transition hover:bg-[rgba(197,154,68,0.2)]"
+              aria-label="Close popup"
+            >
+              Close
+            </button>
+
+            <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+              Tutor Application
+            </p>
+            <h2 className="oman-title-accent mt-4 pr-16 text-2xl font-semibold sm:text-3xl">
+              {activeApplication.full_name}
+            </h2>
+
+            <div className="mt-6 grid gap-3 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">University:</span>{" "}
+                {activeApplication.university_name || "Not provided"}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">Email:</span>{" "}
+                {activeApplication.university_email}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">University ID:</span>{" "}
+                {activeApplication.university_id || "Not provided"}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">Major:</span>{" "}
+                {activeApplication.major_name || "Not provided"}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">Desired Courses:</span>{" "}
+                {activeApplication.desired_tutoring_courses || "Not provided"}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">WhatsApp:</span>{" "}
+                {activeApplication.phone_number || "Not provided"}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">Status:</span>{" "}
+                {formatStatusLabel(activeApplication.status)}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">Submitted:</span>{" "}
+                {formatSubmittedAt(activeApplication.submitted_at || activeApplication.created_at)}
+              </p>
+            </div>
+
+            <div className="mt-6 rounded-2xl bg-[rgba(255,252,247,0.92)] px-4 py-4 text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.1)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
+                Status Workflow
+              </p>
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+                <label className="flex-1">
+                  <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
+                    Update status
+                  </span>
+                  <select
+                    value={statusDraft}
+                    onChange={(event) => setStatusDraft(event.target.value)}
+                    className="mt-2 min-h-12 w-full rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
+                  >
+                    {TUTOR_APPLICATION_STATUS_OPTIONS.map((statusOption) => (
+                      <option key={statusOption} value={statusOption}>
+                        {formatStatusLabel(statusOption)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  onClick={handleStatusSave}
+                  disabled={statusSaving || statusDraft === normalizeStatus(activeApplication.status)}
+                  className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {statusSaving ? "Saving..." : "Save Status"}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-2xl bg-[rgba(255,252,247,0.92)] px-4 py-4 text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.1)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
+                Submitted Details
+              </p>
+              <p className="mt-3 whitespace-pre-wrap leading-7 text-[var(--oman-ink)]/80">
+                {activeApplication.application_message || "No extra application message provided."}
+              </p>
+            </div>
+
+            {(activeApplication.attachment_notes ||
+              (Array.isArray(activeApplication.attachment_files) &&
+                activeApplication.attachment_files.length > 0)) && (
+              <div className="mt-4 rounded-2xl bg-[rgba(244,232,214,0.34)] px-4 py-4 text-[var(--oman-ink)]">
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
+                  Attachments
+                </p>
+                {activeApplication.attachment_notes && (
+                  <p className="mt-3 whitespace-pre-wrap leading-7 text-[var(--oman-ink)]/80">
+                    {activeApplication.attachment_notes}
+                  </p>
+                )}
+                <AdminAttachmentDownloadList
+                  files={activeApplication.attachment_files}
+                  bucket={TUTOR_APPLICANT_BUCKET}
+                  downloadingPaths={downloadingPaths}
+                  onDownload={handleAttachmentDownload}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </main>
+  );
+}

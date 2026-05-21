@@ -1,21 +1,55 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
-import { getUserRole } from "../lib/authRouting";
 
 const AuthContext = createContext(null);
+const PROFILE_LOAD_TIMEOUT_MS = 8000;
 
-function createMetadataProfile(authUser) {
+function createProfileSeed(authUser, fallbackRole = null) {
   if (!authUser?.id) {
     return null;
   }
 
   return {
     id: authUser.id,
-    full_name: authUser.user_metadata?.full_name ?? null,
-    role: getUserRole(null, authUser, null),
+    full_name: authUser.user_metadata?.full_name ?? authUser.user_metadata?.name ?? null,
+    role: fallbackRole,
     institute: authUser.user_metadata?.institute ?? null,
     email: authUser.email ?? null,
   };
+}
+
+function getPendingOAuthRole() {
+  try {
+    return window.localStorage.getItem("ucan_pending_oauth_role");
+  } catch (_error) {
+    return null;
+  }
+}
+
+function clearPendingOAuthRole() {
+  try {
+    window.localStorage.removeItem("ucan_pending_oauth_role");
+  } catch (_error) {
+    // Ignore storage access issues. The profile row is already resolved by this point.
+  }
+}
+
+function withTimeout(promise, timeoutMs, timeoutMessage) {
+  return new Promise((resolve, reject) => {
+    const timeoutId = window.setTimeout(() => {
+      reject(new Error(timeoutMessage));
+    }, timeoutMs);
+
+    promise
+      .then((value) => {
+        window.clearTimeout(timeoutId);
+        resolve(value);
+      })
+      .catch((error) => {
+        window.clearTimeout(timeoutId);
+        reject(error);
+      });
+  });
 }
 
 export function AuthProvider({ children }) {
@@ -23,58 +57,132 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState("");
+  const profileRequestIdRef = useRef(0);
 
-  const loadProfile = async (authUser) => {
+  const clearAuthState = () => {
+    profileRequestIdRef.current += 1;
+    setSession(null);
+    setUser(null);
+    setProfile(null);
+    setProfileLoading(false);
+    setProfileError("");
+    setLoading(false);
+  };
+
+  const resolveProfileRecord = async (authUser) => {
     if (!isSupabaseConfigured || !supabase || !authUser?.id) {
-      setProfile(null);
       return null;
     }
 
-    const metadataProfile = createMetadataProfile(authUser);
+    const seededRole = authUser.user_metadata?.role || getPendingOAuthRole() || null;
+    const profileSeed = createProfileSeed(authUser, seededRole);
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", authUser.id)
-      .maybeSingle();
+    const { data, error } = await withTimeout(
+      supabase.from("profiles").select("*").eq("id", authUser.id).maybeSingle(),
+      PROFILE_LOAD_TIMEOUT_MS,
+      "Profile loading timed out. Please try again."
+    );
 
     if (error) {
-      setProfile(metadataProfile);
-      return metadataProfile;
+      throw error;
     }
 
-    const shouldSyncProfile =
-      !data ||
-      (!data.full_name && metadataProfile.full_name) ||
-      (!data.institute && metadataProfile.institute) ||
-      (!data.email && metadataProfile.email);
+    if (!data) {
+      if (!profileSeed?.role) {
+        throw new Error(
+          "Your account session exists, but the platform could not find a matching profile row."
+        );
+      }
 
-    if (!shouldSyncProfile) {
-      setProfile(data ?? null);
-      return data ?? null;
+      const { data: createdProfile, error: createError } = await withTimeout(
+        supabase.from("profiles").upsert(profileSeed).select("*").single(),
+        PROFILE_LOAD_TIMEOUT_MS,
+        "Profile creation timed out. Please try again."
+      );
+
+      if (createError) {
+        throw createError;
+      }
+
+      return createdProfile;
     }
 
-    const profilePayload = {
-      id: authUser.id,
-      full_name: data?.full_name || metadataProfile.full_name,
-      role: data?.role || metadataProfile.role || "student",
-      institute: data?.institute || metadataProfile.institute,
-      email: data?.email || metadataProfile.email,
-    };
+    const profileUpdates = {};
 
-    const { data: syncedProfile, error: syncError } = await supabase
-      .from("profiles")
-      .upsert(profilePayload)
-      .select("*")
-      .single();
+    if (!data.full_name && profileSeed?.full_name) {
+      profileUpdates.full_name = profileSeed.full_name;
+    }
+
+    if (!data.institute && profileSeed?.institute) {
+      profileUpdates.institute = profileSeed.institute;
+    }
+
+    if (!data.email && profileSeed?.email) {
+      profileUpdates.email = profileSeed.email;
+    }
+
+    if (Object.keys(profileUpdates).length === 0) {
+      return data;
+    }
+
+    const { data: syncedProfile, error: syncError } = await withTimeout(
+      supabase
+        .from("profiles")
+        .update(profileUpdates)
+        .eq("id", authUser.id)
+        .select("*")
+        .single(),
+      PROFILE_LOAD_TIMEOUT_MS,
+      "Profile sync timed out. Please try again."
+    );
 
     if (syncError) {
-      setProfile(data ?? metadataProfile);
-      return data ?? metadataProfile;
+      return data;
     }
 
-    setProfile(syncedProfile);
     return syncedProfile;
+  };
+
+  const loadProfile = async (authUser) => {
+    const requestId = ++profileRequestIdRef.current;
+
+    if (!authUser?.id || !isSupabaseConfigured || !supabase) {
+      setProfile(null);
+      setProfileLoading(false);
+      setProfileError("");
+      return null;
+    }
+
+    setProfileLoading(true);
+    setProfileError("");
+
+    try {
+      const resolvedProfile = await resolveProfileRecord(authUser);
+
+      if (profileRequestIdRef.current !== requestId) {
+        return resolvedProfile;
+      }
+
+      setProfile(resolvedProfile);
+      clearPendingOAuthRole();
+      setProfileError("");
+      return resolvedProfile;
+    } catch (error) {
+      if (profileRequestIdRef.current === requestId) {
+        setProfile(null);
+        setProfileError(
+          error?.message ||
+            "We found your session, but your profile could not be loaded."
+        );
+      }
+      return null;
+    } finally {
+      if (profileRequestIdRef.current === requestId) {
+        setProfileLoading(false);
+      }
+    }
   };
 
   useEffect(() => {
@@ -94,24 +202,14 @@ export function AuthProvider({ children }) {
 
         setSession(currentSession ?? null);
         setUser(currentSession?.user ?? null);
+        setLoading(false);
 
         if (currentSession?.user) {
-          const fallbackProfile = createMetadataProfile(currentSession.user);
-          setProfile(fallbackProfile);
-          if (mounted) {
-            setLoading(false);
-          }
-
-          loadProfile(currentSession.user).catch(() => {
-            if (mounted) {
-              setProfile(fallbackProfile);
-            }
-          });
+          void loadProfile(currentSession.user);
         } else {
           setProfile(null);
-          if (mounted) {
-            setLoading(false);
-          }
+          setProfileLoading(false);
+          setProfileError("");
         }
       } finally {
         if (mounted) {
@@ -136,24 +234,14 @@ export function AuthProvider({ children }) {
 
         setSession(nextSession ?? null);
         setUser(nextSession?.user ?? null);
+        setLoading(false);
 
         if (nextSession?.user) {
-          const fallbackProfile = createMetadataProfile(nextSession.user);
-          setProfile(fallbackProfile);
-          if (mounted) {
-            setLoading(false);
-          }
-
-          loadProfile(nextSession.user).catch(() => {
-            if (mounted) {
-              setProfile(fallbackProfile);
-            }
-          });
+          void loadProfile(nextSession.user);
         } else {
           setProfile(null);
-          if (mounted) {
-            setLoading(false);
-          }
+          setProfileLoading(false);
+          setProfileError("");
         }
       } finally {
         if (mounted) {
@@ -169,13 +257,19 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signOut = async () => {
-    if (isSupabaseConfigured && supabase) {
-      await supabase.auth.signOut();
-    }
+    clearAuthState();
 
-    setSession(null);
-    setUser(null);
-    setProfile(null);
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await withTimeout(
+          supabase.auth.signOut({ scope: "local" }),
+          5000,
+          "Local sign out timed out."
+        );
+      } catch (_error) {
+        // Local auth state was already cleared above, so we do not block logout on a network issue.
+      }
+    }
   };
 
   const value = useMemo(
@@ -184,11 +278,13 @@ export function AuthProvider({ children }) {
       user,
       profile,
       loading,
+      profileLoading,
+      profileError,
       signOut,
       refreshProfile: () => loadProfile(user),
       isSupabaseConfigured,
     }),
-    [session, user, profile, loading]
+    [session, user, profile, loading, profileLoading, profileError]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

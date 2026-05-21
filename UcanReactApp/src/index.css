@@ -25,6 +25,15 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+html[dir="rtl"] body {
+  text-align: right;
+}
+
+html[dir="rtl"] .oman-kicker,
+html[dir="rtl"] .oman-section-kicker {
+  letter-spacing: 0.12em;
+}
+
 #root {
   min-height: 100vh;
 }
@@ -157,4 +166,97 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+@media (max-width: 639px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  .oman-page::before {
+    background-size: 28px 28px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.16), transparent 26%);
+  }
+
+  .oman-page > section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .oman-page :where(.oman-card, .oman-outline-panel, .oman-dark-panel, .oman-photo-frame) {
+    border-radius: 1.25rem;
+  }
+
+  .oman-page :where(.oman-card, .oman-outline-panel, .oman-dark-panel) {
+    box-shadow: 0 12px 32px rgba(73, 39, 27, 0.08);
+  }
+
+  .oman-hero > div {
+    padding-top: 5.75rem;
+    padding-bottom: 2.75rem;
+  }
+
+  .oman-hero h1 {
+    font-size: 2rem;
+    line-height: 1.15;
+  }
+
+  .oman-page h2 {
+    line-height: 1.2;
+  }
+
+  .oman-kicker,
+  .oman-section-kicker {
+    letter-spacing: 0.16em;
+    line-height: 1.5;
+  }
+
+  .oman-page :where(p, li, h1, h2, h3, a, button, span) {
+    overflow-wrap: anywhere;
+  }
+
+  .oman-page :where(input, select, textarea, button, a) {
+    touch-action: manipulation;
+  }
+
+  .oman-page :where(input, select, textarea) {
+    font-size: 1rem;
+  }
+
+  .oman-page :where(button, a) {
+    min-height: 2.75rem;
+  }
+
+  .oman-page :where(.rounded-3xl, .rounded-\[1\.75rem\]) {
+    border-radius: 1.25rem;
+  }
+
+  .contact-page {
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .contact-page > section {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+
+  .contact-page :where(.contact-mobile-grid, .contact-mobile-grid > *, form, .oman-card, .oman-dark-panel) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .contact-page :where(input, select, textarea, input[type="file"]) {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .contact-page .oman-card,
+  .contact-page .oman-dark-panel {
+    margin-left: auto;
+    margin-right: auto;
+  }
 }

@@ -22,3 +22,10 @@ create policy "Admins can read contact messages"
 on public.contact_messages
 for select
 using (public.is_admin_user());
+
+drop policy if exists "Admins can update contact messages" on public.contact_messages;
+create policy "Admins can update contact messages"
+on public.contact_messages
+for update
+using (public.is_admin_user())
+with check (public.is_admin_user());
