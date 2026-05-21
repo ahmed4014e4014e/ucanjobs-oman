@@ -81,6 +81,19 @@ function mapEnrollmentRow(row, course) {
   };
 }
 
+function mapEnrollmentRecord(row) {
+  if (!row) {
+    return null;
+  }
+
+  return {
+    id: row.id,
+    status: row.status,
+    progressPercent: row.progress_percent ?? 0,
+    enrolledAt: row.enrolled_at,
+  };
+}
+
 async function addCourseRelations(courses) {
   if (!courses?.length) {
     return [];
@@ -201,7 +214,58 @@ export async function enrollInCourse({ learnerId, courseId }) {
     throw error;
   }
 
-  return data;
+  return mapEnrollmentRecord(data);
+}
+
+export async function fetchCourseEnrollment({ learnerId, courseId }) {
+  if (!isSupabaseConfigured || !supabase || !learnerId || !courseId) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("course_enrollments")
+    .select("id, status, progress_percent, enrolled_at")
+    .eq("learner_id", learnerId)
+    .eq("course_id", courseId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return mapEnrollmentRecord(data);
+}
+
+export async function updateCourseProgress({ learnerId, courseId, progressPercent }) {
+  if (!isSupabaseConfigured || !supabase) {
+    throw new Error("database is not configured yet.");
+  }
+
+  if (!learnerId || !courseId) {
+    throw new Error("A learner account and course are required before updating progress.");
+  }
+
+  const normalizedProgress = Math.max(0, Math.min(100, Number(progressPercent) || 0));
+  const nextStatus =
+    normalizedProgress >= 100 ? "completed" : normalizedProgress > 0 ? "in_progress" : "enrolled";
+
+  const { data, error } = await supabase
+    .from("course_enrollments")
+    .update({
+      progress_percent: normalizedProgress,
+      status: nextStatus,
+      completed_at: normalizedProgress >= 100 ? new Date().toISOString() : null,
+    })
+    .eq("learner_id", learnerId)
+    .eq("course_id", courseId)
+    .select("id, status, progress_percent, enrolled_at")
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return mapEnrollmentRecord(data);
 }
 
 export async function fetchLearnerEnrollments(learnerId) {
