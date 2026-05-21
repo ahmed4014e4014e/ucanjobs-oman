@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import ActionFeedback from "../components/ActionFeedback";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
-import { fetchLearnerEnrollments } from "../lib/courseApi";
+import { fetchLearnerEnrollments, fetchPublishedCourses } from "../lib/courseApi";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
 
@@ -28,6 +28,9 @@ export default function StudentDashboard() {
   const [universityName, setUniversityName] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
   const [enrollments, setEnrollments] = useState([]);
+  const [availableCourses, setAvailableCourses] = useState([]);
+  const [loadingAvailableCourses, setLoadingAvailableCourses] = useState(false);
+  const [availableCoursesError, setAvailableCoursesError] = useState("");
   const [loadingEnrollments, setLoadingEnrollments] = useState(false);
   const [enrollmentError, setEnrollmentError] = useState("");
   const [feedback, setFeedback] = useState({
@@ -44,6 +47,31 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     let active = true;
+
+    async function loadAvailableCourses() {
+      setLoadingAvailableCourses(true);
+      setAvailableCoursesError("");
+
+      try {
+        const nextCourses = await fetchPublishedCourses();
+
+        if (!active) {
+          return;
+        }
+
+        setAvailableCourses(nextCourses.filter((course) => course.source === "database"));
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+
+        setAvailableCoursesError(error?.message || "We could not load live database courses.");
+      } finally {
+        if (active) {
+          setLoadingAvailableCourses(false);
+        }
+      }
+    }
 
     async function loadEnrollments() {
       if (!user?.id) {
@@ -75,6 +103,7 @@ export default function StudentDashboard() {
       }
     }
 
+    loadAvailableCourses();
     loadEnrollments();
 
     return () => {
@@ -273,6 +302,82 @@ export default function StudentDashboard() {
                   </Link>
                 </article>
               ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="mx-auto mt-10 max-w-6xl">
+        <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
+          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+            Available Live Courses
+          </p>
+          <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
+            Courses loaded from the database
+          </h2>
+          <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
+            These are published courses currently coming from your live database. Open a course to
+            test the enrollment flow.
+          </p>
+
+          {loadingAvailableCourses && (
+            <div className="mt-6 rounded-3xl oman-outline-panel p-5 text-[var(--oman-ink)]/75">
+              Loading live database courses...
+            </div>
+          )}
+
+          {availableCoursesError && (
+            <ActionFeedback
+              type="error"
+              message={availableCoursesError}
+              title="Live Courses"
+              className="mt-6"
+            />
+          )}
+
+          {!loadingAvailableCourses && !availableCoursesError && availableCourses.length === 0 && (
+            <div className="mt-6 rounded-3xl oman-outline-panel p-5 text-center">
+              <h3 className="text-lg font-semibold text-[var(--oman-ink)]">
+                No live database courses loaded
+              </h3>
+              <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
+                The dashboard could not read published courses from the database yet. If you can see
+                the rows in Supabase, check that this local app is using the same project URL and
+                anon key.
+              </p>
+            </div>
+          )}
+
+          {availableCourses.length > 0 && (
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {availableCourses.map((course) => {
+                const content = course.en;
+
+                return (
+                  <article key={course.id} className="rounded-3xl oman-outline-panel p-5">
+                    <div className="flex flex-wrap gap-2">
+                      <span className="oman-chip rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em]">
+                        {course.category}
+                      </span>
+                      <span className="rounded-full bg-[rgba(244,232,214,0.54)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)]">
+                        {course.price}
+                      </span>
+                    </div>
+                    <h3 className="mt-4 text-xl font-semibold text-[var(--oman-ink)]">
+                      {content.title}
+                    </h3>
+                    <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
+                      {content.subtitle}
+                    </p>
+                    <Link
+                      to={`/courses/${course.slug}/`}
+                      className="oman-button-primary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+                    >
+                      Open And Enroll
+                    </Link>
+                  </article>
+                );
+              })}
             </div>
           )}
         </div>
