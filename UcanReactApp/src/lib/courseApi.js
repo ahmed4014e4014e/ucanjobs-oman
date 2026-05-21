@@ -1,6 +1,23 @@
 import { courseCatalog } from "./courseCatalog";
 import { isSupabaseConfigured, supabase } from "./supabase";
 
+const COURSE_COLUMNS = `
+  id,
+  category_id,
+  slug,
+  title_en,
+  title_ar,
+  subtitle_en,
+  subtitle_ar,
+  summary_en,
+  summary_ar,
+  level,
+  duration,
+  language,
+  price_omr,
+  sort_order
+`;
+
 function formatPrice(price) {
   const numericPrice = Number(price);
 
@@ -54,9 +71,7 @@ function mapCourseRow(row, outcomes = [], modules = []) {
   };
 }
 
-function mapEnrollmentRow(row) {
-  const course = row.course ? mapCourseRow(row.course) : null;
-
+function mapEnrollmentRow(row, course) {
   return {
     id: row.id,
     status: row.status,
@@ -66,34 +81,35 @@ function mapEnrollmentRow(row) {
   };
 }
 
-async function fetchCourseRows(queryBuilder) {
-  if (!isSupabaseConfigured || !supabase) {
-    return [];
-  }
-
-  const { data: courses, error: coursesError } = await queryBuilder;
-
-  if (coursesError) {
-    throw coursesError;
-  }
-
+async function addCourseRelations(courses) {
   if (!courses?.length) {
     return [];
   }
 
   const courseIds = courses.map((course) => course.id);
+  const categoryIds = Array.from(new Set(courses.map((course) => course.category_id).filter(Boolean)));
 
-  const [{ data: outcomes, error: outcomesError }, { data: modules, error: modulesError }] =
-    await Promise.all([
-      supabase
-        .from("course_outcomes")
-        .select("course_id, outcome_en, outcome_ar, sort_order")
-        .in("course_id", courseIds),
-      supabase
-        .from("course_modules")
-        .select("course_id, title_en, title_ar, sort_order")
-        .in("course_id", courseIds),
-    ]);
+  const [
+    { data: categories, error: categoriesError },
+    { data: outcomes, error: outcomesError },
+    { data: modules, error: modulesError },
+  ] = await Promise.all([
+    categoryIds.length
+      ? supabase.from("course_categories").select("id, slug, name_en, name_ar").in("id", categoryIds)
+      : Promise.resolve({ data: [], error: null }),
+    supabase
+      .from("course_outcomes")
+      .select("course_id, outcome_en, outcome_ar, sort_order")
+      .in("course_id", courseIds),
+    supabase
+      .from("course_modules")
+      .select("course_id, title_en, title_ar, sort_order")
+      .in("course_id", courseIds),
+  ]);
+
+  if (categoriesError) {
+    throw categoriesError;
+  }
 
   if (outcomesError) {
     throw outcomesError;
@@ -103,13 +119,29 @@ async function fetchCourseRows(queryBuilder) {
     throw modulesError;
   }
 
-  return courses.map((course) =>
-    mapCourseRow(
-      course,
+  return courses.map((course) => {
+    const category = (categories ?? []).find((item) => item.id === course.category_id);
+
+    return mapCourseRow(
+      { ...course, category },
       (outcomes ?? []).filter((outcome) => outcome.course_id === course.id),
       (modules ?? []).filter((module) => module.course_id === course.id)
-    )
-  );
+    );
+  });
+}
+
+async function fetchCourseRows(queryBuilder) {
+  if (!isSupabaseConfigured || !supabase) {
+    return [];
+  }
+
+  const { data: courses, error } = await queryBuilder;
+
+  if (error) {
+    throw error;
+  }
+
+  return addCourseRelations(courses ?? []);
 }
 
 export async function fetchPublishedCourses() {
@@ -120,33 +152,29 @@ export async function fetchPublishedCourses() {
   const courses = await fetchCourseRows(
     supabase
       .from("learning_courses")
-      .select(
-        `
-          id,
-          slug,
-          title_en,
-          title_ar,
-          subtitle_en,
-          subtitle_ar,
-          summary_en,
-          summary_ar,
-          level,
-          duration,
-          language,
-          price_omr,
-          sort_order,
-          category:course_categories (
-            slug,
-            name_en,
-            name_ar
-          )
-        `
-      )
+      .select(COURSE_COLUMNS)
       .eq("is_published", true)
       .order("sort_order", { ascending: true })
   );
 
   return courses.length ? courses : courseCatalog;
+}
+
+export async function fetchPublishedCourseBySlug(slug) {
+  if (!isSupabaseConfigured || !supabase) {
+    return courseCatalog.find((course) => course.slug === slug) || null;
+  }
+
+  const courses = await fetchCourseRows(
+    supabase
+      .from("learning_courses")
+      .select(COURSE_COLUMNS)
+      .eq("is_published", true)
+      .eq("slug", slug)
+      .limit(1)
+  );
+
+  return courses[0] || courseCatalog.find((course) => course.slug === slug) || null;
 }
 
 export async function enrollInCourse({ learnerId, courseId }) {
@@ -185,81 +213,32 @@ export async function fetchLearnerEnrollments(learnerId) {
     return [];
   }
 
-  const { data, error } = await supabase
+  const { data: enrollments, error: enrollmentsError } = await supabase
     .from("course_enrollments")
-    .select(
-      `
-        id,
-        status,
-        progress_percent,
-        enrolled_at,
-        course:learning_courses (
-          id,
-          slug,
-          title_en,
-          title_ar,
-          subtitle_en,
-          subtitle_ar,
-          summary_en,
-          summary_ar,
-          level,
-          duration,
-          language,
-          price_omr,
-          sort_order,
-          category:course_categories (
-            slug,
-            name_en,
-            name_ar
-          )
-        )
-      `
-    )
+    .select("id, status, progress_percent, enrolled_at, course_id")
     .eq("learner_id", learnerId)
     .neq("status", "cancelled")
     .order("enrolled_at", { ascending: false });
 
-  if (error) {
-    throw error;
+  if (enrollmentsError) {
+    throw enrollmentsError;
   }
 
-  return (data ?? []).map(mapEnrollmentRow).filter((entry) => entry.course);
-}
-
-export async function fetchPublishedCourseBySlug(slug) {
-  if (!isSupabaseConfigured || !supabase) {
-    return courseCatalog.find((course) => course.slug === slug) || null;
+  if (!enrollments?.length) {
+    return [];
   }
 
+  const courseIds = enrollments.map((enrollment) => enrollment.course_id).filter(Boolean);
   const courses = await fetchCourseRows(
-    supabase
-      .from("learning_courses")
-      .select(
-        `
-          id,
-          slug,
-          title_en,
-          title_ar,
-          subtitle_en,
-          subtitle_ar,
-          summary_en,
-          summary_ar,
-          level,
-          duration,
-          language,
-          price_omr,
-          sort_order,
-          category:course_categories (
-            slug,
-            name_en,
-            name_ar
-          )
-        `
-      )
-      .eq("is_published", true)
-      .eq("slug", slug)
-      .limit(1)
+    supabase.from("learning_courses").select(COURSE_COLUMNS).in("id", courseIds)
   );
 
-  return courses[0] || courseCatalog.find((course) => course.slug === slug) || null;
+  return enrollments
+    .map((enrollment) =>
+      mapEnrollmentRow(
+        enrollment,
+        courses.find((course) => course.id === enrollment.course_id)
+      )
+    )
+    .filter((entry) => entry.course);
 }
