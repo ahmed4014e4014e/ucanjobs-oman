@@ -3,21 +3,21 @@ import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { themeImages } from "../lib/themeImages";
 
-const tutorActionTargets = [
+const instructorActionTargets = [
   {
-    to: "/tutor-tutoring-requests/",
+    to: "/instructor-learning-requests/",
   },
 ];
 
-export default function TutorDashboard() {
+export default function InstructorDashboard() {
   const { user, profile } = useAuth();
   const { t } = useLanguage();
   const copy = t("tutorDashboard");
   const name = profile?.full_name || user?.user_metadata?.full_name || copy.fallbackName;
   const institute = profile?.institute || user?.user_metadata?.institute || copy.notSet;
-  const tutorActions = copy.actions.map((item, index) => ({
+  const instructorActions = copy.actions.map((item, index) => ({
     ...item,
-    to: tutorActionTargets[index]?.to || "/",
+    to: instructorActionTargets[index]?.to || "/",
   }));
   const requestInstructions = copy.instructions;
 
@@ -74,7 +74,7 @@ export default function TutorDashboard() {
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
             {copy.actionsKicker}
           </p>
-          {tutorActions.length === 0 ? (
+          {instructorActions.length === 0 ? (
             <div className="mt-6 rounded-3xl oman-outline-panel p-6 text-center">
               <h2 className="text-lg font-semibold text-[var(--oman-ink)]">
                 {copy.emptyTitle}
@@ -85,7 +85,7 @@ export default function TutorDashboard() {
             </div>
           ) : (
             <div className="mt-6 grid gap-4">
-              {tutorActions.map((item) => (
+              {instructorActions.map((item) => (
                 <article key={item.title} className="rounded-3xl oman-outline-panel p-5">
                   <h2 className="text-lg font-semibold text-[var(--oman-ink)]">{item.title}</h2>
                   <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">{item.description}</p>

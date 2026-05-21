@@ -6,17 +6,17 @@ function ensureSupabase() {
   }
 }
 
-export async function fetchTutorDirectory() {
+export async function fetchInstructorDirectory() {
   ensureSupabase();
 
   const { data, error } = await supabase
-    .from("tutor_course_offerings")
+    .from("instructor_course_offerings")
     .select(
       `
         id,
         session_type,
         is_active,
-        tutor:tutor_profiles (
+        instructor:instructor_profiles (
           id,
           display_name,
           institute_code,
@@ -43,34 +43,34 @@ export async function fetchTutorDirectory() {
   }
 
   return (data ?? [])
-    .filter((entry) => entry.tutor?.is_active)
-    .filter((entry) => entry.tutor?.display_name)
+    .filter((entry) => entry.instructor?.is_active)
+    .filter((entry) => entry.instructor?.display_name)
     .filter((entry) => entry.course?.institute?.code);
 }
 
-export function buildTutorCards(offerings, sessionType) {
+export function buildInstructorCards(offerings, sessionType) {
   const grouped = new Map();
 
   offerings
     .filter((entry) => entry.session_type === sessionType)
     .forEach((entry) => {
-      const tutorId = entry.tutor.id;
-      const key = `${tutorId}:${sessionType}`;
-      const tutorName = entry.tutor.display_name;
+      const instructorId = entry.instructor.id;
+      const key = `${instructorId}:${sessionType}`;
+      const instructorName = entry.instructor.display_name;
       const instituteCode = entry.course.institute.code;
       const courseLabel = `${instituteCode} ${entry.course.code}`;
 
       if (!grouped.has(key)) {
         grouped.set(key, {
           id: key,
-          tutorId,
-          name: tutorName,
-          institute: entry.tutor.institute_code || instituteCode,
+          instructorId,
+          name: instructorName,
+          institute: entry.instructor.institute_code || instituteCode,
           institutes: new Set(),
           courses: [],
           courseIds: [],
           bio:
-            entry.tutor.bio ||
+            entry.instructor.bio ||
             `Offers free ${sessionType === "private" ? "one-on-one" : "group"} tutoring sessions.`,
           availability:
             sessionType === "private"
@@ -80,14 +80,14 @@ export function buildTutorCards(offerings, sessionType) {
         });
       }
 
-      const tutorCard = grouped.get(key);
-      tutorCard.institutes.add(instituteCode);
-      tutorCard.courses.push({
+      const instructorCard = grouped.get(key);
+      instructorCard.institutes.add(instituteCode);
+      instructorCard.courses.push({
         id: entry.course.id,
         label: courseLabel,
         title: entry.course.title,
       });
-      tutorCard.courseIds.push(entry.course.id);
+      instructorCard.courseIds.push(entry.course.id);
     });
 
   return Array.from(grouped.values())
@@ -100,11 +100,11 @@ export function buildTutorCards(offerings, sessionType) {
     .sort((left, right) => left.name.localeCompare(right.name));
 }
 
-export async function createTutoringRequest(payload) {
+export async function createLearningRequest(payload) {
   ensureSupabase();
 
   const { data, error } = await supabase
-    .from("tutoring_requests")
+    .from("learning_requests")
     .insert(payload)
     .select("*")
     .single();
@@ -116,7 +116,7 @@ export async function createTutoringRequest(payload) {
   return data;
 }
 
-export async function uploadTutoringAttachments({ files, userId, tutorId, sessionType }) {
+export async function uploadLearningAttachments({ files, userId, instructorId, sessionType }) {
   ensureSupabase();
 
   if (!Array.isArray(files) || files.length === 0) {
@@ -127,10 +127,10 @@ export async function uploadTutoringAttachments({ files, userId, tutorId, sessio
 
   for (const file of files) {
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const uniquePath = `${userId}/${tutorId}/${sessionType}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+    const uniquePath = `${userId}/${instructorId}/${sessionType}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
 
     const { error } = await supabase.storage
-      .from("tutoring-attachments")
+      .from("learning-attachments")
       .upload(uniquePath, file, { upsert: false });
 
     if (error) {
@@ -148,11 +148,11 @@ export async function uploadTutoringAttachments({ files, userId, tutorId, sessio
   return uploads;
 }
 
-export async function fetchAdminTutoringRequests() {
+export async function fetchAdminLearningRequests() {
   ensureSupabase();
 
   const { data, error } = await supabase
-    .from("tutoring_requests")
+    .from("learning_requests")
     .select(
       `
         id,
@@ -163,18 +163,18 @@ export async function fetchAdminTutoringRequests() {
         attachment_files,
         status,
         created_at,
-        student:profiles!tutoring_requests_student_id_fkey (
+        learner:profiles!learning_requests_learner_id_fkey (
           id,
           full_name,
           email,
           institute
         ),
-        tutor:tutor_profiles!tutoring_requests_tutor_id_fkey (
+        instructor:instructor_profiles!learning_requests_instructor_id_fkey (
           id,
           display_name,
           institute_code
         ),
-        course:courses!tutoring_requests_course_id_fkey (
+        course:courses!learning_requests_course_id_fkey (
           id,
           code,
           title
@@ -190,15 +190,15 @@ export async function fetchAdminTutoringRequests() {
   return data ?? [];
 }
 
-export async function fetchTutorTutoringRequests(tutorId) {
+export async function fetchInstructorLearningRequests(instructorId) {
   ensureSupabase();
 
-  if (!tutorId) {
+  if (!instructorId) {
     return [];
   }
 
   const { data, error } = await supabase
-    .from("tutoring_requests")
+    .from("learning_requests")
     .select(
       `
         id,
@@ -209,20 +209,20 @@ export async function fetchTutorTutoringRequests(tutorId) {
         attachment_files,
         status,
         created_at,
-        student:profiles!tutoring_requests_student_id_fkey (
+        learner:profiles!learning_requests_learner_id_fkey (
           id,
           full_name,
           email,
           institute
         ),
-        course:courses!tutoring_requests_course_id_fkey (
+        course:courses!learning_requests_course_id_fkey (
           id,
           code,
           title
         )
       `
     )
-    .eq("tutor_id", tutorId)
+    .eq("instructor_id", instructorId)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -232,11 +232,11 @@ export async function fetchTutorTutoringRequests(tutorId) {
   return data ?? [];
 }
 
-export async function updateTutoringRequestStatus(requestId, status) {
+export async function updateLearningRequestStatus(requestId, status) {
   ensureSupabase();
 
   const { data, error } = await supabase
-    .from("tutoring_requests")
+    .from("learning_requests")
     .update({ status })
     .eq("id", requestId)
     .select(

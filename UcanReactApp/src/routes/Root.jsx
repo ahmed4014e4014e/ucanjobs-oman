@@ -35,6 +35,22 @@ function ScrollToTopOnRouteChange() {
   return null;
 }
 
+function getVisibleRoleLabel(role, t) {
+  if (role === "student" || role === "learner") {
+    return t("roles.learner");
+  }
+
+  if (role === "tutor" || role === "instructor") {
+    return t("roles.instructor");
+  }
+
+  if (role === "admin") {
+    return t("roles.admin");
+  }
+
+  return t("roles.member");
+}
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [logoutMessage, setLogoutMessage] = useState("");
@@ -51,8 +67,8 @@ export default function Navbar() {
     { name: t("nav.policies"), to: "/terms/" },
   ];
   const guestLinks = [
-    { name: t("nav.studentAccess"), to: "/student-access/" },
-    { name: t("nav.tutorAccess"), to: "/tutor-access/" },
+    { name: t("nav.studentAccess"), to: "/learner-access/" },
+    { name: t("nav.tutorAccess"), to: "/instructor-access/" },
     { name: t("nav.adminAccess"), to: "/admin-access/" },
   ];
   const memberLinks = [{ name: t("nav.dashboard"), to: getDashboardPath(role) }];
@@ -109,7 +125,7 @@ export default function Navbar() {
           <div className="hidden items-center gap-4 lg:flex xl:gap-6">
             {user && (
               <div className="rounded-full border border-[rgba(197,154,68,0.24)] bg-[rgba(197,154,68,0.12)] px-4 py-2 text-sm font-medium capitalize text-[var(--oman-terracotta-dark)]">
-                {profile?.role || t("roles.member")}
+                {getVisibleRoleLabel(profile?.role, t)}
               </div>
             )}
 

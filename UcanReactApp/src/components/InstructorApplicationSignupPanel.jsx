@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 
-export default function TutorApplicationSignupPanel() {
+export default function InstructorApplicationSignupPanel() {
   const { t } = useLanguage();
   const copy = t("tutorApplicationPanel");
 
@@ -27,7 +27,7 @@ export default function TutorApplicationSignupPanel() {
         </ul>
       </div>
       <Link
-        to="/tutor-application/"
+        to="/instructor-application/"
         className="oman-button-primary mt-6 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition"
       >
         {copy.button}

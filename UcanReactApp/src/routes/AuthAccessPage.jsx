@@ -8,6 +8,19 @@ import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { getDashboardPath, getUserRole } from "../lib/authRouting";
 import { themeImages } from "../lib/themeImages";
 
+function getVisibleRoleLabel(role) {
+  if (role === "student" || role === "learner") return "learner";
+  if (role === "tutor" || role === "instructor") return "instructor";
+  if (role === "admin") return "admin";
+  return role || "member";
+}
+
+function normalizeRole(role) {
+  if (role === "student") return "learner";
+  if (role === "tutor") return "instructor";
+  return role;
+}
+
 function formatCopy(template, values) {
   return Object.entries(values).reduce(
     (text, [key, value]) => text.replaceAll(`{${key}}`, value),
@@ -132,7 +145,7 @@ export default function AuthAccessPage({
       .eq("id", authUser.id)
       .maybeSingle();
 
-    return data?.role ?? null;
+    return normalizeRole(data?.role ?? null);
   };
 
   const handleLogin = async (event) => {
@@ -158,7 +171,7 @@ export default function AuthAccessPage({
     if (error) {
       const errorMessage = error.message || "";
       const shouldSuggestSignup =
-        role === "student" &&
+        role === "learner" &&
         /invalid login credentials|invalid credentials|email not confirmed/i.test(errorMessage);
 
       showMessage(
@@ -185,11 +198,11 @@ export default function AuthAccessPage({
       return;
     }
 
-    if (actualRole !== role) {
+    if (actualRole !== normalizeRole(role)) {
       await supabase.auth.signOut();
       showMessage(
         "error",
-        formatCopy(copy.wrongRole, { role: actualRole })
+        formatCopy(copy.wrongRole, { role: getVisibleRoleLabel(actualRole) })
       );
       setRoleCheckInProgress(false);
       setLoginLoading(false);
@@ -485,7 +498,7 @@ export default function AuthAccessPage({
         <div
           className="oman-hero overflow-hidden rounded-[1.75rem] px-6 py-10 text-white shadow-xl sm:px-8 sm:py-12"
           style={{
-            backgroundImage: `url(${role === "tutor" ? themeImages.heroFort : themeImages.studentsGroup})`,
+            backgroundImage: `url(${role === "instructor" ? themeImages.heroFort : themeImages.studentsGroup})`,
           }}
         >
           <div className="grid items-center gap-6 lg:grid-cols-[1.05fr_0.95fr]">
@@ -505,11 +518,11 @@ export default function AuthAccessPage({
                 <img
                   src={
                     accessImage ||
-                    (role === "tutor" ? themeImages.mountainFort : themeImages.studentsStudyHall)
+                    (role === "instructor" ? themeImages.mountainFort : themeImages.studentsStudyHall)
                   }
                   alt={
                     accessImageAlt ||
-                    (role === "tutor"
+                    (role === "instructor"
                       ? "Traditional Omani fort scenery"
                       : "Students in a quiet study space")
                   }

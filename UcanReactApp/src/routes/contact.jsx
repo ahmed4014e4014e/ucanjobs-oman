@@ -225,8 +225,8 @@ export default function Contact() {
                     className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
                   >
                     <option value="">{t("contact.placeholders.role")}</option>
-                    <option value="student">{t("contact.roleStudent")}</option>
-                    <option value="tutor">{t("contact.roleTutor")}</option>
+                    <option value="learner">{t("contact.roleStudent")}</option>
+                    <option value="instructor">{t("contact.roleTutor")}</option>
                   </select>
                 </label>
 

@@ -16,7 +16,7 @@ const quickLinkTargets = [
   },
 ];
 
-export default function StudentDashboard() {
+export default function LearnerDashboard() {
   const { user, profile, refreshProfile } = useAuth();
   const { t } = useLanguage();
   const copy = t("studentDashboard");
@@ -142,7 +142,7 @@ export default function StudentDashboard() {
         full_name: fullName.trim(),
         institute: universityName.trim(),
         email: user.email || profile?.email || null,
-        role: "student",
+        role: "learner",
       };
 
       const { error } = await supabase.from("profiles").upsert(profilePayload);
@@ -155,7 +155,7 @@ export default function StudentDashboard() {
         data: {
           full_name: profilePayload.full_name,
           institute: profilePayload.institute,
-          role: "student",
+          role: "learner",
         },
       });
 

@@ -36,7 +36,7 @@ export default function RoleProtectedRoute({ allowedRole, children }) {
   }
 
   if (!user) {
-    return <Navigate to="/student-access/" replace />;
+    return <Navigate to="/learner-access/" replace />;
   }
 
   if (profileLoading) {

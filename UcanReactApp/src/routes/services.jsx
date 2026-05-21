@@ -7,11 +7,11 @@ import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { isSupabaseConfigured } from "../lib/supabase";
 import {
-  buildTutorCards,
-  createTutoringRequest,
-  fetchTutorDirectory,
-  uploadTutoringAttachments,
-} from "../lib/tutoringApi";
+  buildInstructorCards,
+  createLearningRequest,
+  fetchInstructorDirectory,
+  uploadLearningAttachments,
+} from "../lib/learningRequestsApi";
 import {
   ACCEPTED_UPLOAD_ATTRIBUTE,
   ACCEPTED_UPLOAD_TYPES,
@@ -32,7 +32,7 @@ const services = [
       "Students can attend group tutoring sessions for free and learn together around shared course topics.",
   },
   {
-    title: "Online Student Community",
+    title: "Online Learner Community",
     description:
       "College students can ask questions, explain ideas, and help each other understand coursework in a supportive space.",
   },
@@ -59,7 +59,7 @@ const serviceHighlights = [
   { number: "Saved", label: "tutoring requests stored in the database" },
 ];
 
-function getTutorInitials(name) {
+function getInstructorInitials(name) {
   return name
     .split(" ")
     .filter(Boolean)
@@ -68,16 +68,16 @@ function getTutorInitials(name) {
     .join("");
 }
 
-function filterTutorCards(tutors, selectedInstitute, selectedCourse) {
+function filterInstructorCards(instructors, selectedInstitute, selectedCourse) {
   if (!selectedInstitute) {
     return [];
   }
 
-  return tutors.filter((tutor) => {
-    const instituteMatches = tutor.institutes.includes(selectedInstitute);
+  return instructors.filter((instructor) => {
+    const instituteMatches = instructor.institutes.includes(selectedInstitute);
     const courseMatches =
       selectedCourse === "All Courses" ||
-      tutor.courses.some((course) => course.label === selectedCourse);
+      instructor.courses.some((course) => course.label === selectedCourse);
 
     return instituteMatches && courseMatches;
   });
@@ -98,17 +98,17 @@ function formatCopy(template, values) {
   );
 }
 
-function TutorSection({
+function InstructorSection({
   id,
   label,
   title,
   description,
-  tutors,
+  instructors,
   selectedInstitute,
   setSelectedInstitute,
   selectedCourse,
   setSelectedCourse,
-  onTutorClick,
+  onInstructorClick,
   canBook,
   institutes,
   loading,
@@ -122,39 +122,39 @@ function TutorSection({
       return [];
     }
 
-    const relevantTutors = tutors.filter((tutor) =>
-      tutor.institutes.includes(selectedInstitute)
+    const relevantInstructors = instructors.filter((instructor) =>
+      instructor.institutes.includes(selectedInstitute)
     );
 
     const uniqueCourses = Array.from(
-      new Set(relevantTutors.flatMap((tutor) => tutor.courses.map((course) => course.label)))
+      new Set(relevantInstructors.flatMap((instructor) => instructor.courses.map((course) => course.label)))
     ).sort();
 
     return ["All Courses", ...uniqueCourses];
-  }, [selectedInstitute, tutors]);
+  }, [selectedInstitute, instructors]);
 
   const hasCourseOptions = availableCourses.length > 1;
   const showLoginPrompt = !canBook;
   const showDirectoryLoading = canBook && (authLoading || loading);
 
-  const filteredTutors = useMemo(() => {
+  const filteredInstructors = useMemo(() => {
     if (!selectedInstitute) {
       return [];
     }
 
-    return tutors.filter((tutor) => {
-      const instituteMatches = tutor.institutes.includes(selectedInstitute);
+    return instructors.filter((instructor) => {
+      const instituteMatches = instructor.institutes.includes(selectedInstitute);
       const courseMatches =
         selectedCourse === "All Courses" ||
-        tutor.courses.some((course) => course.label === selectedCourse);
+        instructor.courses.some((course) => course.label === selectedCourse);
 
       return instituteMatches && courseMatches;
     });
-  }, [selectedCourse, selectedInstitute, tutors]);
+  }, [selectedCourse, selectedInstitute, instructors]);
 
   const totalCoursesAvailable = useMemo(() => {
-    return filteredTutors.reduce((count, tutor) => count + tutor.courses.length, 0);
-  }, [filteredTutors]);
+    return filteredInstructors.reduce((count, instructor) => count + instructor.courses.length, 0);
+  }, [filteredInstructors]);
 
   useEffect(() => {
     if (!selectedInstitute) {
@@ -234,15 +234,15 @@ function TutorSection({
           </label>
         </div>
 
-        {hasSelectedInstitute && !loading && filteredTutors.length > 0 && (
+        {hasSelectedInstitute && !loading && filteredInstructors.length > 0 && (
           <div className="mt-6 rounded-3xl border border-[rgba(197,154,68,0.24)] bg-[rgba(255,244,222,0.74)] p-5 text-[var(--oman-ink)] shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--oman-terracotta)]">
               {copy.availableNow}
             </p>
             <p className="mt-3 text-lg font-semibold sm:text-xl">
               {formatCopy(copy.tutorsAvailable, {
-                count: filteredTutors.length,
-                plural: filteredTutors.length === 1 ? "" : "s",
+                count: filteredInstructors.length,
+                plural: filteredInstructors.length === 1 ? "" : "s",
                 title: title.toLowerCase(),
               })}
             </p>
@@ -253,15 +253,15 @@ function TutorSection({
               })}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {filteredTutors.map((tutor) => (
+              {filteredInstructors.map((instructor) => (
                 <span
-                  key={`${id}-summary-${tutor.id}`}
+                  key={`${id}-summary-${instructor.id}`}
                   className="inline-flex items-center gap-2 rounded-full bg-[rgba(255,252,247,0.96)] px-4 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.12)]"
                 >
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[rgba(197,154,68,0.18)] text-xs font-bold text-[var(--oman-terracotta-dark)]">
-                    {getTutorInitials(tutor.name)}
+                    {getInstructorInitials(instructor.name)}
                   </span>
-                  {tutor.name}
+                  {instructor.name}
                 </span>
               ))}
             </div>
@@ -280,7 +280,7 @@ function TutorSection({
                     {copy.profileRequiredText}
                   </p>
                   <Link
-                    to="/student-dashboard/"
+                    to="/learner-dashboard/"
                     className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
                   >
                     {copy.profileRequiredButton}
@@ -315,20 +315,20 @@ function TutorSection({
                 {copy.selectInstituteText}
               </p>
             </div>
-          ) : filteredTutors.length > 0 ? (
-            filteredTutors.map((tutor) => (
+          ) : filteredInstructors.length > 0 ? (
+            filteredInstructors.map((instructor) => (
               <article
-                key={`${id}-${tutor.id}`}
+                key={`${id}-${instructor.id}`}
                 className="rounded-3xl border-2 border-[rgba(197,154,68,0.22)] bg-[rgba(255,252,247,0.96)] p-6 shadow-[0_16px_38px_rgba(73,39,27,0.1)] transition hover:-translate-y-1 hover:shadow-[0_22px_46px_rgba(73,39,27,0.12)] sm:p-8"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex items-start gap-4">
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(197,154,68,0.24),rgba(155,77,49,0.22))] text-lg font-bold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.1)]">
-                      {getTutorInitials(tutor.name)}
+                      {getInstructorInitials(instructor.name)}
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
-                        {tutor.name}
+                        {instructor.name}
                       </h3>
                       <p className="mt-2 text-sm font-medium uppercase tracking-[0.18em] text-[var(--oman-brass)]">
                         {copy.profileLabel}
@@ -337,11 +337,11 @@ function TutorSection({
                   </div>
 
                   <span className="oman-chip self-start rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]">
-                    {tutor.institutes.length === 1 ? tutor.institutes[0] : copy.multiInstitute}
+                    {instructor.institutes.length === 1 ? instructor.institutes[0] : copy.multiInstitute}
                   </span>
                 </div>
 
-                <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">{tutor.bio}</p>
+                <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">{instructor.bio}</p>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-3">
@@ -349,7 +349,7 @@ function TutorSection({
                       {copy.sessionType}
                     </p>
                     <p className="mt-2 text-sm font-semibold text-[var(--oman-ink)]">
-                      {tutor.sessionType === "private"
+                      {instructor.sessionType === "private"
                         ? copy.privateSession
                         : copy.groupSession}
                     </p>
@@ -359,7 +359,7 @@ function TutorSection({
                       {copy.availability}
                     </p>
                     <p className="mt-2 text-sm font-semibold text-[var(--oman-olive)]">
-                      {tutor.availability}
+                      {instructor.availability}
                     </p>
                   </div>
                 </div>
@@ -369,13 +369,13 @@ function TutorSection({
                     {copy.courses}
                   </p>
                   <span className="rounded-full bg-[rgba(197,154,68,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)]">
-                    {formatCopy(copy.offered, { count: tutor.courses.length })}
+                    {formatCopy(copy.offered, { count: instructor.courses.length })}
                   </span>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {tutor.courses.map((course) => (
+                  {instructor.courses.map((course) => (
                     <span
-                      key={`${id}-${tutor.id}-${course.id}`}
+                      key={`${id}-${instructor.id}-${course.id}`}
                       className="rounded-full bg-[rgba(255,252,247,0.98)] px-3 py-2 text-sm font-medium text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.12)]"
                     >
                       {course.label}
@@ -386,7 +386,7 @@ function TutorSection({
                 <button
                   type="button"
                   disabled={!canBook}
-                  onClick={() => onTutorClick(tutor)}
+                  onClick={() => onInstructorClick(instructor)}
                   className={[
                     "mt-6 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition sm:w-auto",
                     canBook
@@ -423,7 +423,7 @@ export default function Services() {
   const { user, profile, loading: authLoading } = useAuth();
   const { t } = useLanguage();
   const page = t("servicesPage");
-  const tutorSectionCopy = page.tutorSection;
+  const instructorSectionCopy = page.tutorSection;
   const requestModalCopy = page.requestModal;
   const servicesCopy = page.services;
   const serviceHighlightsCopy = page.highlights;
@@ -436,15 +436,15 @@ export default function Services() {
   const [privateCourse, setPrivateCourse] = useState("");
   const [groupInstitute, setGroupInstitute] = useState("");
   const [groupCourse, setGroupCourse] = useState("");
-  const [privateTutors, setPrivateTutors] = useState([]);
-  const [groupTutors, setGroupTutors] = useState([]);
+  const [privateInstructors, setPrivateInstructors] = useState([]);
+  const [groupInstructors, setGroupInstructors] = useState([]);
   const [rawOfferingCount, setRawOfferingCount] = useState(0);
   const [directoryLoading, setDirectoryLoading] = useState(true);
   const [directoryError, setDirectoryError] = useState("");
-  const [activeTutor, setActiveTutor] = useState(null);
+  const [activeInstructor, setActiveInstructor] = useState(null);
   const [requestTitle, setRequestTitle] = useState("");
   const [selectedCourseId, setSelectedCourseId] = useState("");
-  const [studentInstitute, setStudentInstitute] = useState("");
+  const [learnerInstitute, setLearnerInstitute] = useState("");
   const [topicsNeededHelpWith, setTopicsNeededHelpWith] = useState("");
   const [attachmentNotes, setAttachmentNotes] = useState("");
   const [selectedAttachments, setSelectedAttachments] = useState([]);
@@ -454,31 +454,31 @@ export default function Services() {
   const location = useLocation();
   const needsStudentProfileCompletion = Boolean(
     user?.id &&
-      profile?.role === "student" &&
+      (profile?.role === "learner" || profile?.role === "student") &&
       (!profile?.full_name?.trim() || !profile?.institute?.trim())
   );
   const canBook = Boolean(user?.id && profile?.role && !needsStudentProfileCompletion);
-  const studentAccountName = profile?.full_name || user?.user_metadata?.full_name || t("common.notAvailable");
-  const studentAccountEmail = profile?.email || user?.email || t("common.notAvailable");
+  const learnerAccountName = profile?.full_name || user?.user_metadata?.full_name || t("common.notAvailable");
+  const learnerAccountEmail = profile?.email || user?.email || t("common.notAvailable");
 
   const instituteOptions = useMemo(() => {
     const instituteCodes = new Set();
 
-    [...privateTutors, ...groupTutors].forEach((tutor) => {
-      tutor.institutes.forEach((institute) => instituteCodes.add(institute));
+    [...privateInstructors, ...groupInstructors].forEach((instructor) => {
+      instructor.institutes.forEach((institute) => instituteCodes.add(institute));
     });
 
     return Array.from(instituteCodes).sort();
-  }, [groupTutors, privateTutors]);
+  }, [groupInstructors, privateInstructors]);
 
-  const visiblePrivateTutors = useMemo(
-    () => filterTutorCards(privateTutors, privateInstitute, privateCourse),
-    [privateCourse, privateInstitute, privateTutors]
+  const visiblePrivateInstructors = useMemo(
+    () => filterInstructorCards(privateInstructors, privateInstitute, privateCourse),
+    [privateCourse, privateInstitute, privateInstructors]
   );
 
-  const visibleGroupTutors = useMemo(
-    () => filterTutorCards(groupTutors, groupInstitute, groupCourse),
-    [groupCourse, groupInstitute, groupTutors]
+  const visibleGroupInstructors = useMemo(
+    () => filterInstructorCards(groupInstructors, groupInstitute, groupCourse),
+    [groupCourse, groupInstitute, groupInstructors]
   );
 
   useEffect(() => {
@@ -506,17 +506,17 @@ export default function Services() {
       setDirectoryError("");
 
       try {
-        const offerings = await fetchTutorDirectory();
+        const offerings = await fetchInstructorDirectory();
 
         if (ignore) return;
 
         setRawOfferingCount(offerings.length);
-        setPrivateTutors(buildTutorCards(offerings, "private"));
-        setGroupTutors(buildTutorCards(offerings, "group"));
+        setPrivateInstructors(buildInstructorCards(offerings, "private"));
+        setGroupInstructors(buildInstructorCards(offerings, "group"));
       } catch (error) {
         if (!ignore) {
           setRawOfferingCount(0);
-          setDirectoryError(error.message || "Unable to load the tutor directory right now.");
+          setDirectoryError(error.message || "Unable to load the instructor directory right now.");
         }
       } finally {
         if (!ignore) {
@@ -533,35 +533,35 @@ export default function Services() {
   }, []);
 
   useEffect(() => {
-    if (!activeTutor) return;
+    if (!activeInstructor) return;
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
-        setActiveTutor(null);
+        setActiveInstructor(null);
       }
     };
 
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
-  }, [activeTutor]);
+  }, [activeInstructor]);
 
   useEffect(() => {
-    if (!activeTutor) return;
+    if (!activeInstructor) return;
 
-    const firstCourse = activeTutor.courses[0];
+    const firstCourse = activeInstructor.courses[0];
     setRequestTitle("");
     setSelectedCourseId(firstCourse?.id || "");
-    setStudentInstitute(profile?.institute || user?.user_metadata?.institute || "");
+    setLearnerInstitute(profile?.institute || user?.user_metadata?.institute || "");
     setTopicsNeededHelpWith("");
     setAttachmentNotes("");
     setSelectedAttachments([]);
     setRequestLoading(false);
     setRequestMessage("");
     setRequestMessageType("info");
-  }, [activeTutor, profile?.institute, user?.user_metadata?.institute]);
+  }, [activeInstructor, profile?.institute, user?.user_metadata?.institute]);
 
-  const handleTutorClick = (tutor) => {
-    setActiveTutor(tutor);
+  const handleInstructorClick = (instructor) => {
+    setActiveInstructor(instructor);
   };
 
   const handleAttachmentChange = (event) => {
@@ -580,13 +580,13 @@ export default function Services() {
   const handleRequestSubmit = async (event) => {
     event.preventDefault();
 
-    if (!user || !activeTutor || !selectedCourseId) {
+    if (!user || !activeInstructor || !selectedCourseId) {
       setRequestMessageType("error");
       setRequestMessage(page.messages.loginAndCourse);
       return;
     }
 
-    if (!requestTitle.trim() || !studentInstitute.trim()) {
+    if (!requestTitle.trim() || !learnerInstitute.trim()) {
       setRequestMessageType("error");
       setRequestMessage(page.messages.requiredTitleInstitute);
       return;
@@ -598,7 +598,7 @@ export default function Services() {
       return;
     }
 
-    const selectedCourse = activeTutor.courses.find((course) => course.id === selectedCourseId);
+    const selectedCourse = activeInstructor.courses.find((course) => course.id === selectedCourseId);
 
     if (!selectedCourse) {
       setRequestMessageType("error");
@@ -610,22 +610,22 @@ export default function Services() {
     setRequestMessage("");
 
     try {
-      const attachmentFiles = await uploadTutoringAttachments({
+      const attachmentFiles = await uploadLearningAttachments({
         files: selectedAttachments,
         userId: user.id,
-        tutorId: activeTutor.tutorId,
-        sessionType: activeTutor.sessionType,
+        instructorId: activeInstructor.instructorId,
+        sessionType: activeInstructor.sessionType,
       });
 
-      await createTutoringRequest({
-        student_id: user.id,
-        tutor_id: activeTutor.tutorId,
+      await createLearningRequest({
+        learner_id: user.id,
+        instructor_id: activeInstructor.instructorId,
         course_id: selectedCourseId,
-        session_type: activeTutor.sessionType,
-        institute_name_snapshot: studentInstitute.trim(),
+        session_type: activeInstructor.sessionType,
+        institute_name_snapshot: learnerInstitute.trim(),
         topics_needed_help_with: [
           `Title: ${requestTitle.trim()}`,
-          `Student Institute: ${studentInstitute.trim()}`,
+          `Learner Institute: ${learnerInstitute.trim()}`,
           "",
           "Topics Need Help With:",
           topicsNeededHelpWith.trim(),
@@ -639,7 +639,7 @@ export default function Services() {
         page.messages.requestSuccess
       );
       setRequestTitle("");
-      setStudentInstitute(profile?.institute || user?.user_metadata?.institute || "");
+      setLearnerInstitute(profile?.institute || user?.user_metadata?.institute || "");
       setTopicsNeededHelpWith("");
       setAttachmentNotes("");
       setSelectedAttachments([]);
@@ -733,13 +733,13 @@ export default function Services() {
             </p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <Link
-                to="/student-access/"
+                to="/learner-access/"
                 className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
               >
                 {page.studentLogin}
               </Link>
               <Link
-                to="/tutor-access/"
+                to="/instructor-access/"
                 className="oman-button-primary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
               >
                 {page.tutorLogin}
@@ -749,42 +749,42 @@ export default function Services() {
         </section>
       )}
 
-      <TutorSection
-        id="tutor-directory"
+      <InstructorSection
+        id="instructor-directory"
         label={page.private.label}
         title={page.private.title}
         description={page.private.description}
-        tutors={privateTutors}
+        instructors={privateInstructors}
         selectedInstitute={privateInstitute}
         setSelectedInstitute={setPrivateInstitute}
         selectedCourse={privateCourse}
         setSelectedCourse={setPrivateCourse}
-        onTutorClick={handleTutorClick}
+        onInstructorClick={handleInstructorClick}
         canBook={canBook}
         institutes={instituteOptions}
         loading={directoryLoading}
         authLoading={authLoading}
         requiresProfileCompletion={needsStudentProfileCompletion}
-        copy={tutorSectionCopy}
+        copy={instructorSectionCopy}
       />
 
-      <TutorSection
+      <InstructorSection
         id="group-tutoring"
         label={page.group.label}
         title={page.group.title}
         description={page.group.description}
-        tutors={groupTutors}
+        instructors={groupInstructors}
         selectedInstitute={groupInstitute}
         setSelectedInstitute={setGroupInstitute}
         selectedCourse={groupCourse}
         setSelectedCourse={setGroupCourse}
-        onTutorClick={handleTutorClick}
+        onInstructorClick={handleInstructorClick}
         canBook={canBook}
         institutes={instituteOptions}
         loading={directoryLoading}
         authLoading={authLoading}
         requiresProfileCompletion={needsStudentProfileCompletion}
-        copy={tutorSectionCopy}
+        copy={instructorSectionCopy}
       />
 
       <section className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-8">
@@ -848,12 +848,12 @@ export default function Services() {
         {footerText}
       </footer>
 
-      {activeTutor && (
+      {activeInstructor && (
         <div className="oman-overlay fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/65 px-4 py-6">
           <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[1.75rem] oman-card p-6 sm:p-8">
             <button
               type="button"
-              onClick={() => setActiveTutor(null)}
+              onClick={() => setActiveInstructor(null)}
               className="absolute right-4 top-4 rounded-full bg-[rgba(197,154,68,0.12)] px-3 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] transition hover:bg-[rgba(197,154,68,0.2)]"
               aria-label={t("common.close")}
             >
@@ -864,7 +864,7 @@ export default function Services() {
               {requestModalCopy.kicker}
             </p>
             <h3 className="oman-title-accent mt-4 pr-16 text-2xl font-semibold sm:text-3xl">
-              {formatCopy(requestModalCopy.title, { name: activeTutor.name })}
+              {formatCopy(requestModalCopy.title, { name: activeInstructor.name })}
             </h3>
 
             <div className="mt-6 rounded-3xl oman-outline-panel p-5 sm:p-6">
@@ -884,11 +884,11 @@ export default function Services() {
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     <p>
                       <span className="font-semibold text-[var(--oman-ink)]">{requestModalCopy.name}</span>{" "}
-                      {studentAccountName}
+                      {learnerAccountName}
                     </p>
                     <p>
                       <span className="font-semibold text-[var(--oman-ink)]">{requestModalCopy.email}</span>{" "}
-                      {studentAccountEmail}
+                      {learnerAccountEmail}
                     </p>
                   </div>
                   <p className="mt-3 text-[var(--oman-ink)]/70">
@@ -912,8 +912,8 @@ export default function Services() {
                   <RequiredLabel>{requestModalCopy.instituteLabel}</RequiredLabel>
                   <input
                     type="text"
-                    value={studentInstitute}
-                    onChange={(event) => setStudentInstitute(event.target.value)}
+                    value={learnerInstitute}
+                    onChange={(event) => setLearnerInstitute(event.target.value)}
                     placeholder={requestModalCopy.institutePlaceholder}
                     required
                     className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
@@ -928,7 +928,7 @@ export default function Services() {
                     className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
                     required
                   >
-                    {activeTutor.courses.map((course) => (
+                    {activeInstructor.courses.map((course) => (
                       <option key={course.id} value={course.id}>
                         {course.label}
                       </option>

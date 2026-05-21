@@ -4,10 +4,10 @@ import ActionFeedback from "../components/ActionFeedback";
 import AdminAttachmentDownloadList from "../components/AdminAttachmentDownloadList";
 import { downloadStorageAttachment } from "../lib/adminDownloads";
 import {
-  fetchTutorApplicants,
-  TUTOR_APPLICANT_BUCKET,
-  updateTutorApplicantStatus,
-} from "../lib/tutorApplicantsApi";
+  fetchInstructorApplicants,
+  INSTRUCTOR_APPLICANT_BUCKET,
+  updateInstructorApplicantStatus,
+} from "../lib/instructorApplicantsApi";
 import {
   formatStatusLabel,
   isDashboardArchivedStatus,
@@ -29,7 +29,7 @@ function formatSubmittedAt(value) {
   });
 }
 
-export default function AdminTutorApplications() {
+export default function AdminInstructorApplications() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -51,14 +51,14 @@ export default function AdminTutorApplications() {
       setError("");
 
       try {
-        const results = await fetchTutorApplicants();
+        const results = await fetchInstructorApplicants();
 
         if (!ignore) {
           setApplications(results);
         }
       } catch (fetchError) {
         if (!ignore) {
-          setError(fetchError.message || "Unable to load tutor applications right now.");
+          setError(fetchError.message || "Unable to load instructor applications right now.");
         }
       } finally {
         if (!ignore) {
@@ -166,7 +166,7 @@ export default function AdminTutorApplications() {
     });
 
     try {
-      const updatedApplication = await updateTutorApplicantStatus(activeApplication.id, statusDraft);
+      const updatedApplication = await updateInstructorApplicantStatus(activeApplication.id, statusDraft);
       const normalizedApplication = {
         ...updatedApplication,
         status: normalizeStatus(updatedApplication.status),
@@ -187,12 +187,12 @@ export default function AdminTutorApplications() {
       }
       setFeedback({
         type: "success",
-        message: `Tutor application marked as ${formatStatusLabel(statusDraft)}.`,
+        message: `Instructor application marked as ${formatStatusLabel(statusDraft)}.`,
       });
     } catch (statusError) {
       setFeedback({
         type: "error",
-        message: statusError.message || "Unable to update this tutor application right now.",
+        message: statusError.message || "Unable to update this instructor application right now.",
       });
     } finally {
       setStatusSaving(false);
@@ -209,10 +209,10 @@ export default function AdminTutorApplications() {
                 Admin Records
               </p>
               <h1 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-                Tutor Applications
+                Instructor Applications
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
-                Review applications from students who want to become tutors and download their supporting documents separately from the public contact inbox.
+                Review applications from people who want to become instructors and download their supporting documents separately from the public contact inbox.
               </p>
             </div>
             <Link
@@ -226,7 +226,7 @@ export default function AdminTutorApplications() {
           <ActionFeedback
             type={feedback.type}
             message={feedback.message}
-            title="Tutor application update"
+            title="Instructor application update"
             className="mt-6"
           />
 
@@ -258,7 +258,7 @@ export default function AdminTutorApplications() {
                   Application Workflow
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/75">
-                  Start with pending tutor applications, review the documents carefully, then move them through reviewed, approved, or rejected based on your onboarding process.
+                  Start with pending instructor applications, review the documents carefully, then move them through reviewed, approved, or rejected based on your onboarding process.
                 </p>
               </div>
               <label className="flex flex-col gap-2 lg:min-w-56">
@@ -283,21 +283,21 @@ export default function AdminTutorApplications() {
 
           {loading ? (
             <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
-              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">Loading tutor applications...</h3>
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">Loading instructor applications...</h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Fetching the latest tutor applications from database.
+                Fetching the latest instructor applications from database.
               </p>
             </div>
           ) : error ? (
             <div className="mt-8 rounded-3xl border border-[rgba(155,77,49,0.22)] bg-[rgba(255,239,232,0.95)] p-6 text-[var(--oman-terracotta-dark)]">
-              <h3 className="text-xl font-semibold">Unable to load tutor applications</h3>
+              <h3 className="text-xl font-semibold">Unable to load instructor applications</h3>
               <p className="mt-4 leading-7">{error}</p>
             </div>
           ) : visibleApplications.length === 0 ? (
             <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
-              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No active tutor applications</h3>
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No active instructor applications</h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Completed tutor applications are hidden from the dashboard, but still remain available in database.
+                Completed instructor applications are hidden from the dashboard, but still remain available in database.
               </p>
             </div>
           ) : filteredApplications.length === 0 ? (
@@ -306,7 +306,7 @@ export default function AdminTutorApplications() {
                 No {formatStatusLabel(statusFilter).toLowerCase()} applications
               </h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Try another status filter to continue processing tutor applications.
+                Try another status filter to continue processing instructor applications.
               </p>
             </div>
           ) : (
@@ -345,7 +345,7 @@ export default function AdminTutorApplications() {
                     </p>
                   </div>
                   <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
-                    Click to open this tutor application in a separate popup window.
+                    Click to open this instructor application in a separate popup window.
                   </p>
                 </button>
               ))}
@@ -367,7 +367,7 @@ export default function AdminTutorApplications() {
             </button>
 
             <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              Tutor Application
+              Instructor Application
             </p>
             <h2 className="oman-title-accent mt-4 pr-16 text-2xl font-semibold sm:text-3xl">
               {activeApplication.full_name}
@@ -392,7 +392,7 @@ export default function AdminTutorApplications() {
               </p>
               <p>
                 <span className="font-semibold text-[var(--oman-ink)]">Desired Courses:</span>{" "}
-                {activeApplication.desired_tutoring_courses || "Not provided"}
+                {activeApplication.desired_courses || "Not provided"}
               </p>
               <p>
                 <span className="font-semibold text-[var(--oman-ink)]">WhatsApp:</span>{" "}
@@ -463,7 +463,7 @@ export default function AdminTutorApplications() {
                 )}
                 <AdminAttachmentDownloadList
                   files={activeApplication.attachment_files}
-                  bucket={TUTOR_APPLICANT_BUCKET}
+                  bucket={INSTRUCTOR_APPLICANT_BUCKET}
                   downloadingPaths={downloadingPaths}
                   onDownload={handleAttachmentDownload}
                 />

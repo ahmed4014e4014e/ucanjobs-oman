@@ -22,7 +22,7 @@ export async function fetchContactMessages() {
   const { data, error } = await supabase
     .from("contact_messages")
     .select("*")
-    .not("subject", "ilike", "Tutor Application - %")
+    .not("subject", "ilike", "Instructor Application - %")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -32,13 +32,13 @@ export async function fetchContactMessages() {
   return data ?? [];
 }
 
-export async function fetchTutorApplications() {
+export async function fetchInstructorApplications() {
   ensureSupabase();
 
   const { data, error } = await supabase
     .from("contact_messages")
     .select("*")
-    .ilike("subject", "Tutor Application - %")
+    .ilike("subject", "Instructor Application - %")
     .order("created_at", { ascending: false });
 
   if (error) {

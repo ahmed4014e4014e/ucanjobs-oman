@@ -11,9 +11,9 @@ import {
 } from "../lib/fileUploadRules";
 import { isSupabaseConfigured } from "../lib/supabase";
 import {
-  createTutorApplicant,
-  uploadTutorApplicantAttachments,
-} from "../lib/tutorApplicantsApi";
+  createInstructorApplicant,
+  uploadInstructorApplicantAttachments,
+} from "../lib/instructorApplicantsApi";
 import { themeImages } from "../lib/themeImages";
 
 function formatCopy(template, values) {
@@ -31,7 +31,7 @@ function RequiredLabel({ children }) {
   );
 }
 
-export default function TutorApplication() {
+export default function InstructorApplication() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const copy = t("tutorApplicationPage");
@@ -44,7 +44,7 @@ export default function TutorApplication() {
     universityName: "",
     universityId: "",
     majorName: "",
-    desiredTutoringCourses: "",
+    desiredCourses: "",
     universityEmail: "",
     phoneNumber: "",
   });
@@ -117,21 +117,21 @@ export default function TutorApplication() {
     });
 
     try {
-      const uploadedFiles = await uploadTutorApplicantAttachments(selectedFiles);
+      const uploadedFiles = await uploadInstructorApplicantAttachments(selectedFiles);
 
-      await createTutorApplicant({
+      await createInstructorApplicant({
         applicant_profile_id: user?.id || null,
         full_name: formValues.fullName.trim(),
         university_name: formValues.universityName.trim(),
         university_id: formValues.universityId.trim(),
         major_name: formValues.majorName.trim(),
-        desired_tutoring_courses: formValues.desiredTutoringCourses.trim(),
+        desired_courses: formValues.desiredCourses.trim(),
         university_email: formValues.universityEmail.trim(),
         phone_number: formValues.phoneNumber.trim(),
         application_message: [
           formatCopy(copy.messages.applicationSubmittedBy, { name: formValues.fullName.trim() }),
           formatCopy(copy.messages.university, { university: formValues.universityName.trim() }),
-          formatCopy(copy.messages.desired, { courses: formValues.desiredTutoringCourses.trim() }),
+          formatCopy(copy.messages.desired, { courses: formValues.desiredCourses.trim() }),
         ].join("\n"),
         attachment_notes: requiredAttachments.join("\n"),
         attachment_files: uploadedFiles,
@@ -148,7 +148,7 @@ export default function TutorApplication() {
         universityName: "",
         universityId: "",
         majorName: "",
-        desiredTutoringCourses: "",
+        desiredCourses: "",
         universityEmail: "",
         phoneNumber: "",
       });
@@ -209,7 +209,7 @@ export default function TutorApplication() {
               </h2>
             </div>
             <Link
-              to="/tutor-access/"
+              to="/instructor-access/"
               className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
             >
               {copy.back}
@@ -281,8 +281,8 @@ export default function TutorApplication() {
                 {copy.courseNote}
               </p>
               <textarea
-                name="desiredTutoringCourses"
-                value={formValues.desiredTutoringCourses}
+                name="desiredCourses"
+                value={formValues.desiredCourses}
                 onChange={handleChange}
                 rows={4}
                 required

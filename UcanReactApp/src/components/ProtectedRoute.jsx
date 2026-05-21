@@ -26,7 +26,7 @@ export default function ProtectedRoute({ children }) {
   }
 
   if (!user) {
-    return <Navigate to="/student-access/" replace />;
+    return <Navigate to="/learner-access/" replace />;
   }
 
   return children;

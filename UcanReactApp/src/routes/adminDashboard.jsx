@@ -3,17 +3,17 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import {
-  buildTutorCards,
-  fetchTutorDirectory,
-} from "../lib/tutoringApi";
+  buildInstructorCards,
+  fetchInstructorDirectory,
+} from "../lib/learningRequestsApi";
 import { CONTACT_STATUS_OPTIONS, TUTORING_STATUS_OPTIONS } from "../lib/requestStatuses";
 import { themeImages } from "../lib/themeImages";
 import { isSupabaseConfigured } from "../lib/supabase";
 
 const adminToolTargets = [
   "/admin-contact-messages/",
-  "/admin-tutor-applications/",
-  "/admin-tutoring-requests/",
+  "/admin-instructor-applications/",
+  "/admin-learning-requests/",
 ];
 
 export default function AdminDashboard() {
@@ -30,16 +30,16 @@ export default function AdminDashboard() {
   const [directoryError, setDirectoryError] = useState("");
   const [directoryDiagnostics, setDirectoryDiagnostics] = useState({
     rawOfferingCount: 0,
-    privateTutorCards: 0,
-    groupTutorCards: 0,
+    privateInstructorCards: 0,
+    groupInstructorCards: 0,
     visibleInstitutes: 0,
   });
   const noDirectoryData =
     !directoryLoading &&
     !directoryError &&
     directoryDiagnostics.rawOfferingCount === 0 &&
-    directoryDiagnostics.privateTutorCards === 0 &&
-    directoryDiagnostics.groupTutorCards === 0;
+    directoryDiagnostics.privateInstructorCards === 0 &&
+    directoryDiagnostics.groupInstructorCards === 0;
   const workflowStatuses = Array.from(
     new Set([...CONTACT_STATUS_OPTIONS, ...TUTORING_STATUS_OPTIONS])
   );
@@ -51,8 +51,8 @@ export default function AdminDashboard() {
       if (!isSupabaseConfigured) {
         setDirectoryDiagnostics({
           rawOfferingCount: 0,
-          privateTutorCards: 0,
-          groupTutorCards: 0,
+          privateInstructorCards: 0,
+          groupInstructorCards: 0,
           visibleInstitutes: 0,
         });
         setDirectoryError(copy.supabaseNotConfigured);
@@ -64,9 +64,9 @@ export default function AdminDashboard() {
       setDirectoryError("");
 
       try {
-        const offerings = await fetchTutorDirectory();
-        const privateCards = buildTutorCards(offerings, "private");
-        const groupCards = buildTutorCards(offerings, "group");
+        const offerings = await fetchInstructorDirectory();
+        const privateCards = buildInstructorCards(offerings, "private");
+        const groupCards = buildInstructorCards(offerings, "group");
         const instituteCodes = new Set();
 
         [...privateCards, ...groupCards].forEach((card) => {
@@ -76,8 +76,8 @@ export default function AdminDashboard() {
         if (!ignore) {
           setDirectoryDiagnostics({
             rawOfferingCount: offerings.length,
-            privateTutorCards: privateCards.length,
-            groupTutorCards: groupCards.length,
+            privateInstructorCards: privateCards.length,
+            groupInstructorCards: groupCards.length,
             visibleInstitutes: instituteCodes.size,
           });
         }
@@ -85,8 +85,8 @@ export default function AdminDashboard() {
         if (!ignore) {
           setDirectoryDiagnostics({
             rawOfferingCount: 0,
-            privateTutorCards: 0,
-            groupTutorCards: 0,
+            privateInstructorCards: 0,
+            groupInstructorCards: 0,
             visibleInstitutes: 0,
           });
           setDirectoryError(fetchError.message || copy.diagnosticsError);
@@ -242,11 +242,11 @@ export default function AdminDashboard() {
                   </p>
                   <p>
                     <span className="font-semibold">{copy.diagnosticLabels.privateCards}</span>{" "}
-                    {directoryDiagnostics.privateTutorCards}
+                    {directoryDiagnostics.privateInstructorCards}
                   </p>
                   <p>
                     <span className="font-semibold">{copy.diagnosticLabels.groupCards}</span>{" "}
-                    {directoryDiagnostics.groupTutorCards}
+                    {directoryDiagnostics.groupInstructorCards}
                   </p>
                   <p>
                     <span className="font-semibold">{copy.diagnosticLabels.institutes}</span>{" "}
