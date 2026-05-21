@@ -125,8 +125,10 @@ export default function AuthAccessPage({
   };
 
   useEffect(() => {
-    if (!loading && user && profile?.role && !roleCheckInProgress) {
-      navigate(getDashboardPath(profile.role), { replace: true });
+    const resolvedRole = getUserRole(profile, user);
+
+    if (!loading && user && resolvedRole && !roleCheckInProgress) {
+      navigate(getDashboardPath(resolvedRole), { replace: true });
     }
   }, [loading, navigate, profile, roleCheckInProgress, user]);
 
@@ -215,7 +217,31 @@ export default function AuthAccessPage({
       return;
     }
 
-    const actualRole = await resolveAccountRole(data.user);
+    let actualRole = null;
+
+    try {
+      actualRole = await resolveAccountRole(data.user);
+    } catch (roleError) {
+      if (role === "admin") {
+        await supabase.auth.signOut();
+        showMessage("error", roleError?.message || copy.profileLoadError);
+        setRoleCheckInProgress(false);
+        setLoginLoading(false);
+        return;
+      }
+
+      actualRole = normalizeRole(data.user?.user_metadata?.role ?? role);
+
+      try {
+        await supabase.auth.updateUser({
+          data: {
+            role: actualRole,
+          },
+        });
+      } catch (_metadataError) {
+        // A metadata refresh is useful, but learner/instructor login should not get stuck on it.
+      }
+    }
 
     if (!actualRole) {
       await supabase.auth.signOut();
@@ -241,8 +267,8 @@ export default function AuthAccessPage({
 
     showMessage("success", copy.loginSuccess);
     setRoleCheckInProgress(false);
-    navigate(getDashboardPath(actualRole), { replace: true });
     setLoginLoading(false);
+    navigate(getDashboardPath(actualRole), { replace: true });
   };
 
   const handleForgotPassword = async () => {
