@@ -54,6 +54,18 @@ function mapCourseRow(row, outcomes = [], modules = []) {
   };
 }
 
+function mapEnrollmentRow(row) {
+  const course = row.course ? mapCourseRow(row.course) : null;
+
+  return {
+    id: row.id,
+    status: row.status,
+    progressPercent: row.progress_percent ?? 0,
+    enrolledAt: row.enrolled_at,
+    course,
+  };
+}
+
 async function fetchCourseRows(queryBuilder) {
   if (!isSupabaseConfigured || !supabase) {
     return [];
@@ -135,6 +147,83 @@ export async function fetchPublishedCourses() {
   );
 
   return courses.length ? courses : courseCatalog;
+}
+
+export async function enrollInCourse({ learnerId, courseId }) {
+  if (!isSupabaseConfigured || !supabase) {
+    throw new Error("database is not configured yet.");
+  }
+
+  if (!learnerId || !courseId) {
+    throw new Error("A learner account and course are required before enrollment.");
+  }
+
+  const { data, error } = await supabase
+    .from("course_enrollments")
+    .upsert(
+      {
+        learner_id: learnerId,
+        course_id: courseId,
+        status: "enrolled",
+      },
+      {
+        onConflict: "learner_id,course_id",
+      }
+    )
+    .select("id, status, progress_percent, enrolled_at")
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function fetchLearnerEnrollments(learnerId) {
+  if (!isSupabaseConfigured || !supabase || !learnerId) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("course_enrollments")
+    .select(
+      `
+        id,
+        status,
+        progress_percent,
+        enrolled_at,
+        course:learning_courses (
+          id,
+          slug,
+          title_en,
+          title_ar,
+          subtitle_en,
+          subtitle_ar,
+          summary_en,
+          summary_ar,
+          level,
+          duration,
+          language,
+          price_omr,
+          sort_order,
+          category:course_categories (
+            slug,
+            name_en,
+            name_ar
+          )
+        )
+      `
+    )
+    .eq("learner_id", learnerId)
+    .neq("status", "cancelled")
+    .order("enrolled_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map(mapEnrollmentRow).filter((entry) => entry.course);
 }
 
 export async function fetchPublishedCourseBySlug(slug) {

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import ActionFeedback from "../components/ActionFeedback";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
+import { fetchLearnerEnrollments } from "../lib/courseApi";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
 
@@ -26,6 +27,9 @@ export default function StudentDashboard() {
   const [fullName, setFullName] = useState("");
   const [universityName, setUniversityName] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
+  const [enrollments, setEnrollments] = useState([]);
+  const [loadingEnrollments, setLoadingEnrollments] = useState(false);
+  const [enrollmentError, setEnrollmentError] = useState("");
   const [feedback, setFeedback] = useState({
     type: "idle",
     message: "",
@@ -37,6 +41,46 @@ export default function StudentDashboard() {
     setFullName(profile?.full_name || "");
     setUniversityName(profile?.institute || "");
   }, [profile?.full_name, profile?.institute]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadEnrollments() {
+      if (!user?.id) {
+        setEnrollments([]);
+        return;
+      }
+
+      setLoadingEnrollments(true);
+      setEnrollmentError("");
+
+      try {
+        const nextEnrollments = await fetchLearnerEnrollments(user.id);
+
+        if (!active) {
+          return;
+        }
+
+        setEnrollments(nextEnrollments);
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+
+        setEnrollmentError(error?.message || "We could not load your enrolled courses.");
+      } finally {
+        if (active) {
+          setLoadingEnrollments(false);
+        }
+      }
+    }
+
+    loadEnrollments();
+
+    return () => {
+      active = false;
+    };
+  }, [user?.id]);
 
   const handleProfileSubmit = async (event) => {
     event.preventDefault();
@@ -229,6 +273,86 @@ export default function StudentDashboard() {
                   </Link>
                 </article>
               ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="mx-auto mt-10 max-w-6xl">
+        <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
+          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+            Enrolled Courses
+          </p>
+          <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
+            Your Ucan learning path
+          </h2>
+          <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
+            Courses you enroll in will appear here. Detailed progress tracking will be added in a
+            later phase.
+          </p>
+
+          {loadingEnrollments && (
+            <div className="mt-6 rounded-3xl oman-outline-panel p-5 text-[var(--oman-ink)]/75">
+              Loading your enrolled courses...
+            </div>
+          )}
+
+          {enrollmentError && (
+            <ActionFeedback
+              type="error"
+              message={enrollmentError}
+              title="Enrollment Status"
+              className="mt-6"
+            />
+          )}
+
+          {!loadingEnrollments && !enrollmentError && enrollments.length === 0 && (
+            <div className="mt-6 rounded-3xl oman-outline-panel p-5 text-center">
+              <h3 className="text-lg font-semibold text-[var(--oman-ink)]">
+                No enrolled courses yet
+              </h3>
+              <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
+                Browse the course catalog and enroll in your first course when you are ready.
+              </p>
+              <Link
+                to="/courses/"
+                className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+              >
+                Browse Courses
+              </Link>
+            </div>
+          )}
+
+          {enrollments.length > 0 && (
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {enrollments.map((enrollment) => {
+                const content = enrollment.course.en;
+
+                return (
+                  <article key={enrollment.id} className="rounded-3xl oman-outline-panel p-5">
+                    <div className="flex flex-wrap gap-2">
+                      <span className="oman-chip rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em]">
+                        {enrollment.status}
+                      </span>
+                      <span className="rounded-full bg-[rgba(244,232,214,0.54)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)]">
+                        {enrollment.progressPercent}% progress
+                      </span>
+                    </div>
+                    <h3 className="mt-4 text-xl font-semibold text-[var(--oman-ink)]">
+                      {content.title}
+                    </h3>
+                    <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
+                      {content.subtitle}
+                    </p>
+                    <Link
+                      to={`/courses/${enrollment.course.slug}/`}
+                      className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+                    >
+                      View Course
+                    </Link>
+                  </article>
+                );
+              })}
             </div>
           )}
         </div>

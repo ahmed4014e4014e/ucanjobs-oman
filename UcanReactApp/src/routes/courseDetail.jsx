@@ -1,17 +1,26 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import ActionFeedback from "../components/ActionFeedback";
+import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
-import { fetchPublishedCourseBySlug } from "../lib/courseApi";
+import { enrollInCourse, fetchPublishedCourseBySlug } from "../lib/courseApi";
 import { findCourseBySlug } from "../lib/courseCatalog";
 import { themeImages } from "../lib/themeImages";
 
 export default function CourseDetail() {
   const { slug } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const { isArabic, t } = useLanguage();
   const locale = isArabic ? "ar" : "en";
   const [course, setCourse] = useState(() => findCourseBySlug(slug));
   const [loadingCourse, setLoadingCourse] = useState(true);
+  const [enrolling, setEnrolling] = useState(false);
   const [courseLoadMessage, setCourseLoadMessage] = useState("");
+  const [enrollmentFeedback, setEnrollmentFeedback] = useState({
+    type: "idle",
+    message: "",
+  });
   const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
 
   useEffect(() => {
@@ -32,9 +41,7 @@ export default function CourseDetail() {
         setCourseLoadMessage(
           nextCourse?.source === "database"
             ? ""
-            : isArabic
-              ? "يتم عرض تفاصيل الدورة من كتالوج البداية حالياً."
-              : "Showing this course from the starter catalog for now."
+            : "Showing this course from the starter catalog for now."
         );
       } catch (error) {
         if (!active) {
@@ -44,9 +51,7 @@ export default function CourseDetail() {
         console.error("Course detail load failed:", error);
         setCourse(findCourseBySlug(slug));
         setCourseLoadMessage(
-          isArabic
-            ? "يتم عرض تفاصيل الدورة من كتالوج البداية إلى أن تتوفر بيانات الدورات."
-            : "Showing this course from the starter catalog until live course data is available."
+          "Showing this course from the starter catalog until live course data is available."
         );
       } finally {
         if (active) {
@@ -60,17 +65,54 @@ export default function CourseDetail() {
     return () => {
       active = false;
     };
-  }, [isArabic, slug]);
+  }, [slug]);
+
+  const handleEnrollment = async () => {
+    if (!user?.id) {
+      navigate("/student-access/");
+      return;
+    }
+
+    if (course?.source !== "database" || !course?.id) {
+      setEnrollmentFeedback({
+        type: "error",
+        message: "Enrollment will be available after live course data is connected.",
+      });
+      return;
+    }
+
+    setEnrolling(true);
+    setEnrollmentFeedback({ type: "idle", message: "" });
+
+    try {
+      await enrollInCourse({
+        learnerId: user.id,
+        courseId: course.id,
+      });
+
+      setEnrollmentFeedback({
+        type: "success",
+        message: "You are enrolled. You can now view this course from your learner dashboard.",
+      });
+    } catch (error) {
+      setEnrollmentFeedback({
+        type: "error",
+        message: error?.message || "We could not enroll you in this course right now.",
+      });
+    } finally {
+      setEnrolling(false);
+    }
+  };
 
   if (!course && loadingCourse) {
     return (
       <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
         <section className="mx-auto max-w-3xl rounded-[1.75rem] oman-card p-6 text-center sm:p-8">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            {isArabic ? "جاري تحميل الدورة" : "Loading Course"}
+            Loading Course
           </p>
           <h1 className="oman-title-accent mt-4 text-3xl font-semibold">
-            {isArabic ? "يتم جلب تفاصيل الدورة..." : "Fetching course details..."}
+            Fetching course details...
           </h1>
         </section>
       </main>
@@ -82,23 +124,23 @@ export default function CourseDetail() {
       <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
         <section className="mx-auto max-w-3xl rounded-[1.75rem] oman-card p-6 text-center sm:p-8">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            {isArabic ? "الدورة غير موجودة" : "Course Not Found"}
+            Course Not Found
           </p>
           <h1 className="oman-title-accent mt-4 text-3xl font-semibold">
-            {isArabic ? "لم نتمكن من العثور على هذه الدورة." : "We could not find this course."}
+            We could not find this course.
           </h1>
           <Link
             to="/courses/"
             className="oman-button-primary mt-6 inline-flex rounded-2xl px-6 py-3 font-semibold transition"
           >
-            {isArabic ? "العودة إلى الدورات" : "Back to Courses"}
+            Back to Courses
           </Link>
         </section>
       </main>
     );
   }
 
-  const content = course[locale];
+  const content = course[locale] || course.en;
 
   return (
     <main className="oman-page min-h-screen text-slate-900">
@@ -129,11 +171,7 @@ export default function CourseDetail() {
             </div>
             {(loadingCourse || courseLoadMessage) && (
               <div className="mt-6 inline-flex rounded-2xl bg-[rgba(255,252,247,0.14)] px-4 py-3 text-sm font-semibold text-white ring-1 ring-white/20">
-                {loadingCourse
-                  ? isArabic
-                    ? "جاري تحميل تفاصيل الدورة..."
-                    : "Loading course details..."
-                  : courseLoadMessage}
+                {loadingCourse ? "Loading course details..." : courseLoadMessage}
               </div>
             )}
           </div>
@@ -143,10 +181,10 @@ export default function CourseDetail() {
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            {isArabic ? "نظرة عامة" : "Overview"}
+            Overview
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
-            {isArabic ? "ما الذي ستتعلمه؟" : "What Will You Learn?"}
+            What Will You Learn?
           </h2>
           <p className="mt-4 text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
             {content.summary}
@@ -163,10 +201,10 @@ export default function CourseDetail() {
 
         <aside className="rounded-[1.75rem] oman-card p-6 sm:p-8">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            {isArabic ? "محتوى الدورة" : "Course Content"}
+            Course Content
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
-            {isArabic ? "الوحدات المقترحة" : "Proposed Modules"}
+            Proposed Modules
           </h2>
           <ol className="mt-6 space-y-3">
             {content.modules.map((module, index) => (
@@ -175,23 +213,30 @@ export default function CourseDetail() {
                 className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-4 text-[var(--oman-ink)]"
               >
                 <span className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-                  {isArabic ? `الوحدة ${index + 1}` : `Module ${index + 1}`}
+                  Module {index + 1}
                 </span>
                 <p className="mt-2 font-semibold">{module}</p>
               </li>
             ))}
           </ol>
 
-          <Link
-            to="/student-access/"
-            className="oman-button-primary mt-8 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+          <ActionFeedback
+            type={enrollmentFeedback.type}
+            message={enrollmentFeedback.message}
+            title="Enrollment Update"
+            className="mt-8"
+          />
+
+          <button
+            type="button"
+            onClick={handleEnrollment}
+            disabled={enrolling}
+            className="oman-button-primary mt-5 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isArabic ? "انضم كمتعلم" : "Join As A Learner"}
-          </Link>
+            {enrolling ? "Enrolling..." : user ? "Enroll In This Course" : "Sign In To Enroll"}
+          </button>
           <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
-            {isArabic
-              ? "التسجيل والدفع وتتبع التقدم ستضاف في مراحل لاحقة."
-              : "Enrollment, payment, and progress tracking will be added in later phases."}
+            Payments and detailed progress tracking will be added in later phases.
           </p>
         </aside>
       </section>
