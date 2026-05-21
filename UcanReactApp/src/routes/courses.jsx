@@ -1,12 +1,71 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 import { courseCatalog, courseCategories } from "../lib/courseCatalog";
+import { fetchPublishedCourses } from "../lib/courseApi";
 import { themeImages } from "../lib/themeImages";
 
 export default function Courses() {
   const { isArabic, t } = useLanguage();
   const locale = isArabic ? "ar" : "en";
+  const [courses, setCourses] = useState(courseCatalog);
+  const [loadingCourses, setLoadingCourses] = useState(true);
+  const [courseLoadMessage, setCourseLoadMessage] = useState("");
+  const categories = useMemo(() => {
+    const labels = courses.map((course) => (isArabic ? course.categoryAr || course.category : course.category));
+    const uniqueLabels = Array.from(new Set(labels.filter(Boolean)));
+
+    return uniqueLabels.length ? uniqueLabels : courseCategories;
+  }, [courses, isArabic]);
   const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadCourses() {
+      setLoadingCourses(true);
+      setCourseLoadMessage("");
+
+      try {
+        const nextCourses = await fetchPublishedCourses();
+
+        if (!active) {
+          return;
+        }
+
+        setCourses(nextCourses);
+        setCourseLoadMessage(
+          nextCourses.some((course) => course.source === "database")
+            ? ""
+            : isArabic
+              ? "يتم عرض كتالوج البداية حالياً."
+              : "Showing the starter catalog for now."
+        );
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+
+        console.error("Course catalog load failed:", error);
+        setCourses(courseCatalog);
+        setCourseLoadMessage(
+          isArabic
+            ? "يتم عرض كتالوج البداية حالياً إلى أن تتوفر بيانات الدورات."
+            : "Showing the starter catalog until live course data is available."
+        );
+      } finally {
+        if (active) {
+          setLoadingCourses(false);
+        }
+      }
+    }
+
+    loadCourses();
+
+    return () => {
+      active = false;
+    };
+  }, [isArabic]);
 
   return (
     <main className="oman-page min-h-screen text-slate-900">
@@ -48,7 +107,7 @@ export default function Courses() {
 
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="flex flex-wrap justify-center gap-2 lg:justify-start">
-          {courseCategories.map((category) => (
+          {categories.map((category) => (
             <span
               key={category}
               className="rounded-full bg-[rgba(197,154,68,0.12)] px-4 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.12)]"
@@ -58,15 +117,25 @@ export default function Courses() {
           ))}
         </div>
 
+        {(loadingCourses || courseLoadMessage) && (
+          <div className="mt-6 rounded-2xl bg-[rgba(255,252,247,0.9)] px-4 py-3 text-sm font-semibold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.1)]">
+            {loadingCourses
+              ? isArabic
+                ? "جاري تحميل الدورات..."
+                : "Loading courses..."
+              : courseLoadMessage}
+          </div>
+        )}
+
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
-          {courseCatalog.map((course) => {
+          {courses.map((course) => {
             const content = course[locale];
 
             return (
               <article key={course.slug} className="rounded-[1.75rem] oman-card p-6 sm:p-8">
                 <div className="flex flex-wrap gap-2">
                   <span className="oman-chip rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em]">
-                    {course.category}
+                    {isArabic ? course.categoryAr || course.category : course.category}
                   </span>
                   <span className="rounded-full bg-[rgba(255,252,247,0.95)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.12)]">
                     {course.level}

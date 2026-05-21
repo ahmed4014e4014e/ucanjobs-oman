@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
+import { fetchPublishedCourseBySlug } from "../lib/courseApi";
 import { findCourseBySlug } from "../lib/courseCatalog";
 import { themeImages } from "../lib/themeImages";
 
@@ -7,8 +9,73 @@ export default function CourseDetail() {
   const { slug } = useParams();
   const { isArabic, t } = useLanguage();
   const locale = isArabic ? "ar" : "en";
-  const course = findCourseBySlug(slug);
+  const [course, setCourse] = useState(() => findCourseBySlug(slug));
+  const [loadingCourse, setLoadingCourse] = useState(true);
+  const [courseLoadMessage, setCourseLoadMessage] = useState("");
   const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadCourse() {
+      setLoadingCourse(true);
+      setCourseLoadMessage("");
+
+      try {
+        const nextCourse = await fetchPublishedCourseBySlug(slug);
+
+        if (!active) {
+          return;
+        }
+
+        setCourse(nextCourse);
+        setCourseLoadMessage(
+          nextCourse?.source === "database"
+            ? ""
+            : isArabic
+              ? "يتم عرض تفاصيل الدورة من كتالوج البداية حالياً."
+              : "Showing this course from the starter catalog for now."
+        );
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+
+        console.error("Course detail load failed:", error);
+        setCourse(findCourseBySlug(slug));
+        setCourseLoadMessage(
+          isArabic
+            ? "يتم عرض تفاصيل الدورة من كتالوج البداية إلى أن تتوفر بيانات الدورات."
+            : "Showing this course from the starter catalog until live course data is available."
+        );
+      } finally {
+        if (active) {
+          setLoadingCourse(false);
+        }
+      }
+    }
+
+    loadCourse();
+
+    return () => {
+      active = false;
+    };
+  }, [isArabic, slug]);
+
+  if (!course && loadingCourse) {
+    return (
+      <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
+        <section className="mx-auto max-w-3xl rounded-[1.75rem] oman-card p-6 text-center sm:p-8">
+          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+            {isArabic ? "جاري تحميل الدورة" : "Loading Course"}
+          </p>
+          <h1 className="oman-title-accent mt-4 text-3xl font-semibold">
+            {isArabic ? "يتم جلب تفاصيل الدورة..." : "Fetching course details..."}
+          </h1>
+        </section>
+      </main>
+    );
+  }
 
   if (!course) {
     return (
@@ -42,7 +109,7 @@ export default function CourseDetail() {
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
           <div className="max-w-4xl text-center lg:text-left">
             <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-              {course.category}
+              {isArabic ? course.categoryAr || course.category : course.category}
             </p>
             <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
               {content.title}
@@ -60,6 +127,15 @@ export default function CourseDetail() {
                 </span>
               ))}
             </div>
+            {(loadingCourse || courseLoadMessage) && (
+              <div className="mt-6 inline-flex rounded-2xl bg-[rgba(255,252,247,0.14)] px-4 py-3 text-sm font-semibold text-white ring-1 ring-white/20">
+                {loadingCourse
+                  ? isArabic
+                    ? "جاري تحميل تفاصيل الدورة..."
+                    : "Loading course details..."
+                  : courseLoadMessage}
+              </div>
+            )}
           </div>
         </div>
       </section>
