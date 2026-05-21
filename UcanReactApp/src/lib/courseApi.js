@@ -88,12 +88,7 @@ async function addCourseRelations(courses) {
 
   const courseIds = courses.map((course) => course.id);
   const categoryIds = Array.from(new Set(courses.map((course) => course.category_id).filter(Boolean)));
-
-  const [
-    { data: categories, error: categoriesError },
-    { data: outcomes, error: outcomesError },
-    { data: modules, error: modulesError },
-  ] = await Promise.all([
+  const [categoryResult, outcomeResult, moduleResult] = await Promise.allSettled([
     categoryIds.length
       ? supabase.from("course_categories").select("id, slug, name_en, name_ar").in("id", categoryIds)
       : Promise.resolve({ data: [], error: null }),
@@ -107,25 +102,26 @@ async function addCourseRelations(courses) {
       .in("course_id", courseIds),
   ]);
 
-  if (categoriesError) {
-    throw categoriesError;
-  }
-
-  if (outcomesError) {
-    throw outcomesError;
-  }
-
-  if (modulesError) {
-    throw modulesError;
-  }
+  const categories =
+    categoryResult.status === "fulfilled" && !categoryResult.value.error
+      ? categoryResult.value.data ?? []
+      : [];
+  const outcomes =
+    outcomeResult.status === "fulfilled" && !outcomeResult.value.error
+      ? outcomeResult.value.data ?? []
+      : [];
+  const modules =
+    moduleResult.status === "fulfilled" && !moduleResult.value.error
+      ? moduleResult.value.data ?? []
+      : [];
 
   return courses.map((course) => {
-    const category = (categories ?? []).find((item) => item.id === course.category_id);
+    const category = categories.find((item) => item.id === course.category_id);
 
     return mapCourseRow(
       { ...course, category },
-      (outcomes ?? []).filter((outcome) => outcome.course_id === course.id),
-      (modules ?? []).filter((module) => module.course_id === course.id)
+      outcomes.filter((outcome) => outcome.course_id === course.id),
+      modules.filter((module) => module.course_id === course.id)
     );
   });
 }
