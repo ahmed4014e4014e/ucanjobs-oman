@@ -118,7 +118,7 @@ export default function CourseDetail() {
 
   const handleEnrollment = async () => {
     if (!user?.id) {
-      navigate("/student-access/");
+      navigate("/learner-access/");
       return;
     }
 
