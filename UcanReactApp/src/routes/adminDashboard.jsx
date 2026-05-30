@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -14,6 +14,7 @@ const adminToolTargets = [
   "/admin-contact-messages/",
   "/admin-instructor-applications/",
   "/admin-learning-requests/",
+  "/admin-courses/",
 ];
 
 export default function AdminDashboard() {
@@ -26,6 +27,19 @@ export default function AdminDashboard() {
     ...item,
     to: adminToolTargets[index],
   }));
+  const hasCourseManagementTool = adminTools.some((tool) => tool.to === "/admin-courses/");
+  const visibleAdminTools = hasCourseManagementTool
+    ? adminTools
+    : [
+        ...adminTools,
+        {
+          title: "Course Management",
+          description:
+            "Create, edit, publish, and unpublish Ucan courses from one admin workspace.",
+          action: "Manage Courses",
+          to: "/admin-courses/",
+        },
+      ];
   const [directoryLoading, setDirectoryLoading] = useState(true);
   const [directoryError, setDirectoryError] = useState("");
   const [directoryDiagnostics, setDirectoryDiagnostics] = useState({
@@ -160,7 +174,7 @@ export default function AdminDashboard() {
               {copy.toolsKicker}
             </p>
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
-              {adminTools.map((tool) => (
+              {visibleAdminTools.map((tool) => (
                 <article key={tool.title} className="rounded-3xl oman-outline-panel p-5">
                   <h2 className="text-lg font-semibold text-[var(--oman-ink)]">{tool.title}</h2>
                   <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">

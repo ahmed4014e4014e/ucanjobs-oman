@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
@@ -31,6 +30,7 @@ import AdminDashboard from "./routes/adminDashboard";
 import AdminContactMessages from "./routes/adminContactMessages";
 import AdminInstructorApplications from "./routes/adminInstructorApplications";
 import AdminLearningRequests from "./routes/adminLearningRequests";
+import AdminCourses from "./routes/adminCourses";
 
 // Create a Router
 const router = createBrowserRouter([
@@ -184,6 +184,14 @@ const router = createBrowserRouter([
         element: (
           <RoleProtectedRoute allowedRole="admin">
             <AdminLearningRequests />
+          </RoleProtectedRoute>
+        ),
+      },
+      {
+        path: "admin-courses",
+        element: (
+          <RoleProtectedRoute allowedRole="admin">
+            <AdminCourses />
           </RoleProtectedRoute>
         ),
       },

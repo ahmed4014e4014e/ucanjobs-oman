@@ -4,6 +4,25 @@
 
 alter table public.course_enrollments enable row level security;
 
+create or replace function public.is_admin_user()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+set row_security = off
+as $$
+  select exists (
+    select 1
+    from public.profiles
+    where profiles.id = auth.uid()
+      and profiles.role = 'admin'
+  );
+$$;
+
+revoke all on function public.is_admin_user() from public;
+grant execute on function public.is_admin_user() to authenticated;
+
 drop policy if exists "Learners can create own course enrollments"
 on public.course_enrollments;
 
@@ -47,22 +66,8 @@ create policy "Admins can manage course enrollments"
 on public.course_enrollments
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.profiles
-    where profiles.id = auth.uid()
-      and profiles.role = 'admin'
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.profiles
-    where profiles.id = auth.uid()
-      and profiles.role = 'admin'
-  )
-);
+using (public.is_admin_user())
+with check (public.is_admin_user());
 
 select
   schemaname,

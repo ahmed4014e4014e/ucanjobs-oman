@@ -801,6 +801,12 @@ export const translations = {
             "Open a separate admin page to review tutoring requests and download any submitted attachments.",
           action: "View Tutoring Requests",
         },
+        {
+          title: "Course Management",
+          description:
+            "Create, edit, publish, and unpublish Ucan courses from one admin workspace.",
+          action: "Manage Courses",
+        },
       ],
       workflowTitle: "Simple Admin Workflow",
       workflowText:
