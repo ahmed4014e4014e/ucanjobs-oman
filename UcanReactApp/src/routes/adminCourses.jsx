@@ -13,11 +13,8 @@ const blankCourse = {
   category_id: "",
   slug: "",
   title_en: "",
-  title_ar: "",
   subtitle_en: "",
-  subtitle_ar: "",
   summary_en: "",
-  summary_ar: "",
   level: "Beginner",
   duration: "Self-paced",
   language: "English",
@@ -38,15 +35,12 @@ function rowsToText(rows, key) {
   return rows.map((row) => row[key] || "").filter(Boolean).join("\n");
 }
 
-function textToRows(englishText, arabicText) {
+function textToRows(englishText) {
   const englishLines = englishText.split("\n");
-  const arabicLines = arabicText.split("\n");
-  const maxLength = Math.max(englishLines.length, arabicLines.length);
 
-  return Array.from({ length: maxLength }, (_, index) => ({
-    en: englishLines[index] || "",
-    ar: arabicLines[index] || "",
-  })).filter((row) => row.en.trim() || row.ar.trim());
+  return englishLines.map((line) => ({
+    en: line || "",
+  })).filter((row) => row.en.trim());
 }
 
 function courseToForm(course) {
@@ -56,11 +50,8 @@ function courseToForm(course) {
       category_id: course.category_id || "",
       slug: course.slug || "",
       title_en: course.title_en || "",
-      title_ar: course.title_ar || "",
       subtitle_en: course.subtitle_en || "",
-      subtitle_ar: course.subtitle_ar || "",
       summary_en: course.summary_en || "",
-      summary_ar: course.summary_ar || "",
       level: course.level || "Beginner",
       duration: course.duration || "Self-paced",
       language: course.language || "English",
@@ -69,9 +60,7 @@ function courseToForm(course) {
       sort_order: course.sort_order ?? 0,
     },
     outcomes_en: rowsToText(course.outcomes || [], "outcome_en"),
-    outcomes_ar: rowsToText(course.outcomes || [], "outcome_ar"),
     modules_en: rowsToText(course.modules || [], "title_en"),
-    modules_ar: rowsToText(course.modules || [], "title_ar"),
   };
 }
 
@@ -79,9 +68,7 @@ function createBlankForm() {
   return {
     course: { ...blankCourse },
     outcomes_en: "",
-    outcomes_ar: "",
     modules_en: "",
-    modules_ar: "",
   };
 }
 
@@ -203,8 +190,8 @@ export default function AdminCourses() {
     try {
       const savedCourse = await saveAdminCourse({
         course: form.course,
-        outcomes: textToRows(form.outcomes_en, form.outcomes_ar),
-        modules: textToRows(form.modules_en, form.modules_ar),
+        outcomes: textToRows(form.outcomes_en),
+        modules: textToRows(form.modules_en),
       });
 
       setCourses((current) => {
@@ -547,43 +534,7 @@ export default function AdminCourses() {
                     />
                   </label>
 
-                  <label>
-                    <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                      Arabic title
-                    </span>
-                    <input
-                      type="text"
-                      value={form.course.title_ar}
-                      onChange={(event) => updateCourseField("title_ar", event.target.value)}
-                      className="mt-2 min-h-12 w-full rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
-                    />
-                  </label>
-
-                  <label>
-                    <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                      Arabic subtitle
-                    </span>
-                    <input
-                      type="text"
-                      value={form.course.subtitle_ar}
-                      onChange={(event) => updateCourseField("subtitle_ar", event.target.value)}
-                      className="mt-2 min-h-12 w-full rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
-                    />
-                  </label>
-
                   <label className="sm:col-span-2">
-                    <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                      Arabic summary
-                    </span>
-                    <textarea
-                      value={form.course.summary_ar}
-                      onChange={(event) => updateCourseField("summary_ar", event.target.value)}
-                      rows={3}
-                      className="mt-2 w-full rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
-                    />
-                  </label>
-
-                  <label>
                     <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
                       Outcomes, English
                     </span>
@@ -595,19 +546,7 @@ export default function AdminCourses() {
                     />
                   </label>
 
-                  <label>
-                    <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                      Outcomes, Arabic
-                    </span>
-                    <textarea
-                      value={form.outcomes_ar}
-                      onChange={(event) => setForm((current) => ({ ...current, outcomes_ar: event.target.value }))}
-                      rows={5}
-                      className="mt-2 w-full rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
-                    />
-                  </label>
-
-                  <label>
+                  <label className="sm:col-span-2">
                     <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
                       Modules, English
                     </span>
@@ -619,17 +558,6 @@ export default function AdminCourses() {
                     />
                   </label>
 
-                  <label>
-                    <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                      Modules, Arabic
-                    </span>
-                    <textarea
-                      value={form.modules_ar}
-                      onChange={(event) => setForm((current) => ({ ...current, modules_ar: event.target.value }))}
-                      rows={5}
-                      className="mt-2 w-full rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
-                    />
-                  </label>
                 </div>
 
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">

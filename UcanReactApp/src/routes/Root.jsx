@@ -5,26 +5,6 @@ import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { getDashboardPath, getUserRole } from "../lib/authRouting";
 
-function LanguageToggle({ compact = false }) {
-  const { isArabic, t, toggleLanguage } = useLanguage();
-  const label = isArabic ? t("language.switchToEnglish") : t("language.switchToArabic");
-
-  return (
-    <button
-      type="button"
-      onClick={toggleLanguage}
-      className={[
-        "inline-flex items-center justify-center rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,252,247,0.86)] font-semibold text-[var(--oman-terracotta-dark)] transition hover:bg-[rgba(197,154,68,0.12)]",
-        compact ? "px-4 py-3 text-base" : "px-3 py-2 text-sm",
-      ].join(" ")}
-      aria-label={label}
-      title={label}
-    >
-      {isArabic ? "EN" : "عربي"}
-    </button>
-  );
-}
-
 function ScrollToTopOnRouteChange() {
   const location = useLocation();
 
@@ -148,11 +128,9 @@ export default function Navbar() {
                 {t("nav.logout")}
               </button>
             )}
-            <LanguageToggle />
           </div>
 
           <div className="flex items-center gap-2 lg:hidden">
-            <LanguageToggle />
             <button
               type="button"
               onClick={() => setOpen((value) => !value)}

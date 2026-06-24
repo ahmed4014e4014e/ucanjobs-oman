@@ -16,8 +16,7 @@ export default function CourseDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isArabic, t } = useLanguage();
-  const locale = isArabic ? "ar" : "en";
+  const { t } = useLanguage();
   const [course, setCourse] = useState(() => findCourseBySlug(slug));
   const [loadingCourse, setLoadingCourse] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
@@ -221,7 +220,7 @@ export default function CourseDetail() {
     );
   }
 
-  const content = course[locale] || course.en;
+  const content = course.en;
 
   return (
     <main className="oman-page min-h-screen text-slate-900">
@@ -232,7 +231,7 @@ export default function CourseDetail() {
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
           <div className="max-w-4xl text-center lg:text-left">
             <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-              {isArabic ? course.categoryAr || course.category : course.category}
+              {course.category}
             </p>
             <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
               {content.title}

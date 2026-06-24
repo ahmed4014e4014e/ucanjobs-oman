@@ -5,11 +5,8 @@ const COURSE_ADMIN_COLUMNS = `
   category_id,
   slug,
   title_en,
-  title_ar,
   subtitle_en,
-  subtitle_ar,
   summary_en,
-  summary_ar,
   level,
   duration,
   language,
@@ -53,13 +50,13 @@ async function fetchCourseRelations(courses) {
     courseIds.length
       ? supabase
           .from("course_outcomes")
-          .select("id, course_id, outcome_en, outcome_ar, sort_order")
+          .select("id, course_id, outcome_en, sort_order")
           .in("course_id", courseIds)
       : Promise.resolve({ data: [], error: null }),
     courseIds.length
       ? supabase
           .from("course_modules")
-          .select("id, course_id, title_en, title_ar, sort_order")
+          .select("id, course_id, title_en, sort_order")
           .in("course_id", courseIds)
       : Promise.resolve({ data: [], error: null }),
   ]);
@@ -116,11 +113,8 @@ export async function saveAdminCourse({ course, outcomes, modules }) {
     category_id: course.category_id,
     slug: course.slug,
     title_en: course.title_en,
-    title_ar: course.title_ar || null,
     subtitle_en: course.subtitle_en || null,
-    subtitle_ar: course.subtitle_ar || null,
     summary_en: course.summary_en || null,
-    summary_ar: course.summary_ar || null,
     level: course.level || "Beginner",
     duration: course.duration || "Self-paced",
     language: course.language || "English",
@@ -153,7 +147,6 @@ export async function saveAdminCourse({ course, outcomes, modules }) {
     courseId: savedCourse.id,
     rows: outcomes,
     textColumnEn: "outcome_en",
-    textColumnAr: "outcome_ar",
   });
 
   await replaceCourseLines({
@@ -161,14 +154,13 @@ export async function saveAdminCourse({ course, outcomes, modules }) {
     courseId: savedCourse.id,
     rows: modules,
     textColumnEn: "title_en",
-    textColumnAr: "title_ar",
   });
 
   const [courseWithRelations] = await fetchCourseRelations([savedCourse]);
   return courseWithRelations;
 }
 
-async function replaceCourseLines({ table, courseId, rows, textColumnEn, textColumnAr }) {
+async function replaceCourseLines({ table, courseId, rows, textColumnEn }) {
   const { error: deleteError } = await supabase.from(table).delete().eq("course_id", courseId);
 
   if (deleteError) {
@@ -179,7 +171,6 @@ async function replaceCourseLines({ table, courseId, rows, textColumnEn, textCol
     .map((row, index) => ({
       course_id: courseId,
       [textColumnEn]: row.en.trim(),
-      [textColumnAr]: row.ar.trim() || null,
       sort_order: index + 1,
     }))
     .filter((row) => row[textColumnEn]);

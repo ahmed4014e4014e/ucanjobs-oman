@@ -38,6 +38,7 @@ export default function AuthAccessPage({
   accessImage,
   accessImageAlt,
   signupPanel = null,
+  landingContent = null,
   requireTermsAgreement = false,
   collectSignupProfile = true,
   enableGoogleAuth = false,
@@ -626,6 +627,8 @@ export default function AuthAccessPage({
           </div>
         )}
       </section>
+
+      {landingContent}
 
       <section
         className={[

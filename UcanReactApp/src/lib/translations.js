@@ -4,11 +4,6 @@ export const supportedLanguages = {
     shortLabel: "EN",
     dir: "ltr",
   },
-  ar: {
-    label: "العربية",
-    shortLabel: "ع",
-    dir: "rtl",
-  },
 };
 
 const shared = {
@@ -18,13 +13,6 @@ const shared = {
     acceptedFiles: "Accepted files: {types}. Maximum size: {size} MB per file.",
     close: "Close",
     notAvailable: "Not available",
-  },
-  ar: {
-    footer: "حقوق النشر {year} يوكان. تعليم مهني رقمي مخصص لعُمان.",
-    fieldsRequired: "الحقول المشار إليها بعلامة * مطلوبة.",
-    acceptedFiles: "الملفات المقبولة: {types}. الحد الأقصى: {size} ميجابايت لكل ملف.",
-    close: "إغلاق",
-    notAvailable: "غير متوفر",
   },
 };
 
@@ -48,10 +36,6 @@ export const translations = {
       logout: "Logout",
       openMenu: "Open menu",
       closeMenu: "Close menu",
-    },
-    language: {
-      switchToArabic: "Switch to Arabic",
-      switchToEnglish: "Switch to English",
     },
     feedback: {
       sessionUpdate: "Session update",
@@ -586,10 +570,10 @@ export const translations = {
         imageAlt: "Middle East College campus in Oman",
       },
       tutor: {
-        audienceLabel: "Instructor Access",
-        title: "Log in or apply to join the Ucan instructor team.",
+        audienceLabel: "Instructor Publishing",
+        title: "Create practical courses for Oman's future tech workforce.",
         description:
-          "This page is designed for approved instructors, while new applicants should complete the instructor application form first.",
+          "Approved instructors can log in here, while new instructors can apply with course ideas built around employability, practical projects, and career-ready technology skills.",
         signupHeading: "Instructor application",
         imageAlt: "Sohar University campus in Oman",
       },
@@ -731,7 +715,7 @@ export const translations = {
       heroKicker: "Instructor Dashboard",
       welcome: "Welcome, {name}",
       heroText:
-        "This protected dashboard gives you a clean place to manage your tutoring request workflow, review how your tutoring appears, and coordinate platform updates.",
+        "This protected dashboard is your instructor home base for Ucan course publishing, content preparation, and platform updates.",
       profileKicker: "Profile",
       labels: {
         fullName: "Full name:",
@@ -740,39 +724,14 @@ export const translations = {
         role: "Role:",
       },
       role: "Instructor",
-      actionsKicker: "Instructor Actions",
-      emptyTitle: "No instructor actions available yet",
-      emptyText: "Instructor tools will appear here as your dashboard expands.",
-      actions: [
-        {
-          title: "Submitted Tutoring Requests",
-          description:
-            "Open a separate instructor page to review your assigned requests, update their status, and download attached files.",
-          action: "View Tutoring Requests",
-        },
-      ],
-      instructionsKicker: "Tutoring Request Instructions",
-      instructionsTitle: "How to handle learner tutoring requests",
-      step: "Step {number}",
-      instructions: [
-        "Open the tutoring request.",
-        "Review the content of the request and study the attachments.",
-        "Contact the sender by email to arrange a tutoring session on Google Meet, and use a teaching tool like Microsoft Whiteboard.",
-        'Mark the tutoring request as "completed" or "cancelled" after the request is handled.',
-      ],
     },
     adminDashboard: {
       fallbackName: "Admin",
       notSet: "Not set yet",
-      yes: "Yes",
-      no: "No",
-      none: "None",
-      supabaseNotConfigured: "database is not configured.",
-      diagnosticsError: "Unable to load instructor directory diagnostics right now.",
       heroKicker: "Admin Dashboard",
       welcome: "Welcome, {name}",
       heroText:
-        "This protected dashboard gives you a clean place to review contact form submissions, tutoring requests, and the next stage of platform administration.",
+        "This protected dashboard gives you one operating hub for Ucan content, learners, enrollments, market signals, and platform performance.",
       profileKicker: "Profile",
       labels: {
         fullName: "Full name:",
@@ -796,21 +755,39 @@ export const translations = {
           action: "View Instructor Applications",
         },
         {
-          title: "Submitted Tutoring Requests",
+          title: "Courses Management",
           description:
-            "Open a separate admin page to review tutoring requests and download any submitted attachments.",
-          action: "View Tutoring Requests",
+            "Create, edit, publish, unpublish, and organize live Ucan courses.",
+          action: "Manage Courses",
         },
         {
-          title: "Course Management",
+          title: "Enrollments",
           description:
-            "Create, edit, publish, and unpublish Ucan courses from one admin workspace.",
-          action: "Manage Courses",
+            "Review learner course enrollments, payment readiness, progress status, and access issues.",
+          action: "View Enrollments",
+        },
+        {
+          title: "Learner Accounts",
+          description:
+            "Review learner profiles, account completion, access status, and support needs.",
+          action: "View Learners",
+        },
+        {
+          title: "Market Insights",
+          description:
+            "Track Omani job-market signals that should influence future course topics and learning paths.",
+          action: "View Insights",
+        },
+        {
+          title: "SEO/Course Performance",
+          description:
+            "Monitor course visibility, search positioning, page performance, and conversion signals.",
+          action: "View Performance",
         },
       ],
       workflowTitle: "Simple Admin Workflow",
       workflowText:
-        "Use the same status flow for contact messages and tutoring requests so nothing gets lost.",
+        "Use the dashboard as a compact control center for content quality, learner support, and market alignment.",
       contactWorkflowTitle: "Contact Messages",
       contactWorkflow: [
         "1. Open pending messages first.",
@@ -818,28 +795,52 @@ export const translations = {
         "3. Mark as scheduled if follow-up is arranged.",
         "4. Mark as completed once the issue is fully handled.",
       ],
-      tutoringWorkflowTitle: "Tutoring Requests",
-      tutoringWorkflow: [
-        "1. Review new learner requests and attachments.",
-        "2. Move to reviewed after checking the course/topic details.",
-        "3. Use scheduled once the session is arranged.",
-        "4. Mark completed or cancelled when the workflow ends.",
+      platformWorkflowTitle: "Platform Operations",
+      platformWorkflow: [
+        "1. Review instructor applications and course proposals.",
+        "2. Keep live courses accurate, published, and aligned with learner demand.",
+        "3. Monitor enrollments and learner account readiness.",
+        "4. Use market and SEO signals to decide what Ucan should improve next.",
       ],
-      diagnosticsTitle: "Instructor Directory Diagnostics",
-      diagnosticsText:
-        "Internal status for the Services directory so you can troubleshoot offerings without showing debug data to public users.",
-      noDataTitle: "No instructor directory data yet",
-      noDataText:
-        "database is connected, but no active instructor offerings are available to report yet.",
-      diagnosticLabels: {
-        configured: "database configured:",
-        loading: "Loading:",
-        raw: "Raw offerings:",
-        privateCards: "Private instructor cards:",
-        groupCards: "Group instructor cards:",
-        institutes: "Visible institutes:",
-        error: "Directory error:",
+      statusTags: [
+        "pending",
+        "reviewed",
+        "scheduled",
+        "completed",
+        "cancelled",
+        "draft",
+        "published",
+      ],
+    },
+    adminPlaceholderPages: {
+      enrollments: {
+        kicker: "Admin Records",
+        title: "Enrollments",
+        text:
+          "This section is reserved for reviewing learner course enrollments, payment readiness, course access, and completion progress.",
       },
+      learnerAccounts: {
+        kicker: "Admin Records",
+        title: "Learner Accounts",
+        text:
+          "This section is reserved for reviewing learner profiles, account completion, access support, and role-related account checks.",
+      },
+      marketInsights: {
+        kicker: "Market Intelligence",
+        title: "Market Insights",
+        text:
+          "This section is reserved for future AI/data work using Oman employment and education signals to guide course priorities.",
+      },
+      seoPerformance: {
+        kicker: "Growth Analytics",
+        title: "SEO/Course Performance",
+        text:
+          "This section is reserved for tracking course visibility, organic search performance, learner conversion signals, and content gaps.",
+      },
+      back: "Back to Admin Dashboard",
+      comingSoon: "Workspace prepared",
+      comingSoonText:
+        "The dashboard route is ready. The next implementation step is connecting live database metrics and admin actions for this section.",
     },
     resetPasswordPage: {
       recoveryPrompt: "Enter your new password below to complete the reset.",
@@ -983,938 +984,6 @@ export const translations = {
         popupKicker: "Tutoring Request",
         topics: "Topics Need Help With",
         courseFallback: "Course",
-      },
-    },
-  },
-  ar: {
-    brand: {
-      kicker: "تعليم مهني رقمي",
-      name: "يوكان",
-    },
-    nav: {
-      home: "الرئيسية",
-      about: "من نحن",
-      services: "الدورات",
-      contact: "تواصل معنا",
-      policies: "السياسات",
-      studentAccess: "دخول المتعلمين",
-      tutorAccess: "دخول المدربين",
-      adminAccess: "دخول الإدارة",
-      dashboard: "لوحة التحكم",
-      adminDashboard: "لوحة الإدارة",
-      logout: "تسجيل الخروج",
-      openMenu: "فتح القائمة",
-      closeMenu: "إغلاق القائمة",
-    },
-    language: {
-      switchToArabic: "التبديل إلى العربية",
-      switchToEnglish: "Switch to English",
-    },
-    feedback: {
-      sessionUpdate: "تحديث الجلسة",
-      loggedOut: "تم تسجيل خروجك بنجاح.",
-    },
-    roles: {
-      member: "عضو",
-      learner: "متعلم",
-      instructor: "مدرب",
-      admin: "مسؤول",
-    },
-    common: shared.ar,
-    home: {
-      heroKicker: "مرحباً بك في يوكان",
-      heroTitle: "تعليم مهني رقمي مخصص لجيل عُمان القادم من المواهب التقنية.",
-      heroText:
-        "يساعد يوكان الخريجين الجدد والباحثين عن عمل على بناء مهارات عملية لسوق التقنية في عُمان من خلال دورات في هندسة البرمجيات والذكاء الاصطناعي والأمن السيبراني وتحليل البيانات والاستعداد الوظيفي.",
-      exploreServices: "استكشف الدورات",
-      cardKicker: "السوق العُماني، مهارات حديثة",
-      cardTitle: "منصة تعليمية تجارية تركز على التوظيف والمشاريع العملية والمسارات الرقمية المطلوبة.",
-      stats: [
-        { number: "تقنية", label: "دورات مرتبطة بمسارات مهنية مطلوبة" },
-        { number: "AI", label: "توصيات مستقبلية مبنية على إشارات السوق" },
-        { number: "عُمان", label: "محتوى مخصص لاحتياجات توظيف الخريجين محلياً" },
-      ],
-      featuresKicker: "لماذا تختار يوكان",
-      featuresTitle: "منصة تعليم عملي للخريجين الذين يحتاجون إلى مهارات تقنية جاهزة للعمل.",
-      features: [
-        {
-          title: "دورات موجهة للمهنة",
-          description:
-            "تصمم الدورات حول مهارات عملية تساعد المتعلمين على الاستعداد لوظائف تقنية للمبتدئين.",
-        },
-        {
-          title: "مصمم لعُمان",
-          description:
-            "يركز يوكان على احتياجات الخريجين وحملة الدبلوم والباحثين عن عمل في قطاع التقنية العُماني.",
-        },
-        {
-          title: "توجه مدعوم بالبيانات",
-          description:
-            "تتهيأ المنصة لاستخدام الذكاء الاصطناعي وSEO والبيانات المفتوحة لتحديد مسارات التعلم المطلوبة.",
-        },
-      ],
-      howKicker: "كيف تعمل المنصة",
-      howTitle: "ثلاث خطوات بسيطة من التعلم إلى الجاهزية الوظيفية.",
-      steps: [
-        {
-          title: "اختر مساراً مهنياً",
-          description:
-            "استكشف مسارات مثل تطوير الواجهات، هندسة الخلفية، الذكاء الاصطناعي، الأمن السيبراني، وتحليل البيانات.",
-        },
-        {
-          title: "تعلم مهارات عملية",
-          description:
-            "ادرس دورات منظمة تركز على المشاريع والأدوات وسير العمل والمفاهيم التي يتوقعها أصحاب العمل.",
-        },
-        {
-          title: "ابنِ جاهزيتك للعمل",
-          description:
-            "استخدم تعلمك لتقوية ملفك العملي وثقتك واستعدادك للمقابلات وبيئة العمل.",
-        },
-      ],
-      toolsKicker: "أدوات التعلم",
-      toolsTitle: "أدوات رقمية تدعم التعلم عبر الإنترنت والتعاون المهني.",
-      toolsText:
-        "يمكن أن تستخدم دورات يوكان أدوات الاجتماعات والتخطيط والتعاون الحديثة لمساعدة المتعلمين على ممارسة أساليب العمل المستخدمة في فرق التقنية.",
-      toolGroups: [
-        {
-          title: "منصات التعلم المباشر",
-          description:
-            "دعم الورش المباشرة وجلسات الإرشاد ومشاركة الشاشة والتعلم بقيادة المدرب.",
-        },
-        {
-          title: "أدوات التعاون",
-          description:
-            "تنظيم المشاريع وشرح الأفكار التقنية بصرياً والتعاون حول مهام مهنية عملية.",
-        },
-      ],
-      tutorKicker: "انضم إلى فريق المدربين",
-      tutorTitle: "كن مدرباً وساهم في إعداد الجيل التقني القادم في عُمان.",
-      tutorText:
-        "سيرحب يوكان بالمدربين والممارسين في القطاع الذين يستطيعون تعليم مهارات رقمية عملية وموجهة للتوظيف.",
-      tutorAccess: "دخول المدربين",
-      tutorCardTitle: "سجل الدخول أو تقدم لإنشاء حساب مدرب.",
-      tutorCardText:
-        "استخدم صفحة المدربين للتقديم والدخول إلى لوحتك المحمية والاستعداد لإطلاق الدورات.",
-      tutorButton: "دخول / تقديم مدرب",
-      studentKicker: "دخول المتعلمين",
-      studentTitle: "انضم كمتعلم وابدأ بناء مهارات تقنية جاهزة للعمل.",
-      studentText:
-        "يمكن للمتعلمين إنشاء حساب للوصول إلى الدورات المهنية والموارد التعليمية والتوصيات الشخصية مستقبلاً.",
-      studentCardTitle: "سجل الدخول أو أنشئ حساب متعلم.",
-      studentCardText:
-        "استخدم صفحة حساب المتعلم لإنشاء ملفك والاستعداد لسوق دورات يوكان.",
-      studentButton: "دخول / تسجيل متعلم",
-      ctaKicker: "ابدأ التعلم",
-      ctaTitle: "ابنِ المهارات المطلوبة لقطاع التقنية المتنامي في عُمان.",
-      ctaText:
-        "يتحول يوكان إلى منصة تعليم إلكتروني تجارية لهندسة البرمجيات والذكاء الاصطناعي والأمن السيبراني وتحليل البيانات والاستعداد الوظيفي.",
-      ctaButton: "استكشف الدورات",
-    },
-    about: {
-      heroKicker: "عن يوكان",
-      heroTitle: "منصة تعليم إلكتروني تركز على فجوة توظيف الخريجين في عُمان.",
-      heroText:
-        "يُبنى يوكان لمساعدة خريجي علوم الحاسب وحملة الدبلوم والباحثين عن عمل على الانتقال من المعرفة الأكاديمية إلى مهارات تقنية عملية مناسبة للسوق.",
-      ucf: "جامعة سنترال فلوريدا",
-      ucfText: "نرى التعليم الرقمي عملياً وكريماً ومرتبطاً بعُمان وبنتائج توظيف حقيقية.",
-      founderKicker: "تعرف على المؤسس",
-      founderName: "أحمد محمد الرقيشي",
-      founderTextOne:
-        "نشأ في المملكة المتحدة... وانتقل إلى الولايات المتحدة... والآن في عُمان. وأنتم تعرفون بقية القصة... هيا بنا جميعاً!!",
-      founderTextTwo:
-        'أحمد مطور برمجيات مبتدئ عمره 25 عاماً، ألهمه فيلم "The Social Network" لإنشاء هذه المنصة لتحسين التجربة الجامعية أكاديمياً واجتماعياً ونفسياً قبل كل شيء.',
-      founderLocation: "شاطئ القرم، مسقط، عُمان.",
-      highlights: [
-        { number: "مهنة", label: "مسارات تعلم لأدوار تقنية" },
-        { number: "بيانات", label: "رؤى مستقبلية من إشارات سوق العمل" },
-        { number: "محلي", label: "مهارات مخصصة لاحتياجات التوظيف في عُمان" },
-      ],
-      missionKicker: "رسالتنا",
-      missionTitle: "مساعدة خريجي التقنية في عُمان على أن يصبحوا أكثر جاهزية للتوظيف من خلال دورات عملية.",
-      missionTextOne:
-        "يوجد يوكان لسد الفجوة بين الدراسة الأكاديمية والعمل التقني للمبتدئين من خلال التركيز على المهارات العملية والمشاريع والأدوات والاستعداد المهني.",
-      missionTextTwo:
-        "الرؤية طويلة المدى هي استخدام الذكاء الاصطناعي وSEO ومصادر البيانات المفتوحة في عُمان لتحديد ما يجب أن يتعلمه المستخدمون وما هي موضوعات الدورات الأكثر أهمية للسوق.",
-      valuesKicker: "القيم الأساسية",
-      valuesTitle: "الأفكار التي تشكل سوق يوكان التعليمي.",
-      values: [
-        {
-          title: "التوظيف أولاً",
-          description:
-            "يجب أن تساعد الدورات المتعلمين على بناء قدرات حقيقية تحسن فرصهم في سوق وظائف التقنية في عُمان.",
-        },
-        {
-          title: "ملاءمة السوق المحلي",
-          description:
-            "يجب أن تعكس مسارات التعلم المهارات التي يحتاجها أصحاب العمل فعلاً من المواهب التقنية المبتدئة في عُمان.",
-        },
-        {
-          title: "نمو موجه بالذكاء الاصطناعي",
-          description:
-            "يجب أن تساعد ذكاء المنصة مستقبلاً في اقتراح الدورات وتحديد فجوات المهارات وتوجيه إنشاء الدورات الجديدة.",
-        },
-      ],
-      communityKicker: "متعلمونا",
-      communityTitle: "خريجون وباحثون عن عمل ومدربون وجهات توظيف يجمعهم هدف المهارات الرقمية العملية.",
-      communityText:
-        "يوكان مخصص للمتعلمين الذين يريدون أكثر من الشهادات: يحتاجون إلى ثقة ومشاريع وخبرة مهارية تناسب سوق العمل العُماني.",
-    },
-    contact: {
-      heroKicker: "تواصل مع يوكان",
-      heroTitle: "تواصل مع منصة تعليم مهني رقمي مبنية لعُمان.",
-      heroText:
-        "سواء كنت متعلماً أو مدرباً أو جهة توظيف أو شريكاً، استخدم هذه الصفحة للتواصل مع يوكان حول الدورات والمهارات وفرص التعلم الرقمي.",
-      heroCardText:
-        "نريد للمنصة أن تكون موثوقة وقريبة مثل المعالم التي تشكل هوية عُمان.",
-      formKicker: "نموذج التواصل",
-      formTitle: "أرسل رسالتك مباشرة إلى يوكان.",
-      formText:
-        "املأ النموذج أدناه وسيتم حفظ رسالتك في database حتى يتمكن الفريق من مراجعتها بشكل مناسب.",
-      labels: {
-        fullName: "الاسم الكامل",
-        email: "البريد الإلكتروني",
-        institute: "المؤسسة التعليمية",
-        role: "الدور",
-        subject: "الموضوع",
-        message: "الرسالة",
-        attachmentNotes: "ملاحظات المرفقات",
-        attachFiles: "إرفاق ملفات",
-      },
-      placeholders: {
-        institute: "مثال: MCBS",
-        role: "اختر دورك",
-        subject: "كيف يمكننا مساعدتك؟",
-        message: "اكتب رسالتك هنا...",
-        attachmentNotes: "اختياري: أضف ملاحظة قصيرة عن الملفات المرفقة.",
-      },
-      roleStudent: "متعلم",
-      roleTutor: "مدرب",
-      feedbackTitle: "تحديث نموذج التواصل",
-      submitting: "جارٍ الإرسال...",
-      submit: "إرسال نموذج التواصل",
-      notConfigured: "لم يتم إعداد database بعد، لذلك لا يمكن إرسال نموذج التواصل حالياً.",
-      success: "تم إرسال رسالتك بنجاح. سنراجعها من خلال database.",
-      error: "تعذر إرسال رسالتك حالياً.",
-      methodsKicker: "طرق أخرى للتواصل",
-      methodsTitle: "طرق واضحة للتواصل مع فريق يوكان.",
-      methods: [
-        {
-          title: "البريد الإلكتروني",
-          value: "20258971@mcbs.edu.om",
-          description:
-            "تواصل معنا بخصوص الدورات أو فرص المدربين أو الشراكات أو منصة يوكان التعليمية.",
-        },
-        {
-          title: "الموقع",
-          value: "شاطئ القرم، مسقط، عُمان",
-          description:
-            "يخدم يوكان المتعلمين عبر الإنترنت مع التركيز على توظيف الخريجين والمهارات الرقمية في عُمان.",
-        },
-      ],
-      ctaKicker: "نحن هنا للمساعدة",
-      ctaTitle: "تواصل معنا كلما احتجت إلى دعم أفضل لمقرراتك الجامعية.",
-      ctaText:
-        "يوكان هنا لمساعدة المتعلمين على بناء مهارات رقمية عملية لفرص مهنية أقوى.",
-    },
-    servicesPage: {
-      heroKicker: "الدورات",
-      heroTitle: "دورات مهنية مخصصة لسوق وظائف التقنية في عُمان.",
-      heroText:
-        "يتحول يوكان إلى سوق دورات لهندسة البرمجيات والذكاء الاصطناعي وتعلم الآلة والأمن السيبراني وتحليل البيانات والاستعداد الوظيفي.",
-      heroCardText:
-        "استكشف أول فئات الدورات ومسارات التعلم التي ستشكل سوق يوكان القادم.",
-      highlights: [
-        { number: "مهارات", label: "مسارات تعلم لمجالات رقمية عالية الطلب" },
-        { number: "AI", label: "توصيات مستقبلية مبنية على إحصاءات السوق" },
-        { number: "عُمان", label: "استراتيجية دورات مخصصة لاحتياجات التوظيف المحلية" },
-      ],
-      cards: [
-        {
-          kicker: "سوق الدورات",
-          title: "تصفح دورات مهنية حسب المجال ومستوى المهارة.",
-          text: "سيتحول هذا القسم من دليل المدربين القديم إلى كتالوج دورات تجاري.",
-        },
-        {
-          kicker: "تقدم المتعلم",
-          title: "استعد لمسارات تعلم منظمة والتسجيل في الدورات.",
-          text:
-            "سيتمكن المتعلمون لاحقاً من التسجيل في الدورات وتتبع التقدم وبناء ملفات عملية.",
-        },
-        {
-          kicker: "ذكاء السوق",
-          title: "استخدام الذكاء الاصطناعي والبيانات المفتوحة لتوجيه إنشاء الدورات وتسويقها.",
-          text: "يمكن لتخطيط الدورات مستقبلاً أن يستجيب لطلب سوق العمل الفعلي وتفضيلات المتعلمين.",
-        },
-      ],
-      directoryStatus: "حالة الدليل",
-      requestAccess: "دخول المتعلمين",
-      requestAccessText:
-        "يمكنك استكشاف توجه الدورات القادم بحرية، لكن حساب المتعلم سيكون مطلوباً للتسجيل والتوصيات الشخصية.",
-      studentLogin: "دخول المتعلم",
-      tutorLogin: "دخول المدرب",
-      private: {
-        label: "هندسة البرمجيات",
-        title: "استكشف مسارات تعلم عملية في هندسة البرمجيات.",
-        description: "سيتحول هذا الجزء إلى كتالوج دورات للواجهات والخلفية والتطوير الكامل.",
-      },
-      group: {
-        label: "مهارات رقمية متقدمة",
-        title: "استكشف دورات مستقبلية في الذكاء الاصطناعي والبيانات والأمن السيبراني والسحابة.",
-        description:
-          "ستدعم هذه المجالات المتعلمين الذين يستعدون لأدوار تقنية مطلوبة في عُمان.",
-      },
-      tutorSection: {
-        institute: "المؤسسة",
-        course: "المقرر",
-        selectUniversity: "اختر الجامعة",
-        selectUniversityFirst: "اختر الجامعة أولاً",
-        noCourses: "لا توجد مقررات متاحة بعد",
-        allCourses: "كل المقررات",
-        availableNow: "متاح الآن",
-        tutorsAvailable: "{count} مدرب متاح لـ {title}",
-        courseOfferings: "{count} عرض مقرر يطابق المرشحات المحددة حالياً.",
-        profileRequiredTitle: "أكمل ملف المتعلم لعرض المدربين المتاحين",
-        profileRequiredText:
-          "أضف اسم المتعلم واسم الجامعة في لوحة التحكم قبل إرسال طلب تعلم.",
-        profileRequiredButton: "إكمال ملف المتعلم",
-        loginTitle: "يرجى تسجيل الدخول / إنشاء حساب لعرض المدربين المتاحين",
-        loginText:
-          "أنشئ حساباً أو سجل الدخول أولاً للوصول إلى دليل التدريس الفردي والجماعي وإرسال طلب تدريس.",
-        loadingTitle: "جارٍ تحميل دليل المدربين...",
-        loadingText: "يتم جلب المدربين والمقررات وأنواع الجلسات المتاحة من database.",
-        selectInstituteTitle: "اختر جامعة لعرض المقررات",
-        selectInstituteText: "ستظهر خيارات المقررات وبطاقات المدربين فقط بعد اختيار جامعة.",
-        profileLabel: "ملف مدرب للتدريس المجاني",
-        multiInstitute: "عدة مؤسسات",
-        sessionType: "نوع الجلسة",
-        privateSession: "تدريس فردي خاص",
-        groupSession: "جلسة تدريس جماعية",
-        availability: "التوفر",
-        courses: "المقررات",
-        offered: "{count} معروض",
-        sendRequest: "إرسال طلب تدريس",
-        loginToSend: "سجل الدخول لإرسال طلب تدريس",
-        loginNote: "يرجى تسجيل الدخول إلى حساب المتعلم أو المدرب قبل إرسال جلسة تدريس.",
-        emptyTitle: "لا يوجد مدرب لهذا الاختيار بعد",
-        emptyText:
-          "عند إضافة المزيد من المدربين وعروض المقررات في database، سيتم تحديث هذا الدليل تلقائياً.",
-      },
-      otherKicker: "مجالات الدورات المستقبلية",
-      otherTitle: "موضوعات عالية الطلب يمكن ليوكان تطويرها للقوى الرقمية العاملة في عُمان.",
-      services: [
-        {
-          title: "هندسة الواجهات الأمامية",
-          description:
-            "يمكن أن تغطي الدورات HTML وCSS وJavaScript وReact والتصميم المتجاوب وإمكانية الوصول ومشاريع عملية.",
-        },
-        {
-          title: "هندسة الخلفية",
-          description:
-            "يمكن أن تغطي المسارات واجهات API وقواعد البيانات والمصادقة والنشر السحابي والاختبار وسير العمل الإنتاجي.",
-        },
-        {
-          title: "الذكاء الاصطناعي وتعلم الآلة",
-          description:
-            "تساعد الدورات المتعلمين على فهم Python وأساسيات ML وأدوات AI العملية وسير عمل النماذج والاستخدام المسؤول.",
-        },
-        {
-          title: "الأمن السيبراني",
-          description:
-            "يمكن أن تركز دورات الأمن على الأساسيات والمهارات الدفاعية والحوكمة والمخاطر والممارسة للمبتدئين.",
-        },
-        {
-          title: "تحليل البيانات",
-          description:
-            "يمكن أن تغطي دورات البيانات Excel وSQL ولوحات المعلومات وتحليلات Python والتصور وإعداد التقارير.",
-        },
-        {
-          title: "الاستعداد الوظيفي للخريجين",
-          description:
-            "يمكن لدورات المسار المهني دعم السيرة الذاتية والملفات العملية والمقابلات والتواصل المهني والاستعداد للأدوار التقنية.",
-        },
-      ],
-      whyKicker: "لماذا هذا مهم",
-      whyTitle: "يحتاج كثير من الخريجين إلى مهارات عملية تناسب العمل التقني للمبتدئين.",
-      whyTextOne:
-        "يمكن ليوكان استخدام بيانات الدورات وسلوك المتعلمين وإشارات SEO وإحصاءات البيانات المفتوحة في عُمان لتحديد أهم مسارات التعلم.",
-      whyTextTwo: "سيتم تحويل المنصة تدريجياً من طلبات الخدمات إلى دورات وتسجيلات وتتبع تقدم.",
-      ctaKicker: "ابدأ مسارك المهني",
-      ctaTitle: "استكشف أول فئات الدورات للاقتصاد الرقمي في عُمان.",
-      ctaText:
-        "يتحول يوكان إلى سوق يمكن للمتعلمين فيه شراء دورات مركزة تحسن قابلية التوظيف في المجالات التقنية.",
-      ctaButton: "استكشف المقررات",
-      requestModal: {
-        kicker: "طلب تدريس",
-        title: "أرسل طلب تدريس إلى {name}",
-        intro:
-          "احفظ طلب التدريس أدناه وأرفق أي ملفات مفيدة حتى يتمكن المدرب من التواصل معك مباشرة وترتيب الجلسة.",
-        studentAccount: "حساب المتعلم",
-        name: "الاسم:",
-        email: "البريد الإلكتروني:",
-        accountNote:
-          "يتم جلب هذه التفاصيل تلقائياً من حساب المتعلم المسجل وتظهر للمدرب مع هذا الطلب.",
-        titleLabel: "العنوان",
-        titlePlaceholder: "مثال: مراجعة اختبار MAT255",
-        instituteLabel: "اسم جامعة المتعلم",
-        institutePlaceholder: "مثال: MCBS",
-        courseLabel: "المقرر",
-        topicsLabel: "الموضوعات التي تحتاج مساعدة فيها",
-        topicsPlaceholder:
-          "صف الموضوعات أو المفاهيم أو الواجبات أو أجزاء الاختبار التي تحتاج مساعدة فيها.",
-        attachFiles: "إرفاق الملفات",
-        attachmentNotes: "ملاحظات المرفقات",
-        attachmentPlaceholder:
-          "اذكر أي ملفات أو صور شاشة أو ملاحظات تخطط لإرفاقها في بريدك.",
-        feedbackTitle: "تحديث طلب التدريس",
-        saving: "جارٍ حفظ الطلب...",
-        save: "حفظ طلب التدريس",
-      },
-      messages: {
-        directoryNotConfigured:
-          "لم يتم إعداد database بعد. أضف متغيرات البيئة قبل استخدام دليل المدربين المباشر.",
-        loginAndCourse: "يرجى تسجيل الدخول واختيار مقرر قبل إرسال الطلب.",
-        requiredTitleInstitute: "يرجى إكمال حقلي العنوان واسم المؤسسة التعليمية المطلوبين.",
-        attachmentRequired: "يرجى إرفاق ملف واحد على الأقل قبل إرسال طلب التدريس.",
-        validCourse: "يرجى اختيار مقرر صالح لهذا المدرب.",
-        requestSuccess:
-          "تم حفظ طلب التدريس بنجاح. يمكن للمدرب الآن التواصل معك مباشرة لترتيب الجلسة.",
-        requestError: "تعذر حفظ طلب التدريس.",
-      },
-    },
-    terms: {
-      heroKicker: "سياسات المنصة",
-      heroTitle: "سياسات منصة يوكان",
-      heroText:
-        "تنطبق هذه السياسات على دخول المتعلمين وطلبات المدربين والمشاركة في الدورات والاستخدام المسؤول لمنصة يوكان.",
-      heroCardText: "يرجى مراجعة هذه السياسات بعناية قبل إنشاء حساب متعلم أو التقديم كمدرب.",
-      documentKicker: "وثيقة السياسات",
-      documentTitle: "اقرأ قواعد المنصة والمسؤوليات",
-      policies: [
-        {
-          title: "سياسة السلوك المهني",
-          body:
-            "يتوقع من جميع المدربين المسجلين في يوكان الحفاظ على سلوك مهني عند التعامل مع المتعلمين والإدارة والمدربين الآخرين.",
-          columns: [
-            {
-              title: "يجب على المدربين",
-              items: [
-                "معاملة جميع المتعلمين باحترام ومهنية.",
-                "التواصل بأدب وبشكل مناسب في جميع الأوقات.",
-                "الحضور في الوقت المحدد لجلسات التدريس.",
-                "تقديم دعم أكاديمي صادق قدر الإمكان.",
-                "الحفاظ على بيئة تعلم إيجابية وداعمة.",
-                "الظهور والتصرف بشكل مناسب أثناء الجلسات الإلكترونية أو الحضورية.",
-                "اتباع قواعد وأنظمة المؤسسة التعليمية.",
-              ],
-            },
-            {
-              title: "يجب على المدربين عدم",
-              items: [
-                "استخدام لغة مسيئة أو تمييزية أو غير مناسبة.",
-                "مشاركة محتوى ضار أو غير قانوني أو غير أخلاقي.",
-                "تضليل المتعلمين بشأن المؤهلات أو القدرات الأكاديمية.",
-                "طلب معلومات شخصية غير مناسبة من المتعلمين.",
-                "القيام بسلوك يضر بسمعة يوكان.",
-              ],
-            },
-          ],
-          closing:
-            "قد يؤدي انتهاك هذه السياسة إلى الإيقاف أو الإزالة الدائمة من منصة يوكان.",
-        },
-        {
-          title: "سياسة مكافحة التحرش",
-          body:
-            "يلتزم يوكان بتوفير بيئة آمنة ومحترمة وشاملة لجميع المستخدمين. ويُمنع التحرش بجميع أشكاله منعاً باتاً.",
-          sections: [
-            {
-              title: "تشمل السلوكيات المحظورة",
-              items: [
-                "التنمر أو الترهيب",
-                "التحرش الجنسي أو التعليقات غير المناسبة",
-                "ملاحظات تمييزية مرتبطة بالجنس أو الجنسية أو الدين أو العرق أو الإعاقة",
-                "التواصل المتكرر غير المرغوب فيه",
-                "التهديدات أو اللغة المسيئة أو السلوك العدائي",
-                "مشاركة محتوى مسيء أو صريح",
-              ],
-            },
-            {
-              title: "الإبلاغ عن التحرش",
-              text:
-                "يمكن للمستخدمين الإبلاغ عن الحوادث مباشرة إلى فريق إدارة يوكان. سيتم التعامل مع جميع البلاغات بجدية والتحقيق فيها بسرية.",
-            },
-            {
-              title: "العواقب",
-              items: [
-                "تنبيهات تحذيرية",
-                "إيقاف مؤقت",
-                "إنهاء دائم للحساب",
-                "إبلاغ المؤسسات التعليمية عند الضرورة",
-              ],
-            },
-          ],
-        },
-        {
-          title: "سياسة الأمانة الأكاديمية",
-          body: "يشجع يوكان التعلم الأخلاقي والنزاهة المهنية.",
-          sections: [
-            {
-              title: "يجب على المدربين",
-              items: [
-                "إرشاد المتعلمين إلى فهم المفاهيم الأكاديمية.",
-                "تشجيع التعلم المستقل وحل المشكلات.",
-                "تجنب إنجاز الواجبات أو الاختبارات أو الكويزات نيابة عن المتعلمين.",
-                "تجنب مشاركة مواد اختبارات أو مفاتيح إجابات غير مصرح بها.",
-                "تقديم مساعدة أكاديمية دقيقة وصادقة.",
-              ],
-            },
-          ],
-          closing:
-            "المساعدة على الغش أو الانتحال أو سوء السلوك في الاختبارات ممنوعة منعاً باتاً. وقد تؤدي المخالفات إلى الإزالة الفورية من المنصة.",
-        },
-        {
-          title: "سياسة الخصوصية والسرية",
-          body: "يحترم يوكان خصوصية جميع المستخدمين ويحمي المعلومات المقدمة.",
-          columns: [
-            {
-              title: "قد تشمل المعلومات التي يتم جمعها",
-              items: [
-                "البطاقة الشخصية العُمانية",
-                "البطاقة الجامعية",
-                "السجلات الأكاديمية",
-                "معلومات التواصل",
-                "مؤهلات التدريس",
-              ],
-            },
-            {
-              title: "يلتزم يوكان بـ",
-              items: [
-                "استخدام المستندات المقدمة فقط لأغراض التحقق من المدربين.",
-                "حصر الوصول إلى المعلومات الحساسة على الإداريين المصرح لهم فقط.",
-                "عدم مشاركة المعلومات الشخصية مع أطراف ثالثة دون إذن.",
-                "اتخاذ إجراءات معقولة لحماية بيانات المستخدمين وسريتها.",
-              ],
-            },
-          ],
-          sections: [
-            {
-              title: "يجب على المستخدمين",
-              items: [
-                "احترام خصوصية المتعلمين والمدربين.",
-                "عدم تسجيل أو مشاركة جلسات التدريس دون إذن.",
-                "عدم توزيع معلومات شخصية أو أكاديمية تخص الآخرين.",
-              ],
-            },
-          ],
-          closing: "قد يؤدي انتهاك توقعات السرية إلى إجراءات تأديبية.",
-        },
-      ],
-      requiredTitle: "متى تكون الموافقة مطلوبة",
-      requiredItems: [
-        "يجب على المتعلمين الموافقة قبل إنشاء حساب متعلم.",
-        "يجب على المتقدمين للتدريس الموافقة قبل إرسال نموذج طلب المدرب.",
-      ],
-    },
-    accessPages: {
-      student: {
-        audienceLabel: "دخول المتعلمين",
-        title: "سجل الدخول أو أنشئ حساباً للوصول إلى مزايا المتعلم في يوكان.",
-        description:
-          "هذه الصفحة مخصصة للمتعلمين الذين يريدون إنشاء حساب والوصول إلى الدورات والاستعداد لمسارات تقنية عملية.",
-        signupHeading: "إنشاء حساب متعلم",
-        imageAlt: "حرم كلية الشرق الأوسط في عُمان",
-      },
-      tutor: {
-        audienceLabel: "دخول المدربين",
-        title: "سجل الدخول أو تقدم للانضمام إلى فريق مدربي يوكان.",
-        description:
-          "هذه الصفحة مخصصة للمدربين المعتمدين، أما المتقدمون الجدد فعليهم إكمال نموذج طلب المدرب أولاً.",
-        signupHeading: "طلب المدرب",
-        imageAlt: "حرم جامعة صحار في عُمان",
-      },
-      admin: {
-        audienceLabel: "دخول الإدارة",
-        title: "سجل الدخول لإدارة يوكان كمسؤول.",
-        description:
-          "هذه الصفحة لمسؤولي المنصة الذين يحتاجون إلى الوصول إلى الطلبات ومتابعة الحسابات وأدوات سوق الدورات القادمة.",
-        imageAlt: "بطاقة دخول الإدارة لمسؤولي المنصة",
-      },
-    },
-    authAccess: {
-      recoveryStart: "أدخل كلمة مرور جديدة أدناه لإكمال إعادة تعيين حسابك.",
-      supabaseMissing:
-        "لم يتم إعداد database بعد. أضف متغيرات بيئة قاعدة البيانات في ملف .env.local.",
-      studentSignupFirst:
-        "لم نتمكن من العثور على حساب متعلم بهذه البيانات. يرجى إنشاء حساب أولاً إذا لم تكن قد أنشأت حساباً بعد.",
-      profileLoadError: "تعذر تحميل ملف حسابك حالياً. يرجى المحاولة بعد قليل.",
-      wrongRole: "هذا الحساب مسجل كـ {role}. يرجى استخدام صفحة دخول {role} بدلاً من ذلك.",
-      loginSuccess: "تم تسجيل الدخول بنجاح.",
-      resetCooldown: "يرجى الانتظار {seconds} ثانية قبل طلب بريد إعادة تعيين آخر.",
-      enterEmailFirst: "أدخل بريدك الإلكتروني أولاً، ثم اضغط نسيت كلمة المرور مرة أخرى.",
-      resetSent:
-        "تم إرسال رابط إعادة تعيين كلمة المرور إلى {email}. يرجى التحقق من بريدك ومجلد الرسائل غير المرغوبة.",
-      shortPassword: "يجب أن تتكون كلمة المرور الجديدة من 6 أحرف على الأقل.",
-      passwordUpdated: "تم تحديث كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول.",
-      confirmationEmailFirst: "أدخل بريدك الإلكتروني أولاً حتى نتمكن من إعادة إرسال رابط التأكيد.",
-      confirmationResent:
-        "تم إرسال بريد تأكيد جديد إلى {email}. يرجى أيضاً التحقق من مجلد الرسائل غير المرغوبة.",
-      termsRequired: "يرجى قراءة شروط الخدمة والموافقة عليها قبل إنشاء الحساب.",
-      termsRequiredGoogle:
-        "يرجى قراءة شروط الخدمة والموافقة عليها قبل المتابعة باستخدام Google.",
-      existingAccount:
-        "يوجد حساب بالبريد {email}. يرجى تسجيل الدخول باستخدام حسابك الحالي بدلاً من ذلك.",
-      profileSyncFailed: "تم إنشاء الحساب، لكن مزامنة الملف فشلت: {message}",
-      accountCreated: "تم إنشاء الحساب بنجاح.",
-      accountCreatedConfirm:
-        "تم إنشاء الحساب. تحقق من {email} للحصول على بريد التأكيد قبل تسجيل الدخول.",
-      supabaseNotice:
-        "لم يتم إعداد database بعد. أضف متغيرات بيئة قاعدة البيانات إلى `.env.local` قبل اختبار المصادقة.",
-      feedbackErrorTitle: "تحديث المصادقة",
-      feedbackRecoveryTitle: "تحديث استعادة كلمة المرور",
-      feedbackAccessTitle: "تحديث الوصول للحساب",
-      confirmationQuestion: "لم تستلم بريد التأكيد لـ",
-      resending: "جارٍ إعادة الإرسال...",
-      resendConfirmation: "إعادة إرسال بريد التأكيد",
-      resetPassword: "إعادة تعيين كلمة المرور",
-      logIn: "تسجيل الدخول",
-      createNewPassword: "إنشاء كلمة مرور جديدة",
-      welcomeBack: "مرحباً بعودتك",
-      newPassword: "كلمة المرور الجديدة",
-      newPasswordPlaceholder: "أدخل كلمة مرور جديدة",
-      updatingPassword: "جارٍ تحديث كلمة المرور...",
-      updatePassword: "تحديث كلمة المرور",
-      email: "البريد الإلكتروني",
-      emailPlaceholder: "أدخل بريدك الإلكتروني",
-      password: "كلمة المرور",
-      passwordPlaceholder: "أدخل كلمة المرور",
-      loggingIn: "جارٍ تسجيل الدخول...",
-      sendingReset: "جارٍ إرسال رابط الإعادة...",
-      tryAgain: "حاول مرة أخرى خلال {seconds}ث",
-      forgotPassword: "نسيت كلمة المرور؟",
-      signUp: "إنشاء حساب",
-      fullName: "الاسم الكامل",
-      fullNamePlaceholder: "أدخل اسمك الكامل",
-      institute: "المؤسسة التعليمية",
-      institutePlaceholder: "أدخل اسم مؤسستك التعليمية",
-      createPasswordPlaceholder: "أنشئ كلمة مرور",
-      termsAgreementPrefix: "لقد قرأت وأوافق على",
-      termsAgreementLink: "سياسات منصة يوكان",
-      openingGoogle: "جارٍ فتح Google...",
-      continueWithGoogle: "المتابعة باستخدام Google",
-      or: "أو",
-      creatingAccount: "جارٍ إنشاء الحساب...",
-      createAccount: "إنشاء الحساب",
-    },
-    tutorApplicationPanel: {
-      kicker: "طلب المدرب",
-      title: "تقدم أولاً قبل إنشاء حساب مدرب",
-      text:
-        "يتم تسجيل المدربين من خلال عملية مراجعة طلب منفصلة. أرسل خلفيتك ومجالات التدريس المقترحة والمستندات الداعمة أولاً، ثم يمكن إضافة المدربين المعتمدين إلى المنصة.",
-      needsTitle: "ستحتاج إلى",
-      needs: [
-        "الاسم الكامل والخلفية المهنية أو الأكاديمية",
-        "موضوعات الدورات التي تقترحها",
-        "البريد الإلكتروني ورقم واتساب",
-        "مستندات داعمة أو روابط أعمال",
-      ],
-      button: "فتح نموذج طلب المدرب",
-    },
-    studentDashboard: {
-      fallbackName: "متعلم",
-      heroKicker: "لوحة المتعلم",
-      welcome: "مرحباً، {name}",
-      heroText:
-        "أكمل ملف المتعلم أولاً، ثم استخدم هذه اللوحة المحمية كمركز للوصول إلى الدورات والدعم التعليمي.",
-      profileKicker: "ملف المتعلم",
-      profileComplete: "الملف مكتمل",
-      completeProfile: "أكمل ملفك",
-      profileText: "أدخل اسم المتعلم واسم الجامعة قبل الالتحاق بالدورات.",
-      feedbackTitle: "تحديث ملف المتعلم",
-      studentName: "اسم المتعلم",
-      studentNamePlaceholder: "أدخل اسمك الكامل",
-      universityName: "اسم الجامعة",
-      universityPlaceholder: "مثال: MCBS",
-      email: "البريد الإلكتروني:",
-      role: "الدور:",
-      roleStudent: "متعلم",
-      notSet: "غير محدد",
-      saving: "جارٍ حفظ الملف...",
-      save: "حفظ ملف المتعلم",
-      actionsKicker: "إجراءات المتعلم",
-      lockedTitle: "أكمل ملفك لفتح أدوات التعلم",
-      lockedText:
-        "احفظ اسم المتعلم واسم الجامعة أولاً، ثم ستصبح أدوات التعلم متاحة.",
-      messages: {
-        notConfigured: "لا يمكن حفظ ملف المتعلم حتى يتم إعداد database.",
-        required: "يرجى إدخال اسم المتعلم واسم الجامعة لإكمال ملفك.",
-        success: "تم حفظ ملف المتعلم. يمكنك الآن الالتحاق بالدورات.",
-        error: "تعذر حفظ ملف المتعلم حالياً.",
-      },
-      quickLinks: [
-        {
-          title: "استكشف التدريس",
-          description: "تصفح خيارات التدريس الفردي والجماعي المتاحة في المنصة.",
-          action: "فتح الخدمات",
-        },
-        {
-          title: "تواصل مع الدعم",
-          description: "تواصل معنا إذا احتجت إلى إرشاد لاختيار الدعم المناسب للمقرر.",
-          action: "تواصل مع يوكان",
-        },
-      ],
-    },
-    tutorDashboard: {
-      fallbackName: "مدرب",
-      notSet: "غير محدد بعد",
-      heroKicker: "لوحة المدرب",
-      welcome: "مرحباً، {name}",
-      heroText:
-        "تمنحك هذه اللوحة المحمية مكاناً واضحاً لإدارة طلبات التدريس ومراجعة ظهور خدماتك وتنسيق تحديثات المنصة.",
-      profileKicker: "الملف",
-      labels: {
-        fullName: "الاسم الكامل:",
-        email: "البريد الإلكتروني:",
-        institute: "المؤسسة:",
-        role: "الدور:",
-      },
-      role: "مدرب",
-      actionsKicker: "إجراءات المدرب",
-      emptyTitle: "لا توجد إجراءات للمدرب حالياً",
-      emptyText: "ستظهر أدوات المدرب هنا مع توسع لوحة التحكم.",
-      actions: [
-        {
-          title: "طلبات التدريس المقدمة",
-          description:
-            "افتح صفحة منفصلة للمدرب لمراجعة الطلبات المسندة إليك وتحديث حالتها وتنزيل الملفات المرفقة.",
-          action: "عرض طلبات التدريس",
-        },
-      ],
-      instructionsKicker: "تعليمات طلبات التدريس",
-      instructionsTitle: "كيفية التعامل مع طلبات التدريس من المتعلمين",
-      step: "الخطوة {number}",
-      instructions: [
-        "افتح طلب التدريس.",
-        "راجع محتوى الطلب وادرس المرفقات.",
-        "تواصل مع المرسل عبر البريد الإلكتروني لترتيب جلسة على Google Meet، واستخدم أداة تعليمية مثل Microsoft Whiteboard.",
-        'ضع حالة الطلب "مكتمل" أو "ملغي" بعد التعامل معه.',
-      ],
-    },
-    adminDashboard: {
-      fallbackName: "مسؤول",
-      notSet: "غير محدد بعد",
-      yes: "نعم",
-      no: "لا",
-      none: "لا يوجد",
-      supabaseNotConfigured: "لم يتم إعداد database.",
-      diagnosticsError: "تعذر تحميل تشخيصات دليل المدربين حالياً.",
-      heroKicker: "لوحة الإدارة",
-      welcome: "مرحباً، {name}",
-      heroText:
-        "تمنحك هذه اللوحة المحمية مكاناً واضحاً لمراجعة رسائل التواصل وطلبات التدريس والمرحلة التالية من إدارة المنصة.",
-      profileKicker: "الملف",
-      labels: {
-        fullName: "الاسم الكامل:",
-        email: "البريد الإلكتروني:",
-        institute: "المؤسسة:",
-        role: "الدور:",
-      },
-      role: "مسؤول",
-      toolsKicker: "أدوات الإدارة",
-      tools: [
-        {
-          title: "رسائل التواصل المقدمة",
-          description:
-            "افتح صفحة إدارة منفصلة لمراجعة رسائل التواصل وتنزيل أي ملفات مرفقة.",
-          action: "عرض رسائل التواصل",
-        },
-        {
-          title: "طلبات المدربين",
-          description:
-            "افتح صفحة إدارة منفصلة لمراجعة المتقدمين للتدريس وفحص مستندات التحقق.",
-          action: "عرض طلبات المدربين",
-        },
-        {
-          title: "طلبات التدريس المقدمة",
-          description:
-            "افتح صفحة إدارة منفصلة لمراجعة طلبات التدريس وتنزيل أي مرفقات مقدمة.",
-          action: "عرض طلبات التدريس",
-        },
-      ],
-      workflowTitle: "سير عمل إداري بسيط",
-      workflowText:
-        "استخدم نفس تدفق الحالة لرسائل التواصل وطلبات التدريس حتى لا يضيع أي شيء.",
-      contactWorkflowTitle: "رسائل التواصل",
-      contactWorkflow: [
-        "1. افتح الرسائل المعلقة أولاً.",
-        "2. ضعها كمراجعة بعد القراءة وتحديد الخطوة التالية.",
-        "3. ضعها كمجدولة إذا تم ترتيب المتابعة.",
-        "4. ضعها كمكتملة بعد التعامل مع الموضوع بالكامل.",
-      ],
-      tutoringWorkflowTitle: "طلبات التدريس",
-      tutoringWorkflow: [
-        "1. راجع طلبات المتعلمين الجديدة والمرفقات.",
-        "2. انقلها إلى تمت المراجعة بعد فحص تفاصيل المقرر والموضوع.",
-        "3. استخدم مجدولة بعد ترتيب الجلسة.",
-        "4. ضعها مكتملة أو ملغية عند انتهاء سير العمل.",
-      ],
-      diagnosticsTitle: "تشخيصات دليل المدربين",
-      diagnosticsText:
-        "حالة داخلية لدليل الخدمات حتى تتمكن من حل مشكلات العروض دون إظهار بيانات التشخيص للمستخدمين.",
-      noDataTitle: "لا توجد بيانات لدليل المدربين بعد",
-      noDataText:
-        "database متصل، لكن لا توجد عروض مدربين نشطة للإبلاغ عنها حالياً.",
-      diagnosticLabels: {
-        configured: "database معد:",
-        loading: "جارٍ التحميل:",
-        raw: "العروض الخام:",
-        privateCards: "بطاقات المدربين الفرديين:",
-        groupCards: "بطاقات المدربين الجماعيين:",
-        institutes: "المؤسسات الظاهرة:",
-        error: "خطأ الدليل:",
-      },
-    },
-    resetPasswordPage: {
-      recoveryPrompt: "أدخل كلمة المرور الجديدة أدناه لإكمال إعادة التعيين.",
-      supabaseMissing: "لم يتم إعداد database بعد.",
-      shortPassword: "يجب أن تتكون كلمة المرور الجديدة من 6 أحرف على الأقل.",
-      success: "تم تحديث كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول.",
-      heroKicker: "إعادة تعيين كلمة المرور",
-      heroTitle: "أنشئ كلمة مرور جديدة لحسابك في يوكان.",
-      heroText: "استخدم هذه الصفحة بعد فتح بريد استعادة كلمة المرور من database.",
-      formKicker: "كلمة مرور جديدة",
-      formTitle: "إعادة تعيين كلمة المرور",
-      feedbackTitle: "تحديث إعادة تعيين كلمة المرور",
-      label: "كلمة المرور الجديدة",
-      placeholder: "أدخل كلمة المرور الجديدة",
-      updating: "جارٍ تحديث كلمة المرور...",
-      update: "تحديث كلمة المرور",
-      back: "العودة إلى تسجيل الدخول",
-    },
-    tutorApplicationPage: {
-      heroKicker: "طلب المدرب",
-      heroTitle: "تقدم بشكل منفصل قبل الانضمام إلى فريق مدربي يوكان.",
-      heroText:
-        "أكمل هذا النموذج بخلفيتك المهنية وموضوع الدورة المقترح ورابط أعمالك وعينة تعليمية حتى تتم مراجعة طلبك بشكل مناسب.",
-      heroCardText:
-        "تتم مراجعة طلبات المدربين بناءً على الخبرة وفكرة الدورة والأعمال المنشورة والأدلة التعليمية.",
-      formKicker: "نموذج الطلب",
-      formTitle: "إرسال طلب المدرب",
-      back: "العودة إلى دخول المدربين",
-      feedbackTitle: "تحديث طلب المدرب",
-      fullName: "الاسم الكامل",
-      email: "البريد الإلكتروني",
-      professionalBackground: "الخلفية المهنية",
-      professionalBackgroundPlaceholder:
-        "لخص خبرتك العملية ومهاراتك التقنية والشهادات والجمهور الذي يمكنك تدريبه.",
-      portfolioUrl: "رابط LinkedIn أو GitHub أو ملف الأعمال",
-      portfolioUrlPlaceholder: "https://linkedin.com/in/your-name أو https://github.com/username",
-      courseTopicProposal: "موضوع الدورة المقترحة",
-      courseTopicPlaceholder:
-        "مثال: تطوير الواجهات لخريجي علوم الحاسوب في عُمان، مع مشاريع React والنشر وتجهيز ملف الأعمال.",
-      teachingExperience: "الخبرة في التدريس",
-      teachingExperiencePlaceholder:
-        "اذكر التدريس أو الإرشاد أو الورش أو التدريب أو التحدث العام أو إنشاء المحتوى.",
-      paymentDetails: "تفاصيل البنك/الدفع لاحقاً",
-      paymentDetailsPlaceholder:
-        "اختياري حالياً. يمكن إضافة تفاصيل الدفع لاحقاً بعد الموافقة.",
-      requiredAttachments: "المرفقات المطلوبة",
-      attachFiles: "إرفاق الملفات",
-      termsPrefix: "لقد قرأت وأوافق على",
-      termsLink: "سياسات منصة يوكان",
-      submitting: "جارٍ إرسال الطلب...",
-      submit: "إرسال طلب المدرب",
-      attachments: [
-        "فيديو تعليمي تجريبي أو مخطط دورة أو ملف أعمال PDF أو أي ملف يوضح قدرتك على تدريس هذا الموضوع",
-      ],
-      messages: {
-        terms: "يرجى قراءة سياسات منصة يوكان والموافقة عليها قبل إرسال طلب المدرب.",
-        notConfigured: "لم يتم إعداد database بعد، لذلك لا يمكن إرسال طلب المدرب حالياً.",
-        files: "يرجى إرفاق فيديو أو ملف تجريبي واحد على الأقل قبل إرسال طلب المدرب.",
-        success:
-          "تم إرسال طلب المدرب بنجاح. يمكن لفريق يوكان الآن مراجعة النموذج والمرفقات. ستتلقى رداً خلال أقل من 24 ساعة.",
-        error: "تعذر إرسال طلب المدرب حالياً.",
-        applicationSubmittedBy: "تم إرسال طلب المدرب بواسطة {name}.",
-        email: "البريد الإلكتروني: {email}",
-        courseTopic: "موضوع الدورة المقترحة: {topic}",
-        portfolio: "رابط الأعمال: {portfolio}",
-      },
-    },
-    records: {
-      unknown: "غير معروف",
-      close: "إغلاق",
-      total: "الإجمالي",
-      pending: "قيد الانتظار",
-      private: "فردي",
-      institutes: "المؤسسات",
-      notProvided: "غير مقدم",
-      notProvidedStudent: "متعلم غير معروف",
-      noEmail: "لا يوجد بريد",
-      submitted: "تاريخ الإرسال:",
-      status: "الحالة:",
-      email: "البريد الإلكتروني:",
-      institute: "المؤسسة:",
-      role: "الدور:",
-      from: "من:",
-      attachments: "المرفقات:",
-      statusWorkflow: "سير حالة الطلب",
-      updateStatus: "تحديث الحالة",
-      saving: "جارٍ الحفظ...",
-      saveStatus: "حفظ الحالة",
-      downloaded: "تم تنزيل {fileName} بنجاح.",
-      attachment: "المرفق",
-      downloadError: "تعذر تنزيل هذا المرفق حالياً.",
-      contact: {
-        fetchError: "تعذر تحميل رسائل التواصل حالياً.",
-        statusSaved: "تم وضع رسالة التواصل كـ {status}.",
-        statusError: "تعذر تحديث حالة رسالة التواصل حالياً.",
-        kicker: "سجلات الإدارة",
-        title: "رسائل التواصل المقدمة",
-        description:
-          "راجع رسائل نموذج التواصل العام ونزل أي ملفات مقدمة مباشرة من هذه الصفحة.",
-        back: "العودة إلى لوحة الإدارة",
-        feedbackTitle: "تحديث سجلات التواصل",
-        workflowTitle: "سير عمل الرسائل",
-        workflowText:
-          "ابدأ بالرسائل قيد الانتظار، ثم انقلها إلى تمت المراجعة بعد فحصها، واستخدم مجدولة أو مكتملة حسب النتيجة.",
-        filter: "تصفية حسب الحالة",
-        allStatuses: "كل الحالات",
-        loadingTitle: "جارٍ تحميل رسائل التواصل...",
-        loadingText: "يتم جلب أحدث الرسائل من database.",
-        errorTitle: "تعذر تحميل الرسائل",
-        emptyTitle: "لا توجد رسائل تواصل نشطة",
-        emptyText:
-          "يتم إخفاء رسائل التواصل المكتملة من لوحة التحكم، لكنها تبقى محفوظة في database.",
-        noFilteredTitle: "لا توجد رسائل بحالة {status}",
-        noFilteredText: "جرّب حالة أخرى لمتابعة معالجة رسائل التواصل.",
-        fromLine: "من {name} عبر {email}",
-        openHint: "اضغط لفتح هذه الرسالة في نافذة منبثقة منفصلة.",
-        popupKicker: "رسالة تواصل",
-        message: "الرسالة",
-      },
-      tutoring: {
-        fetchError: "تعذر تحميل طلبات التدريس حالياً.",
-        statusSaved: "تم وضع طلب التدريس كـ {status}.",
-        statusError: "تعذر تحديث حالة طلب التدريس حالياً.",
-        kicker: "سجلات المدرب",
-        title: "طلبات التدريس المقدمة",
-        description:
-          "افتح طلبات التدريس المسندة إليك في نوافذ منبثقة منفصلة، وحدّث حالتها، ونزّل ملفات الدراسة المرفقة من هذه الصفحة.",
-        back: "العودة إلى لوحة المدرب",
-        feedbackTitle: "تحديث طلب المدرب",
-        loadingTitle: "جارٍ تحميل طلبات التدريس...",
-        loadingText: "يتم جلب أحدث طلبات المتعلمين المسندة إلى حساب المدرب.",
-        errorTitle: "تعذر تحميل طلبات التدريس",
-        emptyTitle: "لا توجد طلبات تدريس نشطة",
-        emptyText:
-          "يتم إخفاء طلبات التدريس المكتملة والملغية من لوحة التحكم، لكنها تبقى محفوظة في database.",
-        studentLine: "المتعلم {name} عبر {email}",
-        student: "المتعلم:",
-        studentInstitute: "مؤسسة المتعلم:",
-        sessionType: "نوع الجلسة:",
-        openHint: "اضغط لفتح طلب التدريس هذا في نافذة منبثقة منفصلة.",
-        popupKicker: "طلب تدريس",
-        topics: "الموضوعات التي تحتاج مساعدة",
-        courseFallback: "المقرر",
       },
     },
   },

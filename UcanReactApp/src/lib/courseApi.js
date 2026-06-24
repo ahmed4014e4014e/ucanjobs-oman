@@ -6,11 +6,8 @@ const COURSE_COLUMNS = `
   category_id,
   slug,
   title_en,
-  title_ar,
   subtitle_en,
-  subtitle_ar,
   summary_en,
-  summary_ar,
   level,
   duration,
   language,
@@ -32,13 +29,8 @@ function sortByOrder(left, right) {
   return (left.sort_order ?? 0) - (right.sort_order ?? 0);
 }
 
-function localize(primary, fallback) {
-  return primary || fallback || "";
-}
-
 function mapCourseRow(row, outcomes = [], modules = []) {
   const categoryNameEn = row.category?.name_en || "Courses";
-  const categoryNameAr = row.category?.name_ar || categoryNameEn;
   const sortedOutcomes = [...outcomes].sort(sortByOrder);
   const sortedModules = [...modules].sort(sortByOrder);
 
@@ -46,7 +38,6 @@ function mapCourseRow(row, outcomes = [], modules = []) {
     id: row.id,
     slug: row.slug,
     category: categoryNameEn,
-    categoryAr: categoryNameAr,
     level: row.level,
     price: formatPrice(row.price_omr),
     duration: row.duration,
@@ -58,15 +49,6 @@ function mapCourseRow(row, outcomes = [], modules = []) {
       summary: row.summary_en,
       outcomes: sortedOutcomes.map((item) => item.outcome_en).filter(Boolean),
       modules: sortedModules.map((item) => item.title_en).filter(Boolean),
-    },
-    ar: {
-      title: localize(row.title_ar, row.title_en),
-      subtitle: localize(row.subtitle_ar, row.subtitle_en),
-      summary: localize(row.summary_ar, row.summary_en),
-      outcomes: sortedOutcomes
-        .map((item) => localize(item.outcome_ar, item.outcome_en))
-        .filter(Boolean),
-      modules: sortedModules.map((item) => localize(item.title_ar, item.title_en)).filter(Boolean),
     },
   };
 }
@@ -103,15 +85,15 @@ async function addCourseRelations(courses) {
   const categoryIds = Array.from(new Set(courses.map((course) => course.category_id).filter(Boolean)));
   const [categoryResult, outcomeResult, moduleResult] = await Promise.allSettled([
     categoryIds.length
-      ? supabase.from("course_categories").select("id, slug, name_en, name_ar").in("id", categoryIds)
+      ? supabase.from("course_categories").select("id, slug, name_en").in("id", categoryIds)
       : Promise.resolve({ data: [], error: null }),
     supabase
       .from("course_outcomes")
-      .select("course_id, outcome_en, outcome_ar, sort_order")
+      .select("course_id, outcome_en, sort_order")
       .in("course_id", courseIds),
     supabase
       .from("course_modules")
-      .select("course_id, title_en, title_ar, sort_order")
+      .select("course_id, title_en, sort_order")
       .in("course_id", courseIds),
   ]);
 

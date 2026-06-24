@@ -31,6 +31,7 @@ import AdminContactMessages from "./routes/adminContactMessages";
 import AdminInstructorApplications from "./routes/adminInstructorApplications";
 import AdminLearningRequests from "./routes/adminLearningRequests";
 import AdminCourses from "./routes/adminCourses";
+import AdminPlaceholderPage from "./routes/adminPlaceholderPage";
 
 // Create a Router
 const router = createBrowserRouter([
@@ -192,6 +193,38 @@ const router = createBrowserRouter([
         element: (
           <RoleProtectedRoute allowedRole="admin">
             <AdminCourses />
+          </RoleProtectedRoute>
+        ),
+      },
+      {
+        path: "admin-enrollments",
+        element: (
+          <RoleProtectedRoute allowedRole="admin">
+            <AdminPlaceholderPage pageKey="enrollments" />
+          </RoleProtectedRoute>
+        ),
+      },
+      {
+        path: "admin-learner-accounts",
+        element: (
+          <RoleProtectedRoute allowedRole="admin">
+            <AdminPlaceholderPage pageKey="learnerAccounts" />
+          </RoleProtectedRoute>
+        ),
+      },
+      {
+        path: "admin-market-insights",
+        element: (
+          <RoleProtectedRoute allowedRole="admin">
+            <AdminPlaceholderPage pageKey="marketInsights" />
+          </RoleProtectedRoute>
+        ),
+      },
+      {
+        path: "admin-seo-performance",
+        element: (
+          <RoleProtectedRoute allowedRole="admin">
+            <AdminPlaceholderPage pageKey="seoPerformance" />
           </RoleProtectedRoute>
         ),
       },
