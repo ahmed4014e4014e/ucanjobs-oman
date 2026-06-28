@@ -216,7 +216,7 @@ export default function Home() {
                 {t("home.tutorCardText")}
               </p>
               <Link
-                to="/tutor-access/"
+                to="/instructor-access/"
                 className="oman-button-primary mt-8 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition sm:w-auto"
               >
                 {t("home.tutorButton")}
@@ -252,7 +252,7 @@ export default function Home() {
                 {t("home.studentCardText")}
               </p>
               <Link
-                to="/student-access/"
+                to="/learner-access/"
                 className="oman-button-primary mt-8 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition sm:w-auto"
               >
                 {t("home.studentButton")}

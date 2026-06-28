@@ -1,9 +1,9 @@
 import AuthAccessPage from "./AuthAccessPage";
-import TutorApplicationSignupPanel from "../components/TutorApplicationSignupPanel";
+import InstructorApplicationSignupPanel from "../components/InstructorApplicationSignupPanel";
 import { useLanguage } from "../context/LanguageContext";
 import soharUniversityImage from "../assets/auth-images/sohar-university.jpg";
 
-export default function TutorAccess() {
+export default function InstructorAccess() {
   const { t } = useLanguage();
   const copy = t("accessPages.tutor");
 
@@ -13,10 +13,10 @@ export default function TutorAccess() {
       title={copy.title}
       description={copy.description}
       signupHeading={copy.signupHeading}
-      role="tutor"
+      role="instructor"
       accessImage={soharUniversityImage}
       accessImageAlt={copy.imageAlt}
-      signupPanel={<TutorApplicationSignupPanel />}
+      signupPanel={<InstructorApplicationSignupPanel />}
     />
   );
 }

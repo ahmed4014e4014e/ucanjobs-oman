@@ -2,7 +2,7 @@ import AuthAccessPage from "./AuthAccessPage";
 import { useLanguage } from "../context/LanguageContext";
 import middleEastCollegeImage from "../assets/auth-images/middle-east-college.jpg";
 
-export default function StudentAccess() {
+export default function LearnerAccess() {
   const { t } = useLanguage();
   const copy = t("accessPages.student");
 
@@ -12,7 +12,7 @@ export default function StudentAccess() {
       title={copy.title}
       description={copy.description}
       signupHeading={copy.signupHeading}
-      role="student"
+      role="learner"
       requireTermsAgreement
       collectSignupProfile={false}
       enableGoogleAuth

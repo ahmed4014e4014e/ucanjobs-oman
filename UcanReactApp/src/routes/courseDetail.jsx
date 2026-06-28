@@ -3,7 +3,12 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import ActionFeedback from "../components/ActionFeedback";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
-import { enrollInCourse, fetchPublishedCourseBySlug } from "../lib/courseApi";
+import {
+  enrollInCourse,
+  fetchCourseEnrollment,
+  fetchPublishedCourseBySlug,
+  updateCourseProgress,
+} from "../lib/courseApi";
 import { findCourseBySlug } from "../lib/courseCatalog";
 import { themeImages } from "../lib/themeImages";
 
@@ -11,11 +16,13 @@ export default function CourseDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isArabic, t } = useLanguage();
-  const locale = isArabic ? "ar" : "en";
+  const { t } = useLanguage();
   const [course, setCourse] = useState(() => findCourseBySlug(slug));
   const [loadingCourse, setLoadingCourse] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
+  const [updatingProgress, setUpdatingProgress] = useState(false);
+  const [enrollment, setEnrollment] = useState(null);
+  const [loadingEnrollment, setLoadingEnrollment] = useState(false);
   const [courseLoadMessage, setCourseLoadMessage] = useState("");
   const [enrollmentFeedback, setEnrollmentFeedback] = useState({
     type: "idle",
@@ -67,9 +74,50 @@ export default function CourseDetail() {
     };
   }, [slug]);
 
+  useEffect(() => {
+    let active = true;
+
+    async function loadEnrollment() {
+      if (!user?.id || course?.source !== "database" || !course?.id) {
+        setEnrollment(null);
+        return;
+      }
+
+      setLoadingEnrollment(true);
+
+      try {
+        const nextEnrollment = await fetchCourseEnrollment({
+          learnerId: user.id,
+          courseId: course.id,
+        });
+
+        if (active) {
+          setEnrollment(nextEnrollment);
+        }
+      } catch (error) {
+        if (active) {
+          setEnrollmentFeedback({
+            type: "error",
+            message: error?.message || "We could not load your enrollment status.",
+          });
+        }
+      } finally {
+        if (active) {
+          setLoadingEnrollment(false);
+        }
+      }
+    }
+
+    loadEnrollment();
+
+    return () => {
+      active = false;
+    };
+  }, [course?.id, course?.source, user?.id]);
+
   const handleEnrollment = async () => {
     if (!user?.id) {
-      navigate("/student-access/");
+      navigate("/learner-access/");
       return;
     }
 
@@ -85,10 +133,12 @@ export default function CourseDetail() {
     setEnrollmentFeedback({ type: "idle", message: "" });
 
     try {
-      await enrollInCourse({
+      const nextEnrollment = await enrollInCourse({
         learnerId: user.id,
         courseId: course.id,
       });
+
+      setEnrollment(nextEnrollment);
 
       setEnrollmentFeedback({
         type: "success",
@@ -101,6 +151,36 @@ export default function CourseDetail() {
       });
     } finally {
       setEnrolling(false);
+    }
+  };
+
+  const handleProgressUpdate = async (progressPercent) => {
+    if (!user?.id || !course?.id) {
+      return;
+    }
+
+    setUpdatingProgress(true);
+    setEnrollmentFeedback({ type: "idle", message: "" });
+
+    try {
+      const nextEnrollment = await updateCourseProgress({
+        learnerId: user.id,
+        courseId: course.id,
+        progressPercent,
+      });
+
+      setEnrollment(nextEnrollment);
+      setEnrollmentFeedback({
+        type: "success",
+        message: `Progress updated to ${nextEnrollment.progressPercent}%.`,
+      });
+    } catch (error) {
+      setEnrollmentFeedback({
+        type: "error",
+        message: error?.message || "We could not update your course progress right now.",
+      });
+    } finally {
+      setUpdatingProgress(false);
     }
   };
 
@@ -140,7 +220,7 @@ export default function CourseDetail() {
     );
   }
 
-  const content = course[locale] || course.en;
+  const content = course.en;
 
   return (
     <main className="oman-page min-h-screen text-slate-900">
@@ -151,7 +231,7 @@ export default function CourseDetail() {
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
           <div className="max-w-4xl text-center lg:text-left">
             <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-              {isArabic ? course.categoryAr || course.category : course.category}
+              {course.category}
             </p>
             <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
               {content.title}
@@ -220,6 +300,47 @@ export default function CourseDetail() {
             ))}
           </ol>
 
+          {loadingEnrollment && (
+            <div className="mt-8 rounded-2xl oman-outline-panel px-4 py-4 text-sm font-semibold text-[var(--oman-ink)]/75">
+              Loading your enrollment status...
+            </div>
+          )}
+
+          {enrollment && (
+            <div className="mt-8 rounded-3xl oman-outline-panel p-5">
+              <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+                Your Progress
+              </p>
+              <div className="mt-4 flex items-center justify-between gap-4">
+                <p className="text-lg font-semibold capitalize text-[var(--oman-ink)]">
+                  {enrollment.status.replaceAll("_", " ")}
+                </p>
+                <p className="text-lg font-bold text-[var(--oman-terracotta)]">
+                  {enrollment.progressPercent}%
+                </p>
+              </div>
+              <div className="mt-4 h-3 overflow-hidden rounded-full bg-[rgba(111,49,29,0.12)]">
+                <div
+                  className="h-full rounded-full bg-[var(--oman-terracotta)] transition-all"
+                  style={{ width: `${enrollment.progressPercent}%` }}
+                />
+              </div>
+              <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-5">
+                {[0, 25, 50, 75, 100].map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => handleProgressUpdate(value)}
+                    disabled={updatingProgress}
+                    className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.9)] px-3 py-2 text-sm font-semibold text-[var(--oman-ink)] transition hover:border-[var(--oman-brass)] hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {value}%
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <ActionFeedback
             type={enrollmentFeedback.type}
             message={enrollmentFeedback.message}
@@ -230,10 +351,16 @@ export default function CourseDetail() {
           <button
             type="button"
             onClick={handleEnrollment}
-            disabled={enrolling}
+            disabled={enrolling || Boolean(enrollment)}
             className="oman-button-primary mt-5 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {enrolling ? "Enrolling..." : user ? "Enroll In This Course" : "Sign In To Enroll"}
+            {enrollment
+              ? "Already Enrolled"
+              : enrolling
+                ? "Enrolling..."
+                : user
+                  ? "Enroll In This Course"
+                  : "Sign In To Enroll"}
           </button>
           <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
             Payments and detailed progress tracking will be added in later phases.

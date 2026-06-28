@@ -12,7 +12,7 @@ function createProfileSeed(authUser, fallbackRole = null) {
   return {
     id: authUser.id,
     full_name: authUser.user_metadata?.full_name ?? authUser.user_metadata?.name ?? null,
-    role: fallbackRole,
+    role: fallbackRole ?? authUser.user_metadata?.role ?? null,
     institute: authUser.user_metadata?.institute ?? null,
     email: authUser.email ?? null,
   };
@@ -170,14 +170,19 @@ export function AuthProvider({ children }) {
       setProfileError("");
       return resolvedProfile;
     } catch (error) {
+      const fallbackProfile = createProfileSeed(
+        authUser,
+        authUser.user_metadata?.role || getPendingOAuthRole() || null
+      );
+
       if (profileRequestIdRef.current === requestId) {
-        setProfile(null);
+        setProfile(fallbackProfile);
         setProfileError(
           error?.message ||
             "We found your session, but your profile could not be loaded."
         );
       }
-      return null;
+      return fallbackProfile;
     } finally {
       if (profileRequestIdRef.current === requestId) {
         setProfileLoading(false);

@@ -1,5 +1,19 @@
-export function getUserRole(profile, _user, fallbackRole = null) {
-  return profile?.role ?? fallbackRole;
+export function getUserRole(profile, user, fallbackRole = null) {
+  const role =
+    profile?.role ??
+    user?.user_metadata?.role ??
+    user?.app_metadata?.role ??
+    fallbackRole;
+
+  if (role === "student") {
+    return "learner";
+  }
+
+  if (role === "tutor") {
+    return "instructor";
+  }
+
+  return role;
 }
 
 export function getDashboardPath(role) {
@@ -7,9 +21,9 @@ export function getDashboardPath(role) {
     return "/admin-dashboard/";
   }
 
-  if (role === "tutor") {
-    return "/tutor-dashboard/";
+  if (role === "instructor" || role === "tutor") {
+    return "/instructor-dashboard/";
   }
 
-  return "/student-dashboard/";
+  return "/learner-dashboard/";
 }

@@ -8,6 +8,19 @@ import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { getDashboardPath, getUserRole } from "../lib/authRouting";
 import { themeImages } from "../lib/themeImages";
 
+function getVisibleRoleLabel(role) {
+  if (role === "student" || role === "learner") return "learner";
+  if (role === "tutor" || role === "instructor") return "instructor";
+  if (role === "admin") return "admin";
+  return role || "member";
+}
+
+function normalizeRole(role) {
+  if (role === "student") return "learner";
+  if (role === "tutor") return "instructor";
+  return role;
+}
+
 function formatCopy(template, values) {
   return Object.entries(values).reduce(
     (text, [key, value]) => text.replaceAll(`{${key}}`, value),
@@ -25,6 +38,7 @@ export default function AuthAccessPage({
   accessImage,
   accessImageAlt,
   signupPanel = null,
+  landingContent = null,
   requireTermsAgreement = false,
   collectSignupProfile = true,
   enableGoogleAuth = false,
@@ -112,8 +126,10 @@ export default function AuthAccessPage({
   };
 
   useEffect(() => {
-    if (!loading && user && profile?.role && !roleCheckInProgress) {
-      navigate(getDashboardPath(profile.role), { replace: true });
+    const resolvedRole = getUserRole(profile, user);
+
+    if (!loading && user && resolvedRole && !roleCheckInProgress) {
+      navigate(getDashboardPath(resolvedRole), { replace: true });
     }
   }, [loading, navigate, profile, roleCheckInProgress, user]);
 
@@ -126,13 +142,43 @@ export default function AuthAccessPage({
       return null;
     }
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("profiles")
-      .select("role")
+      .select("id, role, email")
       .eq("id", authUser.id)
       .maybeSingle();
 
-    return data?.role ?? null;
+    if (error) {
+      throw error;
+    }
+
+    const resolvedRole = normalizeRole(data?.role ?? authUser.user_metadata?.role ?? role);
+
+    if (!data || !data.role || !data.email) {
+      const profilePayload = {
+        id: authUser.id,
+        role: resolvedRole,
+        email: authUser.email || loginEmail,
+        full_name: authUser.user_metadata?.full_name || authUser.user_metadata?.name || null,
+        institute: authUser.user_metadata?.institute || null,
+      };
+
+      const { error: upsertError } = await supabase.from("profiles").upsert(profilePayload);
+
+      if (upsertError) {
+        throw upsertError;
+      }
+
+      await supabase.auth.updateUser({
+        data: {
+          role: resolvedRole,
+          ...(profilePayload.full_name ? { full_name: profilePayload.full_name } : {}),
+          ...(profilePayload.institute ? { institute: profilePayload.institute } : {}),
+        },
+      });
+    }
+
+    return resolvedRole;
   };
 
   const handleLogin = async (event) => {
@@ -158,7 +204,7 @@ export default function AuthAccessPage({
     if (error) {
       const errorMessage = error.message || "";
       const shouldSuggestSignup =
-        role === "student" &&
+        role === "learner" &&
         /invalid login credentials|invalid credentials|email not confirmed/i.test(errorMessage);
 
       showMessage(
@@ -172,7 +218,31 @@ export default function AuthAccessPage({
       return;
     }
 
-    const actualRole = await resolveAccountRole(data.user);
+    let actualRole = null;
+
+    try {
+      actualRole = await resolveAccountRole(data.user);
+    } catch (roleError) {
+      if (role === "admin") {
+        await supabase.auth.signOut();
+        showMessage("error", roleError?.message || copy.profileLoadError);
+        setRoleCheckInProgress(false);
+        setLoginLoading(false);
+        return;
+      }
+
+      actualRole = normalizeRole(data.user?.user_metadata?.role ?? role);
+
+      try {
+        await supabase.auth.updateUser({
+          data: {
+            role: actualRole,
+          },
+        });
+      } catch (_metadataError) {
+        // A metadata refresh is useful, but learner/instructor login should not get stuck on it.
+      }
+    }
 
     if (!actualRole) {
       await supabase.auth.signOut();
@@ -185,11 +255,11 @@ export default function AuthAccessPage({
       return;
     }
 
-    if (actualRole !== role) {
+    if (actualRole !== normalizeRole(role)) {
       await supabase.auth.signOut();
       showMessage(
         "error",
-        formatCopy(copy.wrongRole, { role: actualRole })
+        formatCopy(copy.wrongRole, { role: getVisibleRoleLabel(actualRole) })
       );
       setRoleCheckInProgress(false);
       setLoginLoading(false);
@@ -198,8 +268,8 @@ export default function AuthAccessPage({
 
     showMessage("success", copy.loginSuccess);
     setRoleCheckInProgress(false);
-    navigate(getDashboardPath(actualRole), { replace: true });
     setLoginLoading(false);
+    navigate(getDashboardPath(actualRole), { replace: true });
   };
 
   const handleForgotPassword = async () => {
@@ -485,7 +555,7 @@ export default function AuthAccessPage({
         <div
           className="oman-hero overflow-hidden rounded-[1.75rem] px-6 py-10 text-white shadow-xl sm:px-8 sm:py-12"
           style={{
-            backgroundImage: `url(${role === "tutor" ? themeImages.heroFort : themeImages.studentsGroup})`,
+            backgroundImage: `url(${role === "instructor" ? themeImages.heroFort : themeImages.studentsGroup})`,
           }}
         >
           <div className="grid items-center gap-6 lg:grid-cols-[1.05fr_0.95fr]">
@@ -505,11 +575,11 @@ export default function AuthAccessPage({
                 <img
                   src={
                     accessImage ||
-                    (role === "tutor" ? themeImages.mountainFort : themeImages.studentsStudyHall)
+                    (role === "instructor" ? themeImages.mountainFort : themeImages.studentsStudyHall)
                   }
                   alt={
                     accessImageAlt ||
-                    (role === "tutor"
+                    (role === "instructor"
                       ? "Traditional Omani fort scenery"
                       : "Students in a quiet study space")
                   }
@@ -557,6 +627,8 @@ export default function AuthAccessPage({
           </div>
         )}
       </section>
+
+      {landingContent}
 
       <section
         className={[

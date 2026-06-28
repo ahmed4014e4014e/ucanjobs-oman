@@ -1,6 +1,6 @@
 import { isSupabaseConfigured, supabase } from "./supabase";
 
-const TUTOR_APPLICANT_BUCKET = "tutor-applicant-attachments";
+const INSTRUCTOR_APPLICANT_BUCKET = "instructor-applicant-attachments";
 
 function ensureSupabase() {
   if (!isSupabaseConfigured || !supabase) {
@@ -8,11 +8,11 @@ function ensureSupabase() {
   }
 }
 
-export async function createTutorApplicant(payload) {
+export async function createInstructorApplicant(payload) {
   ensureSupabase();
 
   const { data, error } = await supabase
-    .from("tutor_applicants")
+    .from("instructor_applicants")
     .insert(payload)
     .select("*")
     .single();
@@ -24,11 +24,11 @@ export async function createTutorApplicant(payload) {
   return data;
 }
 
-export async function fetchTutorApplicants() {
+export async function fetchInstructorApplicants() {
   ensureSupabase();
 
   const { data, error } = await supabase
-    .from("tutor_applicants")
+    .from("instructor_applicants")
     .select("*")
     .order("submitted_at", { ascending: false })
     .order("created_at", { ascending: false });
@@ -40,7 +40,7 @@ export async function fetchTutorApplicants() {
   return data ?? [];
 }
 
-export async function updateTutorApplicantStatus(applicantId, status) {
+export async function updateInstructorApplicantStatus(applicantId, status) {
   ensureSupabase();
 
   const nextValues = {
@@ -52,7 +52,7 @@ export async function updateTutorApplicantStatus(applicantId, status) {
   };
 
   const { data, error } = await supabase
-    .from("tutor_applicants")
+    .from("instructor_applicants")
     .update(nextValues)
     .eq("id", applicantId)
     .select("*")
@@ -65,7 +65,7 @@ export async function updateTutorApplicantStatus(applicantId, status) {
   return data;
 }
 
-export async function uploadTutorApplicantAttachments(files) {
+export async function uploadInstructorApplicantAttachments(files) {
   ensureSupabase();
 
   if (!Array.isArray(files) || files.length === 0) {
@@ -76,10 +76,10 @@ export async function uploadTutorApplicantAttachments(files) {
 
   for (const file of files) {
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const uniquePath = `tutor-applicants/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+    const uniquePath = `instructor-applicants/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
 
     const { error } = await supabase.storage
-      .from(TUTOR_APPLICANT_BUCKET)
+      .from(INSTRUCTOR_APPLICANT_BUCKET)
       .upload(uniquePath, file, { upsert: false });
 
     if (error) {
@@ -97,4 +97,4 @@ export async function uploadTutorApplicantAttachments(files) {
   return uploads;
 }
 
-export { TUTOR_APPLICANT_BUCKET };
+export { INSTRUCTOR_APPLICANT_BUCKET };

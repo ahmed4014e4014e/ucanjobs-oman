@@ -5,26 +5,6 @@ import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { getDashboardPath, getUserRole } from "../lib/authRouting";
 
-function LanguageToggle({ compact = false }) {
-  const { isArabic, t, toggleLanguage } = useLanguage();
-  const label = isArabic ? t("language.switchToEnglish") : t("language.switchToArabic");
-
-  return (
-    <button
-      type="button"
-      onClick={toggleLanguage}
-      className={[
-        "inline-flex items-center justify-center rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,252,247,0.86)] font-semibold text-[var(--oman-terracotta-dark)] transition hover:bg-[rgba(197,154,68,0.12)]",
-        compact ? "px-4 py-3 text-base" : "px-3 py-2 text-sm",
-      ].join(" ")}
-      aria-label={label}
-      title={label}
-    >
-      {isArabic ? "EN" : "عربي"}
-    </button>
-  );
-}
-
 function ScrollToTopOnRouteChange() {
   const location = useLocation();
 
@@ -33,6 +13,22 @@ function ScrollToTopOnRouteChange() {
   }, [location.pathname]);
 
   return null;
+}
+
+function getVisibleRoleLabel(role, t) {
+  if (role === "student" || role === "learner") {
+    return t("roles.learner");
+  }
+
+  if (role === "tutor" || role === "instructor") {
+    return t("roles.instructor");
+  }
+
+  if (role === "admin") {
+    return t("roles.admin");
+  }
+
+  return t("roles.member");
 }
 
 export default function Navbar() {
@@ -51,8 +47,8 @@ export default function Navbar() {
     { name: t("nav.policies"), to: "/terms/" },
   ];
   const guestLinks = [
-    { name: t("nav.studentAccess"), to: "/student-access/" },
-    { name: t("nav.tutorAccess"), to: "/tutor-access/" },
+    { name: t("nav.studentAccess"), to: "/learner-access/" },
+    { name: t("nav.tutorAccess"), to: "/instructor-access/" },
     { name: t("nav.adminAccess"), to: "/admin-access/" },
   ];
   const memberLinks = [{ name: t("nav.dashboard"), to: getDashboardPath(role) }];
@@ -109,7 +105,7 @@ export default function Navbar() {
           <div className="hidden items-center gap-4 lg:flex xl:gap-6">
             {user && (
               <div className="rounded-full border border-[rgba(197,154,68,0.24)] bg-[rgba(197,154,68,0.12)] px-4 py-2 text-sm font-medium capitalize text-[var(--oman-terracotta-dark)]">
-                {profile?.role || t("roles.member")}
+                {getVisibleRoleLabel(role, t)}
               </div>
             )}
 
@@ -132,11 +128,9 @@ export default function Navbar() {
                 {t("nav.logout")}
               </button>
             )}
-            <LanguageToggle />
           </div>
 
           <div className="flex items-center gap-2 lg:hidden">
-            <LanguageToggle />
             <button
               type="button"
               onClick={() => setOpen((value) => !value)}

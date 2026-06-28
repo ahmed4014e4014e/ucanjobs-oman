@@ -1,4 +1,4 @@
-export function extractTutoringRequestTitle(request) {
+export function extractLearningRequestTitle(request) {
   const requestBody = request?.topics_needed_help_with;
 
   if (typeof requestBody === "string") {

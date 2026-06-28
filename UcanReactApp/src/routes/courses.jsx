@@ -1,17 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
-import { courseCatalog, courseCategories } from "../lib/courseCatalog";
+import { courseCatalog } from "../lib/courseCatalog";
 import { fetchPublishedCourses } from "../lib/courseApi";
 import { themeImages } from "../lib/themeImages";
 
 const FILTER_ALL = "All";
+const UCAN_COURSE_CATEGORIES = [
+  "Frontend Development",
+  "Backend Development",
+  "Full Stack Development",
+  "AI and Machine Learning",
+  "Cyber Security",
+  "Data Analytics",
+  "Cloud and DevOps",
+  "Job Readiness",
+];
 
 const initialFilters = {
   category: FILTER_ALL,
   level: FILTER_ALL,
-  relevance: FILTER_ALL,
-  careerPath: FILTER_ALL,
   price: FILTER_ALL,
   language: FILTER_ALL,
 };
@@ -53,6 +61,39 @@ function getCourseCareerPath(course) {
   return "General Tech Skills";
 }
 
+function getCourseCategory(course) {
+  const slug = course.slug || "";
+  const category = course.category || "";
+  const title = course.en?.title || "";
+  const searchableText = `${slug} ${category} ${title}`.toLowerCase();
+
+  if (searchableText.includes("frontend")) return "Frontend Development";
+  if (searchableText.includes("backend")) return "Backend Development";
+  if (searchableText.includes("full stack") || searchableText.includes("full-stack")) {
+    return "Full Stack Development";
+  }
+  if (
+    searchableText.includes("machine learning") ||
+    searchableText.includes("artificial intelligence") ||
+    searchableText.includes("applied-ai") ||
+    searchableText.includes(" ai ")
+  ) {
+    return "AI and Machine Learning";
+  }
+  if (searchableText.includes("cyber")) return "Cyber Security";
+  if (searchableText.includes("data")) return "Data Analytics";
+  if (searchableText.includes("cloud") || searchableText.includes("devops")) return "Cloud and DevOps";
+  if (
+    searchableText.includes("job") ||
+    searchableText.includes("career") ||
+    searchableText.includes("readiness")
+  ) {
+    return "Job Readiness";
+  }
+
+  return category || "General Tech Skills";
+}
+
 function getCourseRelevance(course) {
   const careerPath = getCourseCareerPath(course);
 
@@ -67,9 +108,9 @@ function getCourseRelevance(course) {
   return "Graduate employability";
 }
 
-function buildCourseFilterMeta(course, isArabic) {
+function buildCourseFilterMeta(course) {
   return {
-    category: isArabic ? course.categoryAr || course.category : course.category,
+    category: getCourseCategory(course),
     level: course.level,
     relevance: getCourseRelevance(course),
     careerPath: getCourseCareerPath(course),
@@ -78,48 +119,49 @@ function buildCourseFilterMeta(course, isArabic) {
   };
 }
 
-function getFilterOptions(courses, filterKey, isArabic) {
-  const values = courses
-    .map((course) => buildCourseFilterMeta(course, isArabic)[filterKey])
-    .filter(Boolean);
+function getFilterOptions(courses, filterKey) {
+  const values = courses.map((course) => buildCourseFilterMeta(course)[filterKey]).filter(Boolean);
+  const baseOptions = filterKey === "category" ? UCAN_COURSE_CATEGORIES : [];
 
-  return [FILTER_ALL, ...Array.from(new Set(values)).sort((left, right) => left.localeCompare(right))];
+  return [
+    FILTER_ALL,
+    ...Array.from(new Set([...baseOptions, ...values])).sort((left, right) =>
+      left.localeCompare(right)
+    ),
+  ];
 }
 
 export default function Courses() {
-  const { isArabic, t } = useLanguage();
-  const locale = isArabic ? "ar" : "en";
+  const { t } = useLanguage();
   const [courses, setCourses] = useState(courseCatalog);
   const [filters, setFilters] = useState(initialFilters);
   const [loadingCourses, setLoadingCourses] = useState(true);
   const [courseLoadMessage, setCourseLoadMessage] = useState("");
   const categories = useMemo(() => {
-    const labels = courses.map((course) => (isArabic ? course.categoryAr || course.category : course.category));
+    const labels = courses.map((course) => getCourseCategory(course));
     const uniqueLabels = Array.from(new Set(labels.filter(Boolean)));
 
-    return uniqueLabels.length ? uniqueLabels : courseCategories;
-  }, [courses, isArabic]);
+    return Array.from(new Set([...UCAN_COURSE_CATEGORIES, ...uniqueLabels]));
+  }, [courses]);
   const filterOptions = useMemo(
     () => ({
-      category: getFilterOptions(courses, "category", isArabic),
-      level: getFilterOptions(courses, "level", isArabic),
-      relevance: getFilterOptions(courses, "relevance", isArabic),
-      careerPath: getFilterOptions(courses, "careerPath", isArabic),
-      price: getFilterOptions(courses, "price", isArabic),
-      language: getFilterOptions(courses, "language", isArabic),
+      category: getFilterOptions(courses, "category"),
+      level: getFilterOptions(courses, "level"),
+      price: getFilterOptions(courses, "price"),
+      language: getFilterOptions(courses, "language"),
     }),
-    [courses, isArabic]
+    [courses]
   );
   const filteredCourses = useMemo(
     () =>
       courses.filter((course) => {
-        const meta = buildCourseFilterMeta(course, isArabic);
+        const meta = buildCourseFilterMeta(course);
 
         return Object.entries(filters).every(
           ([key, value]) => value === FILTER_ALL || meta[key] === value
         );
       }),
-    [courses, filters, isArabic]
+    [courses, filters]
   );
   const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
 
@@ -152,9 +194,7 @@ export default function Courses() {
         setCourseLoadMessage(
           nextCourses.some((course) => course.source === "database")
             ? ""
-            : isArabic
-              ? "يتم عرض كتالوج البداية حالياً."
-              : "Showing the starter catalog for now."
+            : "Showing the starter catalog for now."
         );
       } catch (error) {
         if (!active) {
@@ -163,11 +203,7 @@ export default function Courses() {
 
         console.error("Course catalog load failed:", error);
         setCourses(courseCatalog);
-        setCourseLoadMessage(
-          isArabic
-            ? "يتم عرض كتالوج البداية حالياً إلى أن تتوفر بيانات الدورات."
-            : "Showing the starter catalog until live course data is available."
-        );
+        setCourseLoadMessage("Showing the starter catalog until live course data is available.");
       } finally {
         if (active) {
           setLoadingCourses(false);
@@ -180,7 +216,7 @@ export default function Courses() {
     return () => {
       active = false;
     };
-  }, [isArabic]);
+  }, []);
 
   return (
     <main className="oman-page min-h-screen text-slate-900">
@@ -192,17 +228,14 @@ export default function Courses() {
           <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
             <div className="text-center lg:text-left">
               <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-                {isArabic ? "كتالوج الدورات" : "Course Catalog"}
+                Course Catalog
               </p>
               <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:mx-0 lg:text-5xl">
-                {isArabic
-                  ? "دورات عملية مبنية حول مهارات التوظيف التقني في عُمان."
-                  : "Practical courses built around Oman’s technology employment needs."}
+                Practical courses built around Oman&apos;s technology employment needs.
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#f4e8d6] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
-                {isArabic
-                  ? "هذه هي البنية الأولى لسوق دورات يوكان. في المراحل القادمة ستأتي هذه الدورات من database مع التسجيل والدفع وتتبع التقدم."
-                  : "This is the first structure for the Ucan course marketplace. In later phases, these courses will come from database with enrollment, payments, and progress tracking."}
+                This is the first structure for the Ucan course marketplace. In later phases,
+                these courses will come from database with enrollment, payments, and progress tracking.
               </p>
             </div>
 
@@ -211,9 +244,7 @@ export default function Courses() {
                 <img src={themeImages.studentsStudyHall} alt="Learners studying online" />
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
-                {isArabic
-                  ? "ابدأ بفئات تقنية مطلوبة، ثم وسعها لاحقاً باستخدام بيانات السوق والذكاء الاصطناعي."
-                  : "Start with high-demand tech categories, then expand them later using market data and AI."}
+                Start with high-demand tech categories, then expand them later using market data and AI.
               </p>
             </div>
           </div>
@@ -255,8 +286,6 @@ export default function Courses() {
             {[
               ["category", "Category"],
               ["level", "Level"],
-              ["relevance", "University/graduate relevance"],
-              ["careerPath", "Career path"],
               ["price", "Price"],
               ["language", "Language"],
             ].map(([key, label]) => (
@@ -286,33 +315,23 @@ export default function Courses() {
 
         {(loadingCourses || courseLoadMessage) && (
           <div className="mt-6 rounded-2xl bg-[rgba(255,252,247,0.9)] px-4 py-3 text-sm font-semibold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.1)]">
-            {loadingCourses
-              ? isArabic
-                ? "جاري تحميل الدورات..."
-                : "Loading courses..."
-              : courseLoadMessage}
+            {loadingCourses ? "Loading courses..." : courseLoadMessage}
           </div>
         )}
 
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
           {filteredCourses.map((course) => {
-            const content = course[locale] || course.en;
-            const meta = buildCourseFilterMeta(course, isArabic);
+            const content = course.en;
+            const meta = buildCourseFilterMeta(course);
 
             return (
               <article key={course.slug} className="rounded-[1.75rem] oman-card p-6 sm:p-8">
                 <div className="flex flex-wrap gap-2">
                   <span className="oman-chip rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em]">
-                    {isArabic ? course.categoryAr || course.category : course.category}
+                    {meta.category}
                   </span>
                   <span className="rounded-full bg-[rgba(255,252,247,0.95)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.12)]">
                     {course.level}
-                  </span>
-                  <span className="rounded-full bg-[rgba(244,232,214,0.48)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.1)]">
-                    {meta.careerPath}
-                  </span>
-                  <span className="rounded-full bg-[rgba(244,232,214,0.48)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.1)]">
-                    {meta.relevance}
                   </span>
                 </div>
 
@@ -343,7 +362,7 @@ export default function Courses() {
                   to={`/courses/${course.slug}/`}
                   className="oman-button-primary mt-6 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition sm:w-auto"
                 >
-                  {isArabic ? "عرض تفاصيل الدورة" : "View Course Details"}
+                  View Course Details
                 </Link>
               </article>
             );

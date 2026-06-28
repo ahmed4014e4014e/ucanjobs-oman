@@ -13,7 +13,7 @@ export const courseCatalog = [
     level: "Beginner to Intermediate",
     price: "29 OMR",
     duration: "8 weeks",
-    language: "English + Arabic support",
+    language: "English",
     en: {
       title: "Frontend Engineering For Omani Graduates",
       subtitle: "Build modern web interfaces with HTML, CSS, JavaScript, React, and portfolio projects.",
@@ -29,23 +29,6 @@ export const courseCatalog = [
         "JavaScript fundamentals for real interfaces",
         "React components, routing, and state",
         "Portfolio project and deployment workflow",
-      ],
-    },
-    ar: {
-      title: "هندسة الواجهات الأمامية للخريجين في عُمان",
-      subtitle: "بناء واجهات ويب حديثة باستخدام HTML وCSS وJavaScript وReact ومشاريع عملية.",
-      summary:
-        "مسار عملي للواجهات الأمامية للخريجين الذين يحتاجون إلى مهارات تطوير ويب أقوى قبل التقديم على وظائف برمجية للمبتدئين.",
-      outcomes: [
-        "بناء صفحات متجاوبة ومكونات React",
-        "فهم أساسيات المتصفح وJavaScript الحديثة",
-        "إنشاء مشاريع عملية لملف التقديم الوظيفي",
-      ],
-      modules: [
-        "أساسيات HTML وCSS والتصميم المتجاوب",
-        "أساسيات JavaScript للواجهات العملية",
-        "مكونات React والتوجيه وإدارة الحالة",
-        "مشروع عملي ونشره",
       ],
     },
   },
@@ -73,23 +56,6 @@ export const courseCatalog = [
         "Storage, uploads, and production checks",
       ],
     },
-    ar: {
-      title: "تطوير واجهات Backend API باستخدام database",
-      subtitle: "تعلم قواعد البيانات والمصادقة والتخزين وسير عمل API من خلال تطبيق عملي.",
-      summary:
-        "دورة خلفية تركز على المهارات التي يحتاجها المطور المبتدئ للتعامل مع البيانات والمستخدمين والوصول الآمن.",
-      outcomes: [
-        "تصميم الجداول العلائقية وسير عمل API",
-        "استخدام المصادقة والصلاحيات بأمان",
-        "ربط تطبيقات الواجهة بخدمات الخلفية",
-      ],
-      modules: [
-        "أساسيات بنية Backend",
-        "الجداول والعلاقات والاستعلامات",
-        "المصادقة والأدوار والسياسات",
-        "التخزين ورفع الملفات وفحوصات الإنتاج",
-      ],
-    },
   },
   {
     slug: "applied-ai-for-business-and-productivity",
@@ -97,7 +63,7 @@ export const courseCatalog = [
     level: "Beginner",
     price: "25 OMR",
     duration: "5 weeks",
-    language: "English + Arabic support",
+    language: "English",
     en: {
       title: "Applied AI For Business And Productivity",
       subtitle: "Use AI tools responsibly for research, automation, writing, analysis, and workplace productivity.",
@@ -113,23 +79,6 @@ export const courseCatalog = [
         "Prompting for research and productivity",
         "AI-assisted analysis and automation",
         "Risks, privacy, and responsible use",
-      ],
-    },
-    ar: {
-      title: "الذكاء الاصطناعي التطبيقي للأعمال والإنتاجية",
-      subtitle: "استخدم أدوات AI بمسؤولية للبحث والأتمتة والكتابة والتحليل والإنتاجية.",
-      summary:
-        "دورة عملية في الثقافة الذكية للمتعلمين الذين يريدون مهارات AI مفيدة دون الحاجة إلى رياضيات متقدمة أولاً.",
-      outcomes: [
-        "استخدام أدوات AI في مهام عمل منظمة",
-        "كتابة prompts أفضل ومراجعة مخرجات AI",
-        "فهم الاستخدام المسؤول والآمن للذكاء الاصطناعي",
-      ],
-      modules: [
-        "أساسيات AI لغير المتخصصين",
-        "التوجيه الذكي للبحث والإنتاجية",
-        "التحليل والأتمتة بمساعدة AI",
-        "المخاطر والخصوصية والاستخدام المسؤول",
       ],
     },
   },
@@ -157,23 +106,6 @@ export const courseCatalog = [
         "Governance, risk, and incident thinking",
       ],
     },
-    ar: {
-      title: "أساسيات الأمن السيبراني للأدوار المبتدئة",
-      subtitle: "تعلم أساسيات الأمن والتفكير بالمخاطر والدفاعيات وسير العمل للمبتدئين.",
-      summary:
-        "دورة تأسيسية للمتعلمين المهتمين بأدوار الدعم الأمني أو SOC أو الحوكمة أو أمن تقنية المعلومات.",
-      outcomes: [
-        "فهم التهديدات والضوابط الشائعة",
-        "قراءة التنبيهات والسجلات الأساسية",
-        "شرح المخاطر والسياسات والسلوك الآمن",
-      ],
-      modules: [
-        "مبادئ الأمن ومشهد التهديدات",
-        "أساسيات الشبكات والهوية والوصول",
-        "أساسيات المراقبة الدفاعية",
-        "الحوكمة والمخاطر والتعامل مع الحوادث",
-      ],
-    },
   },
   {
     slug: "data-analytics-with-excel-sql-and-dashboards",
@@ -181,7 +113,7 @@ export const courseCatalog = [
     level: "Beginner to Intermediate",
     price: "30 OMR",
     duration: "6 weeks",
-    language: "English + Arabic support",
+    language: "English",
     en: {
       title: "Data Analytics With Excel, SQL, And Dashboards",
       subtitle: "Turn raw data into useful reports, dashboards, and business insights.",
@@ -199,23 +131,6 @@ export const courseCatalog = [
         "Portfolio analytics case study",
       ],
     },
-    ar: {
-      title: "تحليل البيانات باستخدام Excel وSQL ولوحات المعلومات",
-      subtitle: "حوّل البيانات الخام إلى تقارير ولوحات معلومات ورؤى عملية.",
-      summary:
-        "مسار تحليلات بيانات موجه للوظائف للمتعلمين الذين يريدون مهارات تقارير ودعم قرارات عملية.",
-      outcomes: [
-        "تنظيف وتحليل البيانات في Excel",
-        "كتابة استعلامات SQL مفيدة",
-        "بناء تقارير ولوحات معلومات وشرح الرؤى",
-      ],
-      modules: [
-        "تنظيف البيانات وتحليل الجداول",
-        "استعلامات SQL لأسئلة الأعمال",
-        "الرسوم ولوحات المعلومات وسرد النتائج",
-        "دراسة حالة عملية للملف المهني",
-      ],
-    },
   },
   {
     slug: "graduate-tech-job-readiness",
@@ -223,7 +138,7 @@ export const courseCatalog = [
     level: "Beginner",
     price: "18 OMR",
     duration: "4 weeks",
-    language: "English + Arabic support",
+    language: "English",
     en: {
       title: "Graduate Tech Job Readiness",
       subtitle: "Prepare your CV, portfolio, interviews, LinkedIn, and junior tech role strategy.",
@@ -239,23 +154,6 @@ export const courseCatalog = [
         "Portfolio and GitHub presentation",
         "Interview preparation and communication",
         "Oman tech job search strategy",
-      ],
-    },
-    ar: {
-      title: "الجاهزية الوظيفية للخريجين في التقنية",
-      subtitle: "جهز السيرة الذاتية والملف العملي والمقابلات وLinkedIn واستراتيجية البحث عن وظيفة تقنية.",
-      summary:
-        "دورة جاهزية مهنية للخريجين الذين يحتاجون إلى عرض مهاراتهم بوضوح أكبر لأصحاب العمل.",
-      outcomes: [
-        "تحسين السيرة الذاتية وملف LinkedIn",
-        "الاستعداد للمقابلات التقنية للمبتدئين",
-        "تخطيط بحث واقعي عن وظيفة تقنية مبتدئة",
-      ],
-      modules: [
-        "السيرة الذاتية وLinkedIn لخريجي التقنية",
-        "عرض الملف العملي وGitHub",
-        "الاستعداد للمقابلات والتواصل",
-        "استراتيجية البحث عن وظائف تقنية في عُمان",
       ],
     },
   },

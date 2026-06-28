@@ -1,25 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import ActionFeedback from "../components/ActionFeedback";
-import { useAuth } from "../context/AuthContext";
-import { useLanguage } from "../context/LanguageContext";
+import {
+  fetchAdminLearningRequests,
+  updateLearningRequestStatus,
+} from "../lib/learningRequestsApi";
 import { downloadStorageAttachment } from "../lib/adminDownloads";
 import AdminAttachmentDownloadList from "../components/AdminAttachmentDownloadList";
-import {
-  fetchTutorTutoringRequests,
-  updateTutoringRequestStatus,
-} from "../lib/tutoringApi";
 import {
   formatStatusLabel,
   isDashboardArchivedStatus,
   normalizeStatus,
   TUTORING_STATUS_OPTIONS,
 } from "../lib/requestStatuses";
-import { extractTutoringRequestTitle } from "../lib/tutoringRequestMeta";
+import { extractLearningRequestTitle } from "../lib/learningRequestMeta";
 
 function formatSubmittedAt(value) {
   if (!value) {
-    return null;
+    return "Unknown";
   }
 
   return new Date(value).toLocaleString("en-OM", {
@@ -31,22 +29,12 @@ function formatSubmittedAt(value) {
   });
 }
 
-function formatCopy(template, values) {
-  return Object.entries(values).reduce(
-    (text, [key, value]) => text.replaceAll(`{${key}}`, value),
-    template
-  );
-}
-
-export default function TutorTutoringRequests() {
-  const { user } = useAuth();
-  const { t } = useLanguage();
-  const copy = t("records");
-  const page = copy.tutoring;
+export default function AdminLearningRequests() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeRequest, setActiveRequest] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
   const [feedback, setFeedback] = useState({
     type: "idle",
     message: "",
@@ -59,24 +47,18 @@ export default function TutorTutoringRequests() {
     let ignore = false;
 
     const loadRequests = async () => {
-      if (!user?.id) {
-        setRequests([]);
-        setLoading(false);
-        return;
-      }
-
       setLoading(true);
       setError("");
 
       try {
-        const results = await fetchTutorTutoringRequests(user.id);
+        const results = await fetchAdminLearningRequests();
 
         if (!ignore) {
           setRequests(results);
         }
       } catch (fetchError) {
         if (!ignore) {
-          setError(fetchError.message || page.fetchError);
+          setError(fetchError.message || "Unable to load tutoring requests right now.");
         }
       } finally {
         if (!ignore) {
@@ -90,7 +72,7 @@ export default function TutorTutoringRequests() {
     return () => {
       ignore = true;
     };
-  }, [user?.id]);
+  }, []);
 
   useEffect(() => {
     if (!activeRequest) {
@@ -127,13 +109,23 @@ export default function TutorTutoringRequests() {
       pendingRequests: visibleRequests.filter(
         (request) => normalizeStatus(request.status) === "pending"
       ).length,
-      privateRequests: visibleRequests.filter((request) => request.session_type === "private").length,
+      requestInstitutes: new Set(
+        visibleRequests.map((request) => request.institute_name_snapshot).filter(Boolean)
+      ).size,
     };
   }, [visibleRequests]);
 
+  const filteredRequests = useMemo(() => {
+    if (statusFilter === "all") {
+      return visibleRequests;
+    }
+
+    return visibleRequests.filter((request) => normalizeStatus(request.status) === statusFilter);
+  }, [statusFilter, visibleRequests]);
+
   const getRequestHeading = (request) => {
-    const courseCode = request.course?.code || page.courseFallback;
-    const requestTitle = extractTutoringRequestTitle(request);
+    const courseCode = request.course?.code || "Course";
+    const requestTitle = extractLearningRequestTitle(request);
 
     return requestTitle ? `${courseCode} - ${requestTitle}` : courseCode;
   };
@@ -152,12 +144,12 @@ export default function TutorTutoringRequests() {
       await downloadStorageAttachment({ bucket, path, fileName });
       setFeedback({
         type: "success",
-        message: formatCopy(copy.downloaded, { fileName: fileName || copy.attachment }),
+        message: `Downloaded ${fileName || "attachment"} successfully.`,
       });
     } catch (downloadError) {
       setFeedback({
         type: "error",
-        message: downloadError.message || copy.downloadError,
+        message: downloadError.message || "Unable to download this attachment right now.",
       });
     } finally {
       setDownloadingPaths((current) => ({
@@ -179,32 +171,31 @@ export default function TutorTutoringRequests() {
     });
 
     try {
-      const updatedRequest = await updateTutoringRequestStatus(activeRequest.id, statusDraft);
-      const mergedRequest = {
-        ...activeRequest,
+      const updatedRequest = await updateLearningRequestStatus(activeRequest.id, statusDraft);
+      const normalizedRequest = {
         ...updatedRequest,
         status: normalizeStatus(updatedRequest.status),
       };
 
-      if (isDashboardArchivedStatus(mergedRequest.status)) {
+      if (isDashboardArchivedStatus(normalizedRequest.status)) {
         setRequests((current) =>
-          current.filter((request) => request.id !== mergedRequest.id)
+          current.filter((request) => request.id !== normalizedRequest.id)
         );
         setActiveRequest(null);
       } else {
         setRequests((current) =>
-          current.map((request) => (request.id === mergedRequest.id ? mergedRequest : request))
+          current.map((request) => (request.id === normalizedRequest.id ? normalizedRequest : request))
         );
-        setActiveRequest(mergedRequest);
+        setActiveRequest(normalizedRequest);
       }
       setFeedback({
         type: "success",
-        message: formatCopy(page.statusSaved, { status: formatStatusLabel(statusDraft) }),
+        message: `Tutoring request marked as ${formatStatusLabel(statusDraft)}.`,
       });
     } catch (statusError) {
       setFeedback({
         type: "error",
-        message: statusError.message || page.statusError,
+        message: statusError.message || "Unable to update this tutoring request status right now.",
       });
     } finally {
       setStatusSaving(false);
@@ -218,77 +209,114 @@ export default function TutorTutoringRequests() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                {page.kicker}
+                Admin Records
               </p>
               <h1 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-                {page.title}
+                Submitted Tutoring Requests
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
-                {page.description}
+                Review learner course requests and download submitted files directly from this page.
               </p>
             </div>
             <Link
-              to="/tutor-dashboard/"
+              to="/admin-dashboard/"
               className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
             >
-              {page.back}
+              Back to Admin Dashboard
             </Link>
           </div>
 
           <ActionFeedback
             type={feedback.type}
             message={feedback.message}
-            title={page.feedbackTitle}
+            title="Tutoring records update"
             className="mt-6"
           />
 
           <div className="mt-8 grid grid-cols-3 gap-3 text-center">
             <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-3 py-3">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-                {copy.total}
+                Total
               </p>
               <p className="mt-2 text-xl font-bold text-[var(--oman-ink)]">{stats.totalRequests}</p>
             </div>
             <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-3 py-3">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-                {copy.pending}
+                Pending
               </p>
               <p className="mt-2 text-xl font-bold text-[var(--oman-ink)]">{stats.pendingRequests}</p>
             </div>
             <div className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-3 py-3">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-                {copy.private}
+                Institutes
               </p>
-              <p className="mt-2 text-xl font-bold text-[var(--oman-ink)]">{stats.privateRequests}</p>
+              <p className="mt-2 text-xl font-bold text-[var(--oman-ink)]">{stats.requestInstitutes}</p>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-3xl oman-outline-panel p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
+                  Request Workflow
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/75">
+                  Review pending tutoring requests first, then move them through reviewed,
+                  scheduled, completed, or cancelled as each case progresses.
+                </p>
+              </div>
+              <label className="flex flex-col gap-2 lg:min-w-56">
+                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
+                  Filter by status
+                </span>
+                <select
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value)}
+                  className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
+                >
+                  <option value="all">All statuses</option>
+                  {TUTORING_STATUS_OPTIONS.map((statusOption) => (
+                    <option key={statusOption} value={statusOption}>
+                      {formatStatusLabel(statusOption)}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
           </div>
 
           {loading ? (
             <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
-              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
-                {page.loadingTitle}
-              </h3>
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">Loading tutoring requests...</h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                {page.loadingText}
+                Fetching the latest learner course submissions from database.
               </p>
             </div>
           ) : error ? (
             <div className="mt-8 rounded-3xl border border-[rgba(155,77,49,0.22)] bg-[rgba(255,239,232,0.95)] p-6 text-[var(--oman-terracotta-dark)]">
-              <h3 className="text-xl font-semibold">{page.errorTitle}</h3>
+              <h3 className="text-xl font-semibold">Unable to load tutoring requests</h3>
               <p className="mt-4 leading-7">{error}</p>
             </div>
           ) : visibleRequests.length === 0 ? (
             <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No active tutoring requests</h3>
+              <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
+                Completed and cancelled tutoring requests are hidden from the dashboard, but still
+                kept in database.
+              </p>
+            </div>
+          ) : filteredRequests.length === 0 ? (
+            <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
               <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
-                {page.emptyTitle}
+                No {formatStatusLabel(statusFilter).toLowerCase()} tutoring requests
               </h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                {page.emptyText}
+                Try another status filter to continue handling tutoring workflows.
               </p>
             </div>
           ) : (
             <div className="mt-8 grid gap-4">
-              {visibleRequests.map((request) => (
+              {filteredRequests.map((request) => (
                 <button
                   key={request.id}
                   type="button"
@@ -301,10 +329,11 @@ export default function TutorTutoringRequests() {
                         {getRequestHeading(request)}
                       </h3>
                       <p className="mt-2 text-sm text-[var(--oman-ink)]/70">
-                        {formatCopy(page.studentLine, {
-                          name: request.student?.full_name || copy.notProvidedStudent,
-                          email: request.student?.email || copy.noEmail,
-                        })}
+                        Learner{" "}
+                        <span className="font-semibold">
+                          {request.learner?.full_name || "Unknown learner"}
+                        </span>{" "}
+                        via {request.learner?.email || "No email"}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -317,23 +346,22 @@ export default function TutorTutoringRequests() {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid gap-2 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
+                  <div className="mt-4 grid gap-2 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2 lg:grid-cols-3">
                     <p>
-                      <span className="font-semibold text-[var(--oman-ink)]">{page.studentInstitute}</span>{" "}
-                      {request.institute_name_snapshot || request.student?.institute || copy.notProvided}
+                      <span className="font-semibold text-[var(--oman-ink)]">Institute:</span>{" "}
+                      {request.institute_name_snapshot || request.learner?.institute || "Not provided"}
                     </p>
                     <p>
-                      <span className="font-semibold text-[var(--oman-ink)]">{copy.submitted}</span>{" "}
-                      {formatSubmittedAt(request.created_at) || copy.unknown}
+                      <span className="font-semibold text-[var(--oman-ink)]">Instructor:</span>{" "}
+                      {request.instructor?.display_name || "Unknown instructor"}
                     </p>
                     <p>
-                      <span className="font-semibold text-[var(--oman-ink)]">{copy.attachments}</span>{" "}
-                      {Array.isArray(request.attachment_files) ? request.attachment_files.length : 0}
+                      <span className="font-semibold text-[var(--oman-ink)]">Submitted:</span>{" "}
+                      {formatSubmittedAt(request.created_at)}
                     </p>
                   </div>
-
                   <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
-                    {page.openHint}
+                    Click to open this tutoring request in a separate popup window.
                   </p>
                 </button>
               ))}
@@ -349,13 +377,13 @@ export default function TutorTutoringRequests() {
               type="button"
               onClick={() => setActiveRequest(null)}
               className="absolute right-4 top-4 rounded-full bg-[rgba(197,154,68,0.12)] px-3 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] transition hover:bg-[rgba(197,154,68,0.2)]"
-              aria-label={copy.close}
+              aria-label="Close popup"
             >
-              {copy.close}
+              Close
             </button>
 
             <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              {page.popupKicker}
+              Tutoring Request
             </p>
             <h2 className="oman-title-accent mt-4 pr-16 text-2xl font-semibold sm:text-3xl">
               {getRequestHeading(activeRequest)}
@@ -363,39 +391,43 @@ export default function TutorTutoringRequests() {
 
             <div className="mt-6 grid gap-3 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">{page.student}</span>{" "}
-                {activeRequest.student?.full_name || copy.notProvidedStudent}
+                <span className="font-semibold text-[var(--oman-ink)]">Learner:</span>{" "}
+                {activeRequest.learner?.full_name || "Unknown learner"}
               </p>
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">{copy.email}</span>{" "}
-                {activeRequest.student?.email || copy.noEmail}
+                <span className="font-semibold text-[var(--oman-ink)]">Email:</span>{" "}
+                {activeRequest.learner?.email || "No email"}
               </p>
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">{page.studentInstitute}</span>{" "}
-                {activeRequest.institute_name_snapshot || activeRequest.student?.institute || copy.notProvided}
+                <span className="font-semibold text-[var(--oman-ink)]">Institute:</span>{" "}
+                {activeRequest.institute_name_snapshot || activeRequest.learner?.institute || "Not provided"}
               </p>
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">{page.sessionType}</span>{" "}
+                <span className="font-semibold text-[var(--oman-ink)]">Instructor:</span>{" "}
+                {activeRequest.instructor?.display_name || "Unknown instructor"}
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--oman-ink)]">Session Type:</span>{" "}
                 {activeRequest.session_type}
               </p>
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">{copy.status}</span>{" "}
+                <span className="font-semibold text-[var(--oman-ink)]">Status:</span>{" "}
                 {formatStatusLabel(activeRequest.status)}
               </p>
-              <p>
-                <span className="font-semibold text-[var(--oman-ink)]">{copy.submitted}</span>{" "}
-                {formatSubmittedAt(activeRequest.created_at) || copy.unknown}
+              <p className="sm:col-span-2">
+                <span className="font-semibold text-[var(--oman-ink)]">Submitted:</span>{" "}
+                {formatSubmittedAt(activeRequest.created_at)}
               </p>
             </div>
 
             <div className="mt-6 rounded-2xl bg-[rgba(255,252,247,0.92)] px-4 py-4 text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.1)]">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
-                {copy.statusWorkflow}
+                Status Workflow
               </p>
               <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
                 <label className="flex-1">
                   <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                    {copy.updateStatus}
+                    Update status
                   </span>
                   <select
                     value={statusDraft}
@@ -415,14 +447,14 @@ export default function TutorTutoringRequests() {
                   disabled={statusSaving || statusDraft === normalizeStatus(activeRequest.status)}
                   className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {statusSaving ? copy.saving : copy.saveStatus}
+                  {statusSaving ? "Saving..." : "Save Status"}
                 </button>
               </div>
             </div>
 
             <div className="mt-4 rounded-2xl bg-[rgba(255,252,247,0.92)] px-4 py-4 text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.1)]">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
-                {page.topics}
+                Topics Need Help With
               </p>
               <p className="mt-3 whitespace-pre-wrap leading-7 text-[var(--oman-ink)]/80">
                 {activeRequest.topics_needed_help_with}
@@ -430,11 +462,10 @@ export default function TutorTutoringRequests() {
             </div>
 
             {(activeRequest.attachment_notes ||
-              (Array.isArray(activeRequest.attachment_files) &&
-                activeRequest.attachment_files.length > 0)) && (
+              (Array.isArray(activeRequest.attachment_files) && activeRequest.attachment_files.length > 0)) && (
               <div className="mt-4 rounded-2xl bg-[rgba(244,232,214,0.34)] px-4 py-4 text-[var(--oman-ink)]">
                 <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
-                  {copy.attachments}
+                  Attachments
                 </p>
                 {activeRequest.attachment_notes && (
                   <p className="mt-3 whitespace-pre-wrap leading-7 text-[var(--oman-ink)]/80">
@@ -443,7 +474,7 @@ export default function TutorTutoringRequests() {
                 )}
                 <AdminAttachmentDownloadList
                   files={activeRequest.attachment_files}
-                  bucket="tutoring-attachments"
+                  bucket="learning-attachments"
                   downloadingPaths={downloadingPaths}
                   onDownload={handleAttachmentDownload}
                 />

@@ -36,10 +36,12 @@ export default function RoleProtectedRoute({ allowedRole, children }) {
   }
 
   if (!user) {
-    return <Navigate to="/student-access/" replace />;
+    return <Navigate to="/learner-access/" replace />;
   }
 
-  if (profileLoading) {
+  const role = getUserRole(profile, user);
+
+  if (profileLoading && !role) {
     return (
       <main className="min-h-screen bg-slate-50 px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
         <div className="mx-auto max-w-4xl rounded-3xl bg-white px-6 py-6 shadow-sm ring-1 ring-slate-200">
@@ -53,8 +55,6 @@ export default function RoleProtectedRoute({ allowedRole, children }) {
       </main>
     );
   }
-
-  const role = getUserRole(profile, user);
 
   if (!role) {
     return (
