@@ -125,7 +125,7 @@ export default function Contact() {
     <main className="contact-page oman-page min-h-screen overflow-x-hidden text-slate-900">
       <section
         className="oman-hero text-white"
-        style={{ backgroundImage: `url(${themeImages.studentsGroup})` }}
+        style={{ backgroundImage: `url(${themeImages.brandJourney})` }}
       >
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
           <div className="contact-mobile-grid grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
@@ -142,10 +142,10 @@ export default function Contact() {
             </div>
 
             <div className="min-w-0 oman-card rounded-[1.75rem] p-4 text-[var(--oman-ink)] sm:p-5">
-              <div className="oman-photo-frame aspect-[4/5]">
+              <div className="oman-photo-frame oman-photo-frame--contain aspect-[16/10]">
                 <img
-                  src={themeImages.heroFort}
-                  alt="Traditional Omani fort tower under a bright sky"
+                  src={themeImages.brandWordmark}
+                  alt="UcanJobs employability bridge visual"
                 />
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
@@ -353,7 +353,7 @@ export default function Contact() {
               {t("contact.ctaText")}
             </p>
           </div>
-          <div className="min-w-0 oman-photo-frame aspect-[5/4]">
+          <div className="min-w-0 oman-photo-frame oman-photo-frame--top aspect-[5/4]">
             <img
               src={themeImages.contactBottomCampus}
               alt="University campus building with landscaped lawn"

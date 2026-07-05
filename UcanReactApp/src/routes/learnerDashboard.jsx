@@ -6,6 +6,7 @@ import { useLanguage } from "../context/LanguageContext";
 import { fetchLearnerEnrollments, fetchPublishedCourses } from "../lib/courseApi";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
+import { BUY_ME_A_COFFEE_URL } from "../lib/paymentConfig";
 
 const quickLinkTargets = [
   {
@@ -95,7 +96,8 @@ export default function LearnerDashboard() {
           return;
         }
 
-        setEnrollmentError(error?.message || "We could not load your enrolled courses.");
+        const message = error?.message || "We could not load your enrolled courses right now.";
+        setEnrollmentError(message);
       } finally {
         if (active) {
           setLoadingEnrollments(false);
@@ -380,6 +382,34 @@ export default function LearnerDashboard() {
               })}
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="mx-auto mt-10 max-w-6xl">
+        <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
+          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+            Buy Me a Coffee
+          </p>
+          <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
+            Simple payment support
+          </h2>
+          <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
+            Paid course support now uses a direct Buy Me a Coffee link instead of manual payment orders and payment reference submission.
+          </p>
+
+          <div className="mt-6 rounded-3xl oman-outline-panel p-5">
+            <p className="leading-7 text-[var(--oman-ink)]/75">
+              Open the link below whenever a course asks for payment support, then return to the course page after completing it.
+            </p>
+            <a
+              href={BUY_ME_A_COFFEE_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+            >
+              Open Buy Me a Coffee
+            </a>
+          </div>
         </div>
       </section>
 

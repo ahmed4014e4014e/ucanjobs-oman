@@ -31,6 +31,7 @@ import AdminContactMessages from "./routes/adminContactMessages";
 import AdminInstructorApplications from "./routes/adminInstructorApplications";
 import AdminLearningRequests from "./routes/adminLearningRequests";
 import AdminCourses from "./routes/adminCourses";
+import AdminEnrollments from "./routes/adminEnrollments";
 import AdminPlaceholderPage from "./routes/adminPlaceholderPage";
 
 // Create a Router
@@ -200,7 +201,7 @@ const router = createBrowserRouter([
         path: "admin-enrollments",
         element: (
           <RoleProtectedRoute allowedRole="admin">
-            <AdminPlaceholderPage pageKey="enrollments" />
+            <AdminEnrollments />
           </RoleProtectedRoute>
         ),
       },

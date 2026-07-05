@@ -10,6 +10,8 @@ import {
   updateCourseProgress,
 } from "../lib/courseApi";
 import { findCourseBySlug } from "../lib/courseCatalog";
+import { getCoursePriceOmr } from "../lib/paymentApi";
+import { BUY_ME_A_COFFEE_URL } from "../lib/paymentConfig";
 import { themeImages } from "../lib/themeImages";
 
 export default function CourseDetail() {
@@ -98,7 +100,7 @@ export default function CourseDetail() {
         if (active) {
           setEnrollmentFeedback({
             type: "error",
-            message: error?.message || "We could not load your enrollment status.",
+            message: error?.message || "We could not load your enrollment or payment status.",
           });
         }
       } finally {
@@ -133,6 +135,18 @@ export default function CourseDetail() {
     setEnrollmentFeedback({ type: "idle", message: "" });
 
     try {
+      const priceOmr = getCoursePriceOmr(course);
+
+      if (priceOmr > 0) {
+        window.open(BUY_ME_A_COFFEE_URL, "_blank", "noopener,noreferrer");
+        setEnrollmentFeedback({
+          type: "success",
+          message:
+            "Buy Me a Coffee opened in a new tab so you can complete support payment there.",
+        });
+        return;
+      }
+
       const nextEnrollment = await enrollInCourse({
         learnerId: user.id,
         courseId: course.id,
@@ -184,6 +198,8 @@ export default function CourseDetail() {
     }
   };
 
+
+
   if (!course && loadingCourse) {
     return (
       <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
@@ -221,6 +237,8 @@ export default function CourseDetail() {
   }
 
   const content = course.en;
+  const priceOmr = getCoursePriceOmr(course);
+  const isPaidCourse = priceOmr > 0;
 
   return (
     <main className="oman-page min-h-screen text-slate-900">
@@ -341,6 +359,31 @@ export default function CourseDetail() {
             </div>
           )}
 
+          {isPaidCourse && !enrollment && (
+            <div className="mt-8 rounded-3xl oman-outline-panel p-5">
+              <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+                Buy Me a Coffee
+              </p>
+              <div className="mt-4 space-y-2 text-sm leading-6 text-[var(--oman-ink)]/80">
+                <p>
+                  <span className="font-semibold text-[var(--oman-ink)]">Amount:</span>{" "}
+                  {course.price}
+                </p>
+                <p>
+                  Use the button below to open Buy Me a Coffee in a new tab and complete your support payment there.
+                </p>
+              </div>
+              <a
+                href={BUY_ME_A_COFFEE_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="oman-button-secondary mt-5 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+              >
+                Pay With Buy Me a Coffee
+              </a>
+            </div>
+          )}
+
           <ActionFeedback
             type={enrollmentFeedback.type}
             message={enrollmentFeedback.message}
@@ -359,11 +402,15 @@ export default function CourseDetail() {
               : enrolling
                 ? "Enrolling..."
                 : user
-                  ? "Enroll In This Course"
+                  ? isPaidCourse
+                    ? "Open Buy Me a Coffee"
+                    : "Enroll For Free"
                   : "Sign In To Enroll"}
           </button>
           <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
-            Payments and detailed progress tracking will be added in later phases.
+            {isPaidCourse
+              ? "Paid courses now use a direct Buy Me a Coffee support link instead of manual payment references."
+              : "Free courses enroll instantly. Paid checkout will remain manual for this phase."}
           </p>
         </aside>
       </section>

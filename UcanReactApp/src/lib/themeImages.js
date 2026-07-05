@@ -1,23 +1,30 @@
-import gutechImage from "../assets/campus-images/gutech.jpg";
-import squImage from "../assets/campus-images/squ.jpg";
-import mcbsImage from "../assets/campus-images/mcbs.jpg";
-import dhofarUniversityImage from "../assets/campus-images/dhofar-university.jpg";
-import aboutUsCardImage from "../assets/campus-images/about-us-card.jpg";
-import ucfCampusImage from "../assets/campus-images/ucf-campus.jpg";
-import contactBottomCampusImage from "../assets/campus-images/contact-bottom-campus.jpg";
-import aboutBottomCampusImage from "../assets/campus-images/about-bottom-campus.jpg";
-import policiesCampusImage from "../assets/campus-images/policies-campus-enhanced.jpg";
+import ucanjobsHeroImage from "../assets/brand-theme/ucanjobs-hero.jpg";
+import ucanjobsMarkImage from "../assets/brand-theme/ucanjobs-mark.jpg";
+import ucanjobsGraduatesImage from "../assets/brand-theme/ucanjobs-graduates.jpg";
+import ucanjobsWorkersImage from "../assets/brand-theme/ucanjobs-workers.jpg";
+import ucanjobsBridgeImage from "../assets/brand-theme/ucanjobs-bridge.jpg";
+import ucanjobsSloganImage from "../assets/brand-theme/ucanjobs-slogan.jpg";
+import ucanjobsWordmarkImage from "../assets/brand-theme/ucanjobs-wordmark.jpg";
+import ucanjobsJourneyImage from "../assets/brand-theme/ucanjobs-journey.jpg";
 
 export const themeImages = {
-  heroFort: mcbsImage,
-  heritageFort: squImage,
-  mountainFort: gutechImage,
-  dhofarUniversity: dhofarUniversityImage,
-  aboutUsCard: aboutUsCardImage,
-  ucfLogo: ucfCampusImage,
-  contactBottomCampus: contactBottomCampusImage,
-  studentsLibrary: aboutBottomCampusImage,
-  studentsGroup: squImage,
-  studentsStudyHall: gutechImage,
-  policiesCampus: policiesCampusImage,
+  heroFort: ucanjobsHeroImage,
+  heritageFort: ucanjobsJourneyImage,
+  mountainFort: ucanjobsBridgeImage,
+  dhofarUniversity: ucanjobsWordmarkImage,
+  aboutUsCard: ucanjobsSloganImage,
+  ucfLogo: ucanjobsMarkImage,
+  contactBottomCampus: ucanjobsWorkersImage,
+  studentsLibrary: ucanjobsWordmarkImage,
+  studentsGroup: ucanjobsHeroImage,
+  studentsStudyHall: ucanjobsGraduatesImage,
+  policiesCampus: ucanjobsSloganImage,
+  brandHero: ucanjobsHeroImage,
+  brandMark: ucanjobsMarkImage,
+  brandGraduates: ucanjobsGraduatesImage,
+  brandWorkers: ucanjobsWorkersImage,
+  brandBridge: ucanjobsBridgeImage,
+  brandSlogan: ucanjobsSloganImage,
+  brandWordmark: ucanjobsWordmarkImage,
+  brandJourney: ucanjobsJourneyImage,
 };

@@ -6,7 +6,7 @@ export default function NotFound() {
     <main className="oman-page min-h-screen text-slate-900">
       <section
         className="oman-hero text-white"
-        style={{ backgroundImage: `url(${themeImages.mountainFort})` }}
+        style={{ backgroundImage: `url(${themeImages.brandJourney})` }}
       >
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
           <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12">
@@ -39,10 +39,10 @@ export default function NotFound() {
             </div>
 
             <div className="oman-card rounded-[1.75rem] p-4 text-[var(--oman-ink)] sm:p-5">
-              <div className="oman-photo-frame aspect-[4/5]">
+              <div className="oman-photo-frame oman-photo-frame--contain aspect-[16/10]">
                 <img
-                  src={themeImages.studentsStudyHall}
-                  alt="Students working together in a bright study space"
+                  src={themeImages.brandSlogan}
+                  alt="UcanJobs employability slogan"
                 />
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">

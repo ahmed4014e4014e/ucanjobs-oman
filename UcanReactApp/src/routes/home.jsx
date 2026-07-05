@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 import { themeImages } from "../lib/themeImages";
-import ucanLogo from "../assets/campus-images/ucan-logo.png";
 import googleMeetLogo from "../assets/tool-logos/google-meet.svg";
 import zoomLogo from "../assets/tool-logos/zoom.jpg";
 import microsoftTeamsLogo from "../assets/tool-logos/microsoft-teams.svg";
@@ -67,10 +66,10 @@ export default function Home() {
             </div>
 
             <div className="oman-card rounded-[1.75rem] p-4 text-[var(--oman-ink)] sm:p-5">
-              <div className="oman-photo-frame aspect-[4/5]">
+              <div className="oman-photo-frame oman-photo-frame--contain aspect-[16/11]">
                 <img
-                  src={ucanLogo}
-                  alt="Ucan logo"
+                  src={themeImages.brandWordmark}
+                  alt="UcanJobs brand identity"
                 />
               </div>
               <p className="mt-4 text-xs font-semibold uppercase tracking-[0.25em] text-[var(--oman-terracotta)] sm:text-sm">
@@ -123,9 +122,9 @@ export default function Home() {
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
             {t("home.howTitle")}
           </h2>
-          <div className="oman-photo-frame mt-8 aspect-[5/6]">
+          <div className="oman-photo-frame oman-photo-frame--top mt-8 aspect-[5/6]">
             <img
-              src={themeImages.mountainFort}
+              src={themeImages.brandJourney}
               alt="Traditional Omani fort architecture against a mountain backdrop"
             />
           </div>

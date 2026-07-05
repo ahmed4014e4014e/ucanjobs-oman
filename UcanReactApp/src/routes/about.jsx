@@ -1,6 +1,7 @@
 import { useLanguage } from "../context/LanguageContext";
 import { themeImages } from "../lib/themeImages";
-import founderPhoto from "../assets/founder/ahmed-founder-optimized.jpg";
+import founderCasualPhoto from "../assets/founder/founder-casual.jpg";
+import founderEventPhoto from "../assets/founder/founder-event.jpg";
 
 export default function About() {
   const { t } = useLanguage();
@@ -12,7 +13,7 @@ export default function About() {
     <main className="oman-page min-h-screen text-slate-900">
       <section
         className="oman-hero text-white"
-        style={{ backgroundImage: `url(${themeImages.heritageFort})` }}
+        style={{ backgroundImage: `url(${themeImages.brandHero})` }}
       >
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
           <div className="grid items-center gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12">
@@ -29,17 +30,17 @@ export default function About() {
             </div>
 
             <div className="oman-card rounded-3xl p-4 text-[var(--oman-ink)] sm:p-5">
-              <div className="oman-photo-frame aspect-[4/3]">
+              <div className="oman-photo-frame oman-photo-frame--contain aspect-[16/10]">
                 <img
-                  src={themeImages.ucfLogo}
-                  alt="University of Central Florida logo"
+                  src={themeImages.brandWordmark}
+                  alt="UcanJobs visual identity"
                 />
               </div>
               <p className="mt-4 text-center text-sm font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta-dark)]">
-                {t("about.ucf")}
+                UcanJobs Identity
               </p>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
-                {t("about.ucfText")}
+                A unified visual system centered on employability, graduates, practical skills, and career transition in one recognizable UcanJobs style.
               </p>
             </div>
           </div>
@@ -48,11 +49,19 @@ export default function About() {
 
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="grid items-center gap-8 rounded-[1.75rem] oman-card p-6 sm:p-8 lg:grid-cols-[0.86fr_1.14fr] lg:gap-10">
-          <div className="oman-photo-frame aspect-square">
-            <img
-              src={founderPhoto}
-              alt="Ahmed Mohammed Al Ruqaishi, founder of Ucan"
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="oman-photo-frame aspect-[4/5]">
+              <img
+                src={founderCasualPhoto}
+                alt="Ahmed R in a casual portrait"
+              />
+            </div>
+            <div className="oman-photo-frame aspect-[4/5]">
+              <img
+                src={founderEventPhoto}
+                alt="Ahmed R at a university event"
+              />
+            </div>
           </div>
 
           <div className="text-center lg:text-left">
@@ -60,16 +69,12 @@ export default function About() {
               {t("about.founderKicker")}
             </p>
             <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-              {t("about.founderName")}
+              Ahmed R
             </h2>
             <p className="mt-5 text-base leading-7 text-[var(--oman-ink)]/80 sm:text-lg sm:leading-8">
-              {t("about.founderTextOne")}
-            </p>
-            <p className="mt-5 text-base leading-7 text-[var(--oman-ink)]/80 sm:text-lg sm:leading-8">
-              {t("about.founderTextTwo")}
-            </p>
-            <p className="mt-5 rounded-2xl bg-[rgba(197,154,68,0.12)] px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--oman-terracotta-dark)]">
-              {t("about.founderLocation")}
+              This platform was built by Ahmed R - a college student from Muscat focused on
+              solving the international problem with the big gab between fresh college graduates
+              and entry market requirements to be accepted in a job
             </p>
           </div>
         </div>
@@ -143,7 +148,7 @@ export default function About() {
           </div>
           <div className="oman-photo-frame aspect-[5/4]">
             <img
-              src={themeImages.studentsLibrary}
+              src={themeImages.brandWorkers}
               alt="Students collaborating in a modern university study environment"
             />
           </div>
