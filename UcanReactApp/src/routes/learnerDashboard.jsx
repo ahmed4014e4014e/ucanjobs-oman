@@ -6,6 +6,7 @@ import { useLanguage } from "../context/LanguageContext";
 import { fetchLearnerEnrollments, fetchPublishedCourses } from "../lib/courseApi";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
+import { BANK_MUSCAT_PAYMENT_METHOD, BANK_MUSCAT_PAYMENT_PHONE } from "../lib/paymentConfig";
 
 const quickLinkTargets = [
   {
@@ -95,7 +96,8 @@ export default function LearnerDashboard() {
           return;
         }
 
-        setEnrollmentError(error?.message || "We could not load your enrolled courses.");
+        const message = error?.message || "We could not load your enrolled courses right now.";
+        setEnrollmentError(message);
       } finally {
         if (active) {
           setLoadingEnrollments(false);
@@ -386,6 +388,34 @@ export default function LearnerDashboard() {
       <section className="mx-auto mt-10 max-w-6xl">
         <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+            Bank Muscat Phone Payment
+          </p>
+          <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
+            Pay for paid courses by phone transfer
+          </h2>
+          <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
+            Use the Bank Muscat phone number below when a paid course asks you to send payment before access approval.
+          </p>
+
+          <div className="mt-6 rounded-3xl oman-outline-panel p-5">
+            <p className="leading-7 text-[var(--oman-ink)]/75">
+              Send the requested amount from your bank mobile app, keep proof of payment, then submit the access request for approval. If access is not approved, you can request a full refund.
+            </p>
+            <div className="mt-5 rounded-2xl bg-[rgba(244,232,214,0.5)] px-4 py-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)]">
+                {BANK_MUSCAT_PAYMENT_METHOD}
+              </p>
+              <p className="mt-2 text-2xl font-bold tracking-[0.08em] text-[var(--oman-ink)]">
+                {BANK_MUSCAT_PAYMENT_PHONE}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto mt-10 max-w-6xl">
+        <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
+          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
             Enrolled Courses
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
@@ -450,10 +480,10 @@ export default function LearnerDashboard() {
                       {content.subtitle}
                     </p>
                     <Link
-                      to={`/courses/${enrollment.course.slug}/`}
+                      to={`/learn/${enrollment.course.slug}/`}
                       className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
                     >
-                      View Course
+                      Start Learning
                     </Link>
                   </article>
                 );
@@ -465,3 +495,10 @@ export default function LearnerDashboard() {
     </main>
   );
 }
+
+
+
+
+
+
+

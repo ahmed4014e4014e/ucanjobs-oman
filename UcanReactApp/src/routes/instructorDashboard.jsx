@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import ActionFeedback from "../components/ActionFeedback";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -234,6 +235,12 @@ export default function InstructorDashboard() {
             instructors submit course proposals while admin review keeps publishing
             quality consistent before courses go live.
           </p>
+          <Link
+            to="/instructor-courses/"
+            className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+          >
+            Open My Courses
+          </Link>
         </div>
       </section>
 

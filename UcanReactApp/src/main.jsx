@@ -13,6 +13,7 @@ import Home from "./routes/home";
 import About from "./routes/about";
 import Courses from "./routes/courses";
 import CourseDetail from "./routes/courseDetail";
+import LearnCourse from "./routes/learnCourse";
 import Services from "./routes/services";
 import Contact from "./routes/contact";
 import Terms from "./routes/terms";
@@ -25,12 +26,17 @@ import ResetPassword from "./routes/resetPassword";
 import Account from "./routes/account";
 import LearnerDashboard from "./routes/learnerDashboard";
 import InstructorDashboard from "./routes/instructorDashboard";
+import InstructorCourses from "./routes/instructorCourses";
+import InstructorCourseKit from "./routes/instructorCourseKit";
 import InstructorLearningRequests from "./routes/instructorLearningRequests";
 import AdminDashboard from "./routes/adminDashboard";
 import AdminContactMessages from "./routes/adminContactMessages";
 import AdminInstructorApplications from "./routes/adminInstructorApplications";
 import AdminLearningRequests from "./routes/adminLearningRequests";
 import AdminCourses from "./routes/adminCourses";
+import AdminCourseProposals from "./routes/adminCourseProposals";
+import AdminCourseLessons from "./routes/adminCourseLessons";
+import AdminEnrollments from "./routes/adminEnrollments";
 import AdminPlaceholderPage from "./routes/adminPlaceholderPage";
 
 // Create a Router
@@ -59,6 +65,14 @@ const router = createBrowserRouter([
       {
         path: "courses/:slug",
         element: <CourseDetail />,
+      },
+      {
+        path: "learn/:slug",
+        element: (
+          <RoleProtectedRoute allowedRole="learner">
+            <LearnCourse />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "services",
@@ -149,6 +163,22 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "instructor-courses",
+        element: (
+          <RoleProtectedRoute allowedRole="instructor">
+            <InstructorCourses />
+          </RoleProtectedRoute>
+        ),
+      },
+      {
+        path: "instructor-course-kit/:courseId",
+        element: (
+          <RoleProtectedRoute allowedRole="instructor">
+            <InstructorCourseKit />
+          </RoleProtectedRoute>
+        ),
+      },
+      {
         path: "tutor-tutoring-requests",
         element: <Navigate to="/instructor-learning-requests/" replace />,
       },
@@ -197,10 +227,26 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "admin-course-proposals",
+        element: (
+          <RoleProtectedRoute allowedRole="admin">
+            <AdminCourseProposals />
+          </RoleProtectedRoute>
+        ),
+      },
+      {
+        path: "admin-course-lessons/:courseId",
+        element: (
+          <RoleProtectedRoute allowedRole="admin">
+            <AdminCourseLessons />
+          </RoleProtectedRoute>
+        ),
+      },
+      {
         path: "admin-enrollments",
         element: (
           <RoleProtectedRoute allowedRole="admin">
-            <AdminPlaceholderPage pageKey="enrollments" />
+            <AdminEnrollments />
           </RoleProtectedRoute>
         ),
       },

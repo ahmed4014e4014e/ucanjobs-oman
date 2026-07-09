@@ -368,13 +368,21 @@ export default function AdminCourses() {
                             Updated {formatUpdatedAt(course.updated_at)}
                           </p>
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => handlePublishToggle(course)}
-                          className="mt-3 inline-flex items-center justify-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.12)] transition hover:bg-[rgba(244,232,214,0.4)]"
-                        >
-                          {course.is_published ? "Unpublish" : "Publish"}
-                        </button>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handlePublishToggle(course)}
+                            className="inline-flex items-center justify-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.12)] transition hover:bg-[rgba(244,232,214,0.4)]"
+                          >
+                            {course.is_published ? "Unpublish" : "Publish"}
+                          </button>
+                          <Link
+                            to={`/admin-course-lessons/${course.id}/`}
+                            className="inline-flex items-center justify-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.12)] transition hover:bg-[rgba(244,232,214,0.4)]"
+                          >
+                            Edit Lessons
+                          </Link>
+                        </div>
                       </article>
                     ))}
                   </div>
@@ -584,3 +592,4 @@ export default function AdminCourses() {
     </main>
   );
 }
+

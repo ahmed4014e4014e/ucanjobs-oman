@@ -655,7 +655,7 @@ export default function Services() {
     <main className="oman-page min-h-screen text-slate-900">
       <section
         className="oman-hero text-white"
-        style={{ backgroundImage: `url(${themeImages.mountainFort})` }}
+        style={{ backgroundImage: `url(${themeImages.brandBridge})` }}
       >
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
           <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
@@ -674,8 +674,8 @@ export default function Services() {
             <div className="oman-card rounded-[1.75rem] p-4 text-[var(--oman-ink)] sm:p-5">
               <div className="oman-photo-frame aspect-[4/5]">
                 <img
-                  src={themeImages.studentsGroup}
-                  alt="Students gathering around laptops and books"
+                  src={themeImages.brandWorkers}
+                  alt="UcanJobs workforce readiness visual"
                 />
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">

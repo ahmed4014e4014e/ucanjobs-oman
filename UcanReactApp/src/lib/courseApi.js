@@ -39,6 +39,7 @@ function mapCourseRow(row, outcomes = [], modules = []) {
     slug: row.slug,
     category: categoryNameEn,
     level: row.level,
+    priceOmr: Number(row.price_omr) || 0,
     price: formatPrice(row.price_omr),
     duration: row.duration,
     language: row.language,
@@ -284,3 +285,5 @@ export async function fetchLearnerEnrollments(learnerId) {
     )
     .filter((entry) => entry.course);
 }
+
+

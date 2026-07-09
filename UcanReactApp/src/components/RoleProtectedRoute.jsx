@@ -2,6 +2,12 @@ import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getDashboardPath, getUserRole } from "../lib/authRouting";
 
+const accessPathByRole = {
+  learner: "/learner-access/",
+  instructor: "/instructor-access/",
+  admin: "/admin-access/",
+};
+
 export default function RoleProtectedRoute({ allowedRole, children }) {
   const {
     user,
@@ -36,7 +42,7 @@ export default function RoleProtectedRoute({ allowedRole, children }) {
   }
 
   if (!user) {
-    return <Navigate to="/learner-access/" replace />;
+    return <Navigate to={accessPathByRole[allowedRole] || "/learner-access/"} replace />;
   }
 
   const role = getUserRole(profile, user);

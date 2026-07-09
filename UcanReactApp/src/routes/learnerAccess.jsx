@@ -1,6 +1,6 @@
 import AuthAccessPage from "./AuthAccessPage";
 import { useLanguage } from "../context/LanguageContext";
-import middleEastCollegeImage from "../assets/auth-images/middle-east-college.jpg";
+import { themeImages } from "../lib/themeImages";
 
 export default function LearnerAccess() {
   const { t } = useLanguage();
@@ -16,7 +16,7 @@ export default function LearnerAccess() {
       requireTermsAgreement
       collectSignupProfile={false}
       enableGoogleAuth
-      accessImage={middleEastCollegeImage}
+      accessImage={themeImages.brandGraduates}
       accessImageAlt={copy.imageAlt}
     />
   );

@@ -1,7 +1,7 @@
 import AuthAccessPage from "./AuthAccessPage";
 import InstructorApplicationSignupPanel from "../components/InstructorApplicationSignupPanel";
 import { useLanguage } from "../context/LanguageContext";
-import soharUniversityImage from "../assets/auth-images/sohar-university.jpg";
+import { themeImages } from "../lib/themeImages";
 
 export default function InstructorAccess() {
   const { t } = useLanguage();
@@ -14,7 +14,7 @@ export default function InstructorAccess() {
       description={copy.description}
       signupHeading={copy.signupHeading}
       role="instructor"
-      accessImage={soharUniversityImage}
+      accessImage={themeImages.brandWorkers}
       accessImageAlt={copy.imageAlt}
       signupPanel={<InstructorApplicationSignupPanel />}
     />

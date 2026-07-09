@@ -1,6 +1,6 @@
 import AuthAccessPage from "./AuthAccessPage";
 import { useLanguage } from "../context/LanguageContext";
-import adminLoginImage from "../assets/auth-images/admin-login-photo.jpg";
+import { themeImages } from "../lib/themeImages";
 
 export default function AdminAccess() {
   const { t } = useLanguage();
@@ -13,7 +13,7 @@ export default function AdminAccess() {
       description={copy.description}
       role="admin"
       allowSignup={false}
-      accessImage={adminLoginImage}
+      accessImage={themeImages.brandWordmark}
       accessImageAlt={copy.imageAlt}
     />
   );

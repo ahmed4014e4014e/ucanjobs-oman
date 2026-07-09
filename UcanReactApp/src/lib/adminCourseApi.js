@@ -160,6 +160,71 @@ export async function saveAdminCourse({ course, outcomes, modules }) {
   return courseWithRelations;
 }
 
+export async function fetchAdminCourseLessons(courseId) {
+  requireDatabase();
+
+  if (!courseId) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("course_lessons")
+    .select("id, course_id, title_en, body_en, video_url, resource_url, sort_order, is_preview, is_published")
+    .eq("course_id", courseId)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
+
+export async function saveAdminCourseLessons({ courseId, lessons }) {
+  requireDatabase();
+
+  if (!courseId) {
+    throw new Error("Save the course before adding lessons.");
+  }
+
+  const { error: deleteError } = await supabase
+    .from("course_lessons")
+    .delete()
+    .eq("course_id", courseId);
+
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  const cleanedLessons = lessons
+    .map((lesson, index) => ({
+      course_id: courseId,
+      title_en: lesson.title_en.trim(),
+      body_en: lesson.body_en.trim() || null,
+      video_url: lesson.video_url.trim() || null,
+      resource_url: lesson.resource_url.trim() || null,
+      sort_order: index + 1,
+      is_preview: Boolean(lesson.is_preview),
+      is_published: Boolean(lesson.is_published),
+    }))
+    .filter((lesson) => lesson.title_en);
+
+  if (!cleanedLessons.length) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("course_lessons")
+    .insert(cleanedLessons)
+    .select("id, course_id, title_en, body_en, video_url, resource_url, sort_order, is_preview, is_published")
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
 async function replaceCourseLines({ table, courseId, rows, textColumnEn }) {
   const { error: deleteError } = await supabase.from(table).delete().eq("course_id", courseId);
 
@@ -203,3 +268,5 @@ export async function updateAdminCoursePublishStatus({ courseId, isPublished }) 
   const [course] = await fetchCourseRelations([data]);
   return course;
 }
+
+

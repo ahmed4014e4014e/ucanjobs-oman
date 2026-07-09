@@ -29,7 +29,7 @@ export default function AdminDashboard() {
       <section className="mx-auto max-w-6xl">
         <div
           className="oman-hero overflow-hidden rounded-[1.75rem] px-6 py-10 text-white shadow-xl sm:px-8 sm:py-12"
-          style={{ backgroundImage: `url(${themeImages.mountainFort})` }}
+          style={{ backgroundImage: `url(${themeImages.brandWorkers})` }}
         >
           <div className="grid items-center gap-6 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
@@ -44,8 +44,8 @@ export default function AdminDashboard() {
               </p>
             </div>
             <div className="oman-card rounded-3xl p-4 text-[var(--oman-ink)]">
-              <div className="oman-photo-frame aspect-[4/3]">
-                <img src={themeImages.studentsStudyHall} alt="Students collaborating in a study space" />
+              <div className="oman-photo-frame oman-photo-frame--contain aspect-[16/10]">
+                <img src={themeImages.brandMark} alt="UcanJobs core brand mark" />
               </div>
             </div>
           </div>
@@ -93,6 +93,21 @@ export default function AdminDashboard() {
                   </Link>
                 </article>
               ))}
+
+              <article className="rounded-3xl oman-outline-panel p-5">
+                <h2 className="text-lg font-semibold text-[var(--oman-ink)]">
+                  Course Proposals
+                </h2>
+                <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
+                  Review instructor course ideas and create an instructor-owned draft when approved.
+                </p>
+                <Link
+                  to="/admin-course-proposals/"
+                  className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+                >
+                  Review Proposals
+                </Link>
+              </article>
 
               <article className="rounded-3xl oman-outline-panel p-5 lg:col-span-2">
                 <h2 className="text-lg font-semibold text-[var(--oman-ink)]">{copy.workflowTitle}</h2>
