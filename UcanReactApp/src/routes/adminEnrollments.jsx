@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import ActionFeedback from "../components/ActionFeedback";
+import { downloadStorageAttachment } from "../lib/adminDownloads";
 import {
   fetchAdminOrders,
   fetchAdminPayments,
+  PAYMENT_PROOF_BUCKET,
   updateAdminOrderStatus,
 } from "../lib/paymentApi";
 
@@ -107,6 +109,22 @@ export default function AdminEnrollments() {
     }
   };
 
+  const handleProofDownload = async (payment) => {
+    setFeedback({ type: "idle", message: "" });
+
+    try {
+      await downloadStorageAttachment({
+        bucket: PAYMENT_PROOF_BUCKET,
+        path: payment.proofUrl,
+        fileName: payment.proofUrl?.split("/").pop() || "payment-proof",
+      });
+    } catch (downloadError) {
+      setFeedback({
+        type: "error",
+        message: downloadError?.message || "Unable to download this payment proof right now.",
+      });
+    }
+  };
   return (
     <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
       <section className="mx-auto max-w-6xl">
@@ -206,7 +224,7 @@ export default function AdminEnrollments() {
                             {formatDate(order.createdAt)}
                           </p>
                           <p>
-                            <span className="font-semibold text-[var(--oman-ink)]">Learner:</span>{" "}
+                            <span className="font-semibold text-[var(--oman-ink)]">Job seeker name:</span>{" "}
                             {order.learner?.name || "Not available"}
                           </p>
                           <p>
@@ -238,15 +256,46 @@ export default function AdminEnrollments() {
                         </p>
                         <div className="mt-3 grid gap-3">
                           {orderPayments.map((payment) => (
-                            <div key={payment.id} className="text-sm leading-6 text-[var(--oman-ink)]/80">
-                              <p>
-                                <span className="font-semibold text-[var(--oman-ink)]">Reference:</span>{" "}
-                                {payment.referenceNumber || "Not provided"}
-                              </p>
-                              <p>
-                                <span className="font-semibold text-[var(--oman-ink)]">Submitted:</span>{" "}
-                                {formatDate(payment.submittedAt)}
-                              </p>
+                            <div key={payment.id} className="rounded-2xl bg-[rgba(255,250,244,0.72)] p-4 text-sm leading-6 text-[var(--oman-ink)]/80 ring-1 ring-[rgba(111,49,29,0.1)]">
+                              <div className="grid gap-2 sm:grid-cols-2">
+                                <p>
+                                  <span className="font-semibold text-[var(--oman-ink)]">Job seeker name:</span>{" "}
+                                  {payment.payerName || order.learner?.name || "Not available"}
+                                </p>
+                                <p>
+                                  <span className="font-semibold text-[var(--oman-ink)]">Job seeker email:</span>{" "}
+                                  {payment.payerEmail || order.learner?.email || "Not available"}
+                                </p>
+                                <p>
+                                  <span className="font-semibold text-[var(--oman-ink)]">Amount sent:</span>{" "}
+                                  {payment.amountLabel}
+                                </p>
+                                <p>
+                                  <span className="font-semibold text-[var(--oman-ink)]">Payment status:</span>{" "}
+                                  {formatStatus(payment.status)}
+                                </p>
+                                <p>
+                                  <span className="font-semibold text-[var(--oman-ink)]">Reference:</span>{" "}
+                                  {payment.referenceNumber || "Not provided"}
+                                </p>
+                                <p>
+                                  <span className="font-semibold text-[var(--oman-ink)]">Submitted:</span>{" "}
+                                  {formatDate(payment.submittedAt)}
+                                </p>
+                              </div>
+                              {payment.proofUrl ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleProofDownload(payment)}
+                                  className="oman-button-secondary mt-4 inline-flex items-center justify-center rounded-2xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition"
+                                >
+                                  Download Proof Of Payment
+                                </button>
+                              ) : (
+                                <p className="mt-4 text-sm text-[var(--oman-ink)]/65">
+                                  No proof file attached.
+                                </p>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -262,3 +311,6 @@ export default function AdminEnrollments() {
     </main>
   );
 }
+
+
+

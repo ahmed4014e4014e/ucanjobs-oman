@@ -6,6 +6,7 @@ import ucanjobsBridgeImage from "../assets/brand-theme/ucanjobs-bridge.jpg";
 import ucanjobsSloganImage from "../assets/brand-theme/ucanjobs-slogan.jpg";
 import ucanjobsWordmarkImage from "../assets/brand-theme/ucanjobs-wordmark.jpg";
 import ucanjobsJourneyImage from "../assets/brand-theme/ucanjobs-journey.jpg";
+import ucanjobsLearningEmployabilityImage from "../assets/brand-theme/ucanjobs-learning-employability.png";
 
 export const themeImages = {
   heroFort: ucanjobsHeroImage,
@@ -26,5 +27,5 @@ export const themeImages = {
   brandBridge: ucanjobsBridgeImage,
   brandSlogan: ucanjobsSloganImage,
   brandWordmark: ucanjobsWordmarkImage,
-  brandJourney: ucanjobsJourneyImage,
+  brandJourney: ucanjobsLearningEmployabilityImage,
 };

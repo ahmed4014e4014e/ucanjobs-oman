@@ -1,1 +1,2 @@
-export const BUY_ME_A_COFFEE_URL = "https://buymeacoffee.com/";
+export const BANK_MUSCAT_PAYMENT_PHONE = "95759446";
+export const BANK_MUSCAT_PAYMENT_METHOD = "Bank Muscat phone transfer";

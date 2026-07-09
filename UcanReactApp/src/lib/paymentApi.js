@@ -1,5 +1,6 @@
 import { isSupabaseConfigured, supabase } from "./supabase";
 
+export const PAYMENT_PROOF_BUCKET = "payment-proofs";
 function formatMoney(value) {
   const amount = Number(value);
 
@@ -210,7 +211,33 @@ export async function createManualOrder({ learnerId, course }) {
   return mapOrder(data);
 }
 
-export async function submitManualPayment({ order, learnerId, referenceNumber, payerName, payerEmail }) {
+export async function uploadPaymentProof({ file, learnerId, orderId }) {
+  assertPaymentConfigured();
+
+  if (!file || !learnerId || !orderId) {
+    throw new Error("A proof file, learner account, and order are required before submitting an access request.");
+  }
+
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const uniquePath = `${learnerId}/${orderId}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+
+  const { error } = await supabase.storage
+    .from(PAYMENT_PROOF_BUCKET)
+    .upload(uniquePath, file, { upsert: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    name: file.name,
+    path: uniquePath,
+    size: file.size,
+    type: file.type || "application/octet-stream",
+  };
+}
+
+export async function submitManualPayment({ order, learnerId, referenceNumber, payerName, payerEmail, proofUrl }) {
   assertPaymentConfigured();
 
   if (!order?.id || !learnerId) {
@@ -228,6 +255,7 @@ export async function submitManualPayment({ order, learnerId, referenceNumber, p
       reference_number: referenceNumber?.trim() || null,
       payer_name: payerName?.trim() || null,
       payer_email: payerEmail?.trim() || null,
+      proof_url: proofUrl || null,
     })
     .select("*")
     .single();
@@ -236,9 +264,18 @@ export async function submitManualPayment({ order, learnerId, referenceNumber, p
     throw error;
   }
 
+  const { error: orderError } = await supabase
+    .from("orders")
+    .update({ status: "payment_submitted" })
+    .eq("id", order.id)
+    .eq("learner_id", learnerId);
+
+  if (orderError) {
+    throw orderError;
+  }
+
   return mapPayment(data);
 }
-
 export async function fetchAdminOrders() {
   assertPaymentConfigured();
 
@@ -350,3 +387,8 @@ export async function updateAdminOrderStatus({ order, status }) {
 
   return mapOrder(data);
 }
+
+
+
+
+

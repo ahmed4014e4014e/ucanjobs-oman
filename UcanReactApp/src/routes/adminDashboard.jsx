@@ -94,6 +94,21 @@ export default function AdminDashboard() {
                 </article>
               ))}
 
+              <article className="rounded-3xl oman-outline-panel p-5">
+                <h2 className="text-lg font-semibold text-[var(--oman-ink)]">
+                  Course Proposals
+                </h2>
+                <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
+                  Review instructor course ideas and create an instructor-owned draft when approved.
+                </p>
+                <Link
+                  to="/admin-course-proposals/"
+                  className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+                >
+                  Review Proposals
+                </Link>
+              </article>
+
               <article className="rounded-3xl oman-outline-panel p-5 lg:col-span-2">
                 <h2 className="text-lg font-semibold text-[var(--oman-ink)]">{copy.workflowTitle}</h2>
                 <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">

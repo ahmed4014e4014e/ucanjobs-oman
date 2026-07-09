@@ -10,14 +10,24 @@ import {
   updateCourseProgress,
 } from "../lib/courseApi";
 import { findCourseBySlug } from "../lib/courseCatalog";
-import { getCoursePriceOmr } from "../lib/paymentApi";
-import { BUY_ME_A_COFFEE_URL } from "../lib/paymentConfig";
+import {
+  createManualOrder,
+  getCoursePriceOmr,
+  submitManualPayment,
+  uploadPaymentProof,
+} from "../lib/paymentApi";
+import { BANK_MUSCAT_PAYMENT_METHOD, BANK_MUSCAT_PAYMENT_PHONE } from "../lib/paymentConfig";
+import {
+  ACCEPTED_UPLOAD_ATTRIBUTE,
+  FILE_SIZE_LIMIT_MB,
+  validateUploadSelection,
+} from "../lib/fileUploadRules";
 import { themeImages } from "../lib/themeImages";
 
 export default function CourseDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { t } = useLanguage();
   const [course, setCourse] = useState(() => findCourseBySlug(slug));
   const [loadingCourse, setLoadingCourse] = useState(true);
@@ -30,7 +40,11 @@ export default function CourseDetail() {
     type: "idle",
     message: "",
   });
+  const [paymentProofFile, setPaymentProofFile] = useState(null);
+  const [paymentReference, setPaymentReference] = useState("");
+  const [submittingAccessRequest, setSubmittingAccessRequest] = useState(false);
   const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
+  const jobSeekerName = profile?.full_name || user?.user_metadata?.full_name || user?.email || "Job seeker";
 
   useEffect(() => {
     let active = true;
@@ -117,6 +131,79 @@ export default function CourseDetail() {
     };
   }, [course?.id, course?.source, user?.id]);
 
+  const handlePaymentProofChange = (event) => {
+    const selectedFiles = Array.from(event.target.files || []);
+    const { validFiles, errorMessage } = validateUploadSelection(selectedFiles);
+
+    if (errorMessage) {
+      setPaymentProofFile(null);
+      setEnrollmentFeedback({ type: "error", message: errorMessage });
+      return;
+    }
+
+    setPaymentProofFile(validFiles[0] || null);
+    setEnrollmentFeedback({ type: "idle", message: "" });
+  };
+
+  const handleAccessRequestSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!user?.id) {
+      navigate("/learner-access/");
+      return;
+    }
+
+    if (course?.source !== "database" || !course?.id) {
+      setEnrollmentFeedback({
+        type: "error",
+        message: "Access requests will be available after live course data is connected.",
+      });
+      return;
+    }
+
+    if (!paymentProofFile) {
+      setEnrollmentFeedback({
+        type: "error",
+        message: "Please attach proof of payment before sending your access request.",
+      });
+      return;
+    }
+
+    setSubmittingAccessRequest(true);
+    setEnrollmentFeedback({ type: "idle", message: "" });
+
+    try {
+      const order = await createManualOrder({ learnerId: user.id, course });
+      const proofFile = await uploadPaymentProof({
+        file: paymentProofFile,
+        learnerId: user.id,
+        orderId: order.id,
+      });
+
+      await submitManualPayment({
+        order,
+        learnerId: user.id,
+        referenceNumber: paymentReference,
+        payerName: jobSeekerName,
+        payerEmail: profile?.email || user.email || "",
+        proofUrl: proofFile.path,
+      });
+
+      setPaymentProofFile(null);
+      setPaymentReference("");
+      setEnrollmentFeedback({
+        type: "success",
+        message: "Your access request was sent. The admin team can now review your payment proof and approve course access.",
+      });
+    } catch (error) {
+      setEnrollmentFeedback({
+        type: "error",
+        message: error?.message || "We could not send your access request right now.",
+      });
+    } finally {
+      setSubmittingAccessRequest(false);
+    }
+  };
   const handleEnrollment = async () => {
     if (!user?.id) {
       navigate("/learner-access/");
@@ -138,11 +225,9 @@ export default function CourseDetail() {
       const priceOmr = getCoursePriceOmr(course);
 
       if (priceOmr > 0) {
-        window.open(BUY_ME_A_COFFEE_URL, "_blank", "noopener,noreferrer");
         setEnrollmentFeedback({
-          type: "success",
-          message:
-            "Buy Me a Coffee opened in a new tab so you can complete support payment there.",
+          type: "info",
+          message: `Send ${course.price} to ${BANK_MUSCAT_PAYMENT_PHONE} using your bank app, then upload proof of payment when the access request form is available.`,
         });
         return;
       }
@@ -343,6 +428,12 @@ export default function CourseDetail() {
                   style={{ width: `${enrollment.progressPercent}%` }}
                 />
               </div>
+              <Link
+                to={`/learn/${course.slug}/`}
+                className="oman-button-secondary mt-5 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+              >
+                Open Learning Page
+              </Link>
               <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-5">
                 {[0, 25, 50, 75, 100].map((value) => (
                   <button
@@ -362,25 +453,84 @@ export default function CourseDetail() {
           {isPaidCourse && !enrollment && (
             <div className="mt-8 rounded-3xl oman-outline-panel p-5">
               <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                Buy Me a Coffee
+                Bank Muscat Phone Payment
               </p>
-              <div className="mt-4 space-y-2 text-sm leading-6 text-[var(--oman-ink)]/80">
+              <form className="mt-4 space-y-4 text-sm leading-6 text-[var(--oman-ink)]/80" onSubmit={handleAccessRequestSubmit}>
                 <p>
                   <span className="font-semibold text-[var(--oman-ink)]">Amount:</span>{" "}
                   {course.price}
                 </p>
                 <p>
-                  Use the button below to open Buy Me a Coffee in a new tab and complete your support payment there.
+                  Send the course amount to the Bank Muscat phone number below using your own mobile banking app.
                 </p>
-              </div>
-              <a
-                href={BUY_ME_A_COFFEE_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="oman-button-secondary mt-5 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
-              >
-                Pay With Buy Me a Coffee
-              </a>
+                <div className="rounded-2xl bg-[rgba(244,232,214,0.5)] px-4 py-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)]">
+                    {BANK_MUSCAT_PAYMENT_METHOD}
+                  </p>
+                  <p className="mt-2 text-2xl font-bold tracking-[0.08em] text-[var(--oman-ink)]">
+                    {BANK_MUSCAT_PAYMENT_PHONE}
+                  </p>
+                </div>
+                <ol className="list-decimal space-y-2 pl-5">
+                  <li>Send the requested amount from your bank mobile app.</li>
+                  <li>Attach a screenshot or receipt as proof of payment.</li>
+                  <li>Send your access request and wait for approval.</li>
+                  <li>If access is not approved, request a full refund.</li>
+                </ol>
+
+                <div className="rounded-2xl bg-[rgba(255,250,244,0.72)] px-4 py-4 ring-1 ring-[rgba(111,49,29,0.1)]">
+                  <p>
+                    <span className="font-semibold text-[var(--oman-ink)]">Job seeker name:</span>{" "}
+                    {jobSeekerName}
+                  </p>
+                  <p className="mt-2">
+                    <span className="font-semibold text-[var(--oman-ink)]">Email:</span>{" "}
+                    {profile?.email || user?.email || "Not available"}
+                  </p>
+                </div>
+
+                <label className="flex flex-col gap-2">
+                  <span className="font-semibold text-[var(--oman-terracotta-dark)]">
+                    Attach proof of payment <span aria-hidden="true" className="text-[var(--oman-terracotta)]">*</span>
+                  </span>
+                  <input
+                    type="file"
+                    required
+                    accept={ACCEPTED_UPLOAD_ATTRIBUTE}
+                    onChange={handlePaymentProofChange}
+                    className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-sm text-[var(--oman-ink)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-[rgba(197,154,68,0.16)] file:px-4 file:py-2 file:font-semibold file:text-[var(--oman-terracotta-dark)] focus:border-[var(--oman-brass)] focus:bg-white"
+                  />
+                  <span className="text-xs leading-5 text-[var(--oman-ink)]/65">
+                    Upload a screenshot or receipt. Max {FILE_SIZE_LIMIT_MB} MB.
+                  </span>
+                  {paymentProofFile && (
+                    <span className="rounded-full bg-[rgba(255,252,247,0.98)] px-3 py-2 text-xs font-medium text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.12)]">
+                      {paymentProofFile.name}
+                    </span>
+                  )}
+                </label>
+
+                <label className="flex flex-col gap-2">
+                  <span className="font-semibold text-[var(--oman-terracotta-dark)]">
+                    Payment reference or note
+                  </span>
+                  <input
+                    type="text"
+                    value={paymentReference}
+                    onChange={(event) => setPaymentReference(event.target.value)}
+                    placeholder="Optional transaction reference, sender name, or note"
+                    className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
+                  />
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={submittingAccessRequest}
+                  className="oman-button-primary inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {submittingAccessRequest ? "Sending Access Request..." : "Send Access Request"}
+                </button>
+              </form>
             </div>
           )}
 
@@ -391,27 +541,27 @@ export default function CourseDetail() {
             className="mt-8"
           />
 
-          <button
-            type="button"
-            onClick={handleEnrollment}
-            disabled={enrolling || Boolean(enrollment)}
-            className="oman-button-primary mt-5 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {enrollment
-              ? "Already Enrolled"
-              : enrolling
-                ? "Enrolling..."
-                : user
-                  ? isPaidCourse
-                    ? "Open Buy Me a Coffee"
-                    : "Enroll For Free"
-                  : "Sign In To Enroll"}
-          </button>
-          <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
-            {isPaidCourse
-              ? "Paid courses now use a direct Buy Me a Coffee support link instead of manual payment references."
-              : "Free courses enroll instantly. Paid checkout will remain manual for this phase."}
-          </p>
+          {!isPaidCourse && (
+            <>
+              <button
+                type="button"
+                onClick={handleEnrollment}
+                disabled={enrolling || Boolean(enrollment)}
+                className="oman-button-primary mt-5 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {enrollment
+                  ? "Already Enrolled"
+                  : enrolling
+                    ? "Enrolling..."
+                    : user
+                      ? "Enroll For Free"
+                      : "Sign In To Enroll"}
+              </button>
+              <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
+                Free courses enroll instantly.
+              </p>
+            </>
+          )}
         </aside>
       </section>
 
@@ -421,3 +571,11 @@ export default function CourseDetail() {
     </main>
   );
 }
+
+
+
+
+
+
+
+

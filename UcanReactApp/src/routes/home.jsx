@@ -1,39 +1,11 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 import { themeImages } from "../lib/themeImages";
-import googleMeetLogo from "../assets/tool-logos/google-meet.svg";
-import zoomLogo from "../assets/tool-logos/zoom.jpg";
-import microsoftTeamsLogo from "../assets/tool-logos/microsoft-teams.svg";
-import microsoftWhiteboardLogo from "../assets/tool-logos/microsoft-whiteboard.jpg";
-import clickUpLogo from "../assets/tool-logos/clickup.jpg";
-import miroLogo from "../assets/tool-logos/miro.jpg";
-
-const tutoringToolLogos = [
-  {
-    tools: [
-      { name: "Google Meet", logo: googleMeetLogo },
-      { name: "Zoom", logo: zoomLogo },
-      { name: "Microsoft Teams", logo: microsoftTeamsLogo },
-    ],
-  },
-  {
-    tools: [
-      { name: "Microsoft Whiteboard", logo: microsoftWhiteboardLogo },
-      { name: "ClickUp", logo: clickUpLogo },
-      { name: "Miro", logo: miroLogo },
-    ],
-  },
-];
-
 export default function Home() {
   const { t } = useLanguage();
   const features = t("home.features");
   const stats = t("home.stats");
   const steps = t("home.steps");
-  const toolGroups = t("home.toolGroups").map((group, index) => ({
-    ...group,
-    tools: tutoringToolLogos[index]?.tools || [],
-  }));
   const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
 
   return (
@@ -125,7 +97,7 @@ export default function Home() {
           <div className="oman-photo-frame oman-photo-frame--top mt-8 aspect-[5/6]">
             <img
               src={themeImages.brandJourney}
-              alt="Traditional Omani fort architecture against a mountain backdrop"
+              alt="Omani graduates collaborating on digital skills in a modern learning space"
             />
           </div>
         </div>
@@ -137,55 +109,6 @@ export default function Home() {
               <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">{step.description}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-8">
-        <div className="rounded-[1.75rem] oman-card px-6 py-10 sm:px-8 sm:py-12">
-          <div className="max-w-2xl text-center lg:text-left">
-            <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              {t("home.toolsKicker")}
-            </p>
-            <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-              {t("home.toolsTitle")}
-            </h2>
-            <p className="mt-4 text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
-              {t("home.toolsText")}
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-6 sm:mt-12 lg:grid-cols-2">
-            {toolGroups.map((group) => (
-              <article key={group.title} className="rounded-3xl oman-outline-panel p-6 sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--oman-terracotta)]">
-                  {group.title}
-                </p>
-                <p className="mt-4 text-base leading-7 text-[var(--oman-ink)]/75">
-                  {group.description}
-                </p>
-
-                <div className="mt-6 grid gap-4 sm:grid-cols-3">
-                  {group.tools.map((tool) => (
-                    <div
-                      key={tool.name}
-                      className="rounded-[1.5rem] bg-[rgba(255,252,247,0.95)] p-4 text-center shadow-[0_14px_34px_rgba(73,39,27,0.07)] ring-1 ring-[rgba(111,49,29,0.1)]"
-                    >
-                      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white ring-1 ring-[rgba(111,49,29,0.08)]">
-                        <img
-                          src={tool.logo}
-                          alt={`${tool.name} logo`}
-                          className="h-12 w-12 object-contain"
-                        />
-                      </div>
-                      <h3 className="mt-4 text-sm font-semibold leading-6 text-[var(--oman-ink)] sm:text-base">
-                        {tool.name}
-                      </h3>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
         </div>
       </section>
 
