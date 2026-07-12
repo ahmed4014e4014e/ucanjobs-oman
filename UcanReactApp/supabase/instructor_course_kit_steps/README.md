@@ -20,7 +20,11 @@ Run these files in Supabase SQL Editor in numerical order:
 15. `15_strengthen_publication_validation.sql`
 16. `16_verify_quizzes_and_storage.sql`
 17. `17_test_complete_course_lifecycle.sql`
+18. `18_raise_test_video_upload_limit.sql`
+19. `19_create_video_upload_test_course.sql`
 
 Steps 00 through 7 establish course ownership. Step 8 verifies that foundation.
 Steps 9 through 15 add quizzes, uploads, and publication validation. Step 16 is read-only verification.
 Step 17 runs a complete role-aware lifecycle test and rolls all test records back.
+Step 18 raises the private video bucket limit for large instructor recordings.
+Step 19 creates or reuses an unpublished three-lesson video upload test course.
