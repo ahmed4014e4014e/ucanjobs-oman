@@ -40,7 +40,7 @@ export async function fetchLearningCourse({ slug, learnerId }) {
   requireDatabase();
 
   if (!slug || !learnerId) {
-    throw new Error("A learner account and course slug are required.");
+    throw new Error("A job seeker account and course slug are required.");
   }
 
   const course = await fetchPublishedCourseBySlug(slug);
@@ -56,6 +56,10 @@ export async function fetchLearningCourse({ slug, learnerId }) {
 
   if (!enrollment) {
     throw new Error("You need to enroll in this course before opening the learning page.");
+  }
+
+  if (!["enrolled", "in_progress", "completed"].includes(enrollment.status)) {
+    throw new Error("Your course access is not active yet. Please check your payment or enrollment status from the job seeker dashboard.");
   }
 
   const { data: lessons, error: lessonsError } = await supabase
@@ -139,7 +143,7 @@ export async function updateLessonCompletion({
   requireDatabase();
 
   if (!learnerId || !courseId || !enrollmentId || !lessonId) {
-    throw new Error("A learner, enrollment, course, and lesson are required.");
+    throw new Error("A job seeker, enrollment, course, and lesson are required.");
   }
 
   if (isComplete) {

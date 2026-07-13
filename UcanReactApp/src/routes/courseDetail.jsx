@@ -12,6 +12,7 @@ import {
 import { findCourseBySlug } from "../lib/courseCatalog";
 import {
   createManualOrder,
+  fetchCourseOrder,
   getCoursePriceOmr,
   submitManualPayment,
   uploadPaymentProof,
@@ -34,6 +35,7 @@ export default function CourseDetail() {
   const [enrolling, setEnrolling] = useState(false);
   const [updatingProgress, setUpdatingProgress] = useState(false);
   const [enrollment, setEnrollment] = useState(null);
+  const [courseOrder, setCourseOrder] = useState(null);
   const [loadingEnrollment, setLoadingEnrollment] = useState(false);
   const [courseLoadMessage, setCourseLoadMessage] = useState("");
   const [enrollmentFeedback, setEnrollmentFeedback] = useState({
@@ -102,13 +104,20 @@ export default function CourseDetail() {
       setLoadingEnrollment(true);
 
       try {
-        const nextEnrollment = await fetchCourseEnrollment({
-          learnerId: user.id,
-          courseId: course.id,
-        });
+        const [nextEnrollment, nextOrder] = await Promise.all([
+          fetchCourseEnrollment({
+            learnerId: user.id,
+            courseId: course.id,
+          }),
+          fetchCourseOrder({
+            learnerId: user.id,
+            courseId: course.id,
+          }),
+        ]);
 
         if (active) {
           setEnrollment(nextEnrollment);
+          setCourseOrder(nextOrder);
         }
       } catch (error) {
         if (active) {
@@ -189,6 +198,10 @@ export default function CourseDetail() {
         proofUrl: proofFile.path,
       });
 
+      setCourseOrder({
+        ...order,
+        status: "payment_submitted",
+      });
       setPaymentProofFile(null);
       setPaymentReference("");
       setEnrollmentFeedback({
@@ -241,7 +254,7 @@ export default function CourseDetail() {
 
       setEnrollmentFeedback({
         type: "success",
-        message: "You are enrolled. You can now view this course from your learner dashboard.",
+        message: "You are enrolled. You can now view this course from your job seeker dashboard.",
       });
     } catch (error) {
       setEnrollmentFeedback({
@@ -324,6 +337,9 @@ export default function CourseDetail() {
   const content = course.en;
   const priceOmr = getCoursePriceOmr(course);
   const isPaidCourse = priceOmr > 0;
+  const paidRequestSubmitted = courseOrder?.status === "payment_submitted";
+  const paidRequestApproved = courseOrder?.status === "paid";
+  const paidRequestClosed = ["cancelled", "refunded"].includes(courseOrder?.status);
 
   return (
     <main className="oman-page min-h-screen text-slate-900">
@@ -450,7 +466,38 @@ export default function CourseDetail() {
             </div>
           )}
 
-          {isPaidCourse && !enrollment && (
+          {isPaidCourse && !enrollment && courseOrder && (
+            <div className="mt-8 rounded-3xl oman-outline-panel p-5">
+              <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+                Access Request Status
+              </p>
+              <h3 className="mt-3 text-lg font-semibold capitalize text-[var(--oman-ink)]">
+                {courseOrder.status.replaceAll("_", " ")}
+              </h3>
+              <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
+                {paidRequestSubmitted
+                  ? "Your payment proof was submitted. The admin team needs to approve it before lessons unlock."
+                  : paidRequestApproved
+                    ? "Your payment was approved. Refresh your dashboard if the course does not appear yet."
+                    : paidRequestClosed
+                      ? "This request is closed. Please contact support if you need to submit a new proof for this course."
+                      : "This order is waiting for proof of payment."}
+              </p>
+              <p className="mt-3 text-sm leading-6 text-[var(--oman-ink)]/70">
+                Order {courseOrder.orderNumber} · {courseOrder.totalLabel}
+              </p>
+              {paidRequestApproved ? (
+                <Link
+                  to={`/learn/${course.slug}/`}
+                  className="oman-button-primary mt-5 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+                >
+                  Open Learning Page
+                </Link>
+              ) : null}
+            </div>
+          )}
+
+          {isPaidCourse && !enrollment && !paidRequestSubmitted && !paidRequestApproved && !paidRequestClosed && (
             <div className="mt-8 rounded-3xl oman-outline-panel p-5">
               <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
                 Bank Muscat Phone Payment
@@ -554,11 +601,11 @@ export default function CourseDetail() {
                   : enrolling
                     ? "Enrolling..."
                     : user
-                      ? "Enroll For Free"
+                      ? "Enroll"
                       : "Sign In To Enroll"}
               </button>
               <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
-                Free courses enroll instantly.
+                Enrollment opens after course access is approved.
               </p>
             </>
           )}

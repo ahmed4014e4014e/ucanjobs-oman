@@ -76,7 +76,7 @@ join (
       'Beginner',
       '2 weeks',
       'English',
-      0.000,
+      8.000,
       1
     ),
     (
@@ -91,7 +91,7 @@ join (
       'Beginner',
       '1 week',
       'English',
-      0.000,
+      9.000,
       2
     )
 ) as course_data (

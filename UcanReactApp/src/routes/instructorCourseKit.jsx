@@ -164,7 +164,7 @@ export default function InstructorCourseKit() {
       setCourse(publishedCourse);
       setFeedback({
         type: "success",
-        message: "The course is published and available through the learner course flow.",
+        message: "The course is published and available through the job seeker course flow.",
       });
     } catch (error) {
       setFeedback({
@@ -303,7 +303,7 @@ export default function InstructorCourseKit() {
                 className="mt-1"
               />
               <span className="text-sm leading-6">
-                I confirm that the course content is complete, accurate, and ready for learners.
+                I confirm that the course content is complete, accurate, and ready for job seekers.
               </span>
             </label>
             <button

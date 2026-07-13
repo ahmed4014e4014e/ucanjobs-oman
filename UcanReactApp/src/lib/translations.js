@@ -8,7 +8,7 @@ export const supportedLanguages = {
 
 const shared = {
   en: {
-    footer: "Copyright {year} Ucan. Career-focused e-learning for Oman.",
+    footer: "Copyright {year} Ucan. Career-readiness for Oman.",
     fieldsRequired: "Fields marked with * are required.",
     acceptedFiles: "Accepted files: {types}. Maximum size: {size} MB per file.",
     close: "Close",
@@ -19,7 +19,7 @@ const shared = {
 export const translations = {
   en: {
     brand: {
-      kicker: "Career E-Learning",
+      kicker: "Career Readiness",
       name: "Ucan",
     },
     nav: {
@@ -28,7 +28,7 @@ export const translations = {
       services: "Courses",
       contact: "Contact",
       policies: "Policies",
-      studentAccess: "Learner Access",
+      studentAccess: "Job Seeker Access",
       tutorAccess: "Instructor Access",
       adminAccess: "Admin Access",
       dashboard: "Dashboard",
@@ -43,20 +43,20 @@ export const translations = {
     },
     roles: {
       member: "member",
-      learner: "learner",
+      learner: "job seeker",
       instructor: "instructor",
       admin: "admin",
     },
     common: shared.en,
     home: {
       heroKicker: "Welcome to Ucan",
-      heroTitle: "Career-focused e-learning built for Oman’s next generation of tech talent.",
+      heroTitle: "Career-readiness built for Oman’s next generation of tech talent.",
       heroText:
         "Ucan helps fresh graduates and job seekers build practical skills for Oman’s technology sector through structured courses in software engineering, AI, cyber security, data analytics, and job readiness.",
       exploreServices: "Explore Courses",
       cardKicker: "Omani Market, Modern Skills",
       cardTitle:
-        "A commercial learning platform shaped around employability, practical portfolios, and high-demand digital careers.",
+        "A commercial career-readiness platform shaped around employability, practical portfolios, and high-demand digital careers.",
       stats: [
         { number: "Tech", label: "courses aligned with in-demand career paths" },
         { number: "AI", label: "future recommendations shaped by market signals" },
@@ -64,12 +64,12 @@ export const translations = {
       ],
       featuresKicker: "Why Choose Ucan",
       featuresTitle:
-        "A practical e-learning platform for graduates who need job-ready technology skills.",
+        "A practical career-readiness platform for graduates who need job-ready technology skills.",
       features: [
         {
           title: "Career-Focused Courses",
           description:
-            "Courses are designed around practical skills that help learners prepare for entry-level technology jobs.",
+            "Courses are designed around practical skills that help job seekers prepare for entry-level technology jobs.",
         },
         {
           title: "Built For Oman",
@@ -79,7 +79,7 @@ export const translations = {
         {
           title: "Data-Informed Direction",
           description:
-            "The platform is being prepared to use AI, SEO, and open-data insights to identify high-demand learning paths.",
+            "The career-readiness platform is being prepared to use AI, SEO, and open-data insights to identify high-demand skill paths.",
         },
       ],
       howKicker: "How It Works",
@@ -101,15 +101,15 @@ export const translations = {
             "Use your learning to strengthen your portfolio, confidence, interview preparation, and workplace readiness.",
         },
       ],
-      toolsKicker: "Learning Tools",
-      toolsTitle: "Digital tools that support online learning and professional collaboration.",
+      toolsKicker: "Career-Readiness Tools",
+      toolsTitle: "Digital tools that support career preparation and professional collaboration.",
       toolsText:
-        "Ucan courses can use modern meeting, planning, and collaboration tools to help learners practice the same workflows used in real technology teams.",
+        "Ucan courses can use modern meeting, planning, and collaboration tools to help job seekers practice the same workflows used in real technology teams.",
       toolGroups: [
         {
-          title: "Live Learning Platforms",
+          title: "Live Career Workshops",
           description:
-            "Support live workshops, mentoring sessions, screen sharing, and instructor-led learning.",
+            "Support live workshops, mentoring sessions, screen sharing, and instructor-led career preparation.",
         },
         {
           title: "Collaboration Tools",
@@ -124,38 +124,38 @@ export const translations = {
       tutorAccess: "Instructor Access",
       tutorCardTitle: "Log in or apply to create your instructor account.",
       tutorCardText:
-        "Use the instructor page to apply, enter your protected dashboard, and prepare courses for learners.",
+        "Use the instructor page to apply, enter your protected dashboard, and prepare courses for job seekers.",
       tutorButton: "Instructor Login / Apply",
-      studentKicker: "Learner Access",
-      studentTitle: "Join as a learner and start building job-ready tech skills.",
+      studentKicker: "Job Seeker Access",
+      studentTitle: "Join as a job seeker and start building job-ready tech skills.",
       studentText:
-        "Learners can create an account to access career-focused courses, learning resources, and future personalized recommendations.",
-      studentCardTitle: "Log in or sign up to create your learner account.",
+        "Job Seekers can create an account to access career-focused courses, learning resources, and future personalized recommendations.",
+      studentCardTitle: "Log in or sign up to create your job seeker account.",
       studentCardText:
-        "Use the learner account page to create your profile and prepare for the Ucan course marketplace.",
-      studentButton: "Learner Login / Sign Up",
+        "Use the job seeker account page to create your profile and prepare for the Ucan course marketplace.",
+      studentButton: "Job Seeker Login / Sign Up",
       ctaKicker: "Start Learning",
       ctaTitle:
         "Build the skills needed for Oman’s growing technology sector.",
       ctaText:
-        "Ucan is transforming into a commercial e-learning platform for software engineering, AI, cyber security, data analytics, and job readiness.",
+        "Ucan is transforming into a commercial career-readiness platform for software engineering, AI, cyber security, data analytics, and job readiness.",
       ctaButton: "Explore Courses",
     },
     about: {
       heroKicker: "About Ucan",
       heroTitle:
-        "An e-learning platform focused on Oman’s graduate employability gap.",
+        "A career-readiness platform focused on Oman’s graduate employability gap.",
       heroText:
-        "Ucan is being built to help computer science graduates, diploma holders, and job seekers move from academic knowledge into practical, market-ready technology skills.",
+        "Ucan is being built to help computer science graduates, diploma holders, and job seekers move from theory into practical, market-ready technology skills.",
       ucf: "University of Central Florida",
       ucfText:
-        "We imagine digital education as practical, dignified, locally relevant, and connected to real employment outcomes.",
+        "We imagine career preparation as practical, dignified, locally relevant, and connected to real employment outcomes.",
       founderKicker: "Meet Our Founder",
       founderName: "Ahmed Mohammed Al Ruqaishi",
       founderTextOne:
         "Grew up in UK... Migrated to USA... and now in Oman. You know the rest of the story ... LETS GO EVERYONE!!",
       founderTextTwo:
-        'Ahmed is a 25 year old beginner software developer who was inspired by the movie "The Social Network" to create this platform to better enhance the college experience academically, socially, and most importantly psychologically.',
+        'Ahmed is a 25 year old beginner software developer who was inspired by the movie "The Social Network" to create this platform to help graduates build practical confidence, digital skills, and career readiness.',
       founderLocation: "Qurum Beach, Muscat, Oman.",
       highlights: [
         { number: "Career", label: "learning paths for technology roles" },
@@ -165,16 +165,16 @@ export const translations = {
       missionKicker: "Our Mission",
       missionTitle: "Help Omani tech graduates become more employable through practical online courses.",
       missionTextOne:
-        "Ucan exists to bridge the gap between academic study and entry-level technology work by focusing on practical skills, projects, tools, and career readiness.",
+        "Ucan exists to bridge the gap between formal study and entry-level technology work by focusing on practical skills, projects, tools, and career readiness.",
       missionTextTwo:
-        "The long-term vision is to use AI, SEO, and Oman open-data sources to identify what learners should study and which course topics matter most for the market.",
+        "The long-term vision is to use AI, SEO, and Oman open-data sources to identify what job seekers should study and which course topics matter most for the market.",
       valuesKicker: "Core Values",
-      valuesTitle: "The ideas shaping Ucan’s e-learning marketplace.",
+      valuesTitle: "The ideas shaping Ucan’s career-readiness marketplace.",
       values: [
         {
           title: "Employability First",
           description:
-            "Courses should help learners build real capabilities that improve their chances in Oman’s technology job market.",
+            "Courses should help job seekers build real capabilities that improve their chances in Oman’s technology job market.",
         },
         {
           title: "Local Market Fit",
@@ -187,18 +187,18 @@ export const translations = {
             "Future platform intelligence should help recommend courses, identify skill gaps, and guide new course creation.",
         },
       ],
-      communityKicker: "Our Learners",
+      communityKicker: "Our Job Seekers",
       communityTitle:
         "Graduates, job seekers, instructors, and employers connected by practical digital skills.",
       communityText:
-        "Ucan is built for learners who want more than certificates: they need confidence, project experience, and skills that make sense in Oman’s job market.",
+        "Ucan is built for job seekers who want more than certificates: they need confidence, project experience, and skills that make sense in Oman’s job market.",
     },
     contact: {
       heroKicker: "Contact Ucan",
       heroTitle:
-        "Reach a career-focused e-learning platform built for Oman.",
+        "Reach a career-readiness platform built for Oman.",
       heroText:
-        "Whether you are a learner, instructor, employer, or partner, use this page to contact Ucan about courses, skills, and digital learning opportunities.",
+        "Whether you are a job seeker, instructor, employer, or partner, use this page to contact Ucan about courses, skills, and digital learning opportunities.",
       heroCardText:
         "We want the platform to feel as dependable and recognizable as the landmarks that shape Oman's identity.",
       formKicker: "Contact Form",
@@ -222,7 +222,7 @@ export const translations = {
         message: "Write your message here...",
         attachmentNotes: "Optional: add a short note about the files you attached.",
       },
-      roleStudent: "Learner",
+      roleStudent: "Job Seeker",
       roleTutor: "Instructor",
       feedbackTitle: "Contact form update",
       submitting: "Submitting...",
@@ -239,19 +239,19 @@ export const translations = {
           title: "Email",
           value: "20258971@mcbs.edu.om",
           description:
-            "Reach out with questions about courses, instructor opportunities, partnerships, or the Ucan learning platform.",
+            "Reach out with questions about courses, instructor opportunities, partnerships, or the Ucan career-readiness platform.",
         },
         {
           title: "Location",
           value: "Qurum Beach, Muscat, Oman",
           description:
-            "Ucan serves learners online while focusing on Oman’s graduate employment and digital skills needs.",
+            "Ucan serves job seekers online while focusing on Oman’s graduate employment and digital skills needs.",
         },
       ],
       ctaKicker: "We Are Here to Help",
-      ctaTitle: "Reach out whenever you need better support for your college courses.",
+      ctaTitle: "Reach out whenever you need better support for your career-readiness journey.",
       ctaText:
-        "Ucan is here to help learners build practical digital skills for stronger career opportunities.",
+        "Ucan is here to help job seekers build practical digital skills for stronger career opportunities.",
     },
     servicesPage: {
       heroKicker: "Courses",
@@ -274,23 +274,23 @@ export const translations = {
             "This section will evolve from the old instructor directory into a commercial course catalog.",
         },
         {
-          kicker: "Learner Progress",
+          kicker: "Job Seeker Progress",
           title: "Prepare for structured learning paths and course enrollment.",
           text:
-            "Learners will eventually enroll in courses, track progress, and build practical portfolios.",
+            "Job Seekers will eventually enroll in courses, track progress, and build practical portfolios.",
         },
         {
           kicker: "Market Intelligence",
           title:
             "Use AI and open-data signals to guide which courses Ucan should create and promote.",
-          text: "Future course planning can respond to actual labor-market demand and learner preferences.",
+          text: "Future course planning can respond to actual labor-market demand and job seeker preferences.",
         },
       ],
       directoryStatus: "Directory Status",
-      requestAccess: "Learner Access",
+      requestAccess: "Job Seeker Access",
       requestAccessText:
-        "You can explore the future course direction freely, but learner accounts will be needed for enrollment and personalized recommendations.",
-      studentLogin: "Learner Login",
+        "You can explore the future course direction freely, but job seeker accounts will be needed for enrollment and personalized recommendations.",
+      studentLogin: "Job Seeker Login",
       tutorLogin: "Instructor Login",
       private: {
         label: "Software Engineering",
@@ -302,42 +302,42 @@ export const translations = {
         label: "Advanced Digital Skills",
         title: "Explore future courses in AI, data, cyber security, and cloud skills.",
         description:
-          "These subjects will support learners preparing for high-demand technology roles in Oman.",
+          "These subjects will support job seekers preparing for high-demand technology roles in Oman.",
       },
       tutorSection: {
-        institute: "Institute",
+        institute: "Organization",
         course: "Course",
-        selectUniversity: "Select university",
-        selectUniversityFirst: "Select a university first",
+        selectUniversity: "Select organization",
+        selectUniversityFirst: "Select an organization first",
         noCourses: "No courses available yet",
         allCourses: "All Courses",
         availableNow: "Available Now",
         tutorsAvailable: "{count} instructor{plural} available for {title}",
         courseOfferings: "{count} course offering{plural} currently match your selected filters.",
-        profileRequiredTitle: "Complete your learner profile to view available instructors",
+        profileRequiredTitle: "Complete your job seeker profile to view available instructors",
         profileRequiredText:
-          "Add your learner name and university name in your dashboard before sending a course request.",
-        profileRequiredButton: "Complete Learner Profile",
+          "Add your job seeker name and organization name in your dashboard before sending a course request.",
+        profileRequiredButton: "Complete Job Seeker Profile",
         loginTitle: "Please login / sign up to view available instructors",
         loginText:
           "Create an account or log in first to access the private and group instructor directory and send a course request.",
         loadingTitle: "Loading instructor directory...",
         loadingText: "Fetching instructors, courses, and available session types from database.",
-        selectInstituteTitle: "Select a university to view courses",
+        selectInstituteTitle: "Select an organization to view courses",
         selectInstituteText:
-          "Course options and instructor cards will appear only after a university is selected.",
+          "Course options and instructor cards will appear only after an organization is selected.",
         profileLabel: "Instructor profile",
         multiInstitute: "Multi Institute",
         sessionType: "Session Type",
-        privateSession: "Private one-on-one tutoring",
-        groupSession: "Group tutoring session",
+        privateSession: "Private one-on-one career coaching",
+        groupSession: "Group career-readiness session",
         availability: "Availability",
         courses: "Courses",
         offered: "{count} offered",
-        sendRequest: "Send Tutoring Request",
-        loginToSend: "Log in to send tutoring request",
+        sendRequest: "Send Support Request",
+        loginToSend: "Log in to send support request",
         loginNote:
-          "Please log in to your learner or instructor account before sending a tutoring session.",
+          "Please log in to your job seeker or instructor account before sending a support request.",
         emptyTitle: "No instructor listed yet for this selection",
         emptyText:
           "Once more instructors and course offerings are added in database, this directory will update automatically.",
@@ -358,7 +358,7 @@ export const translations = {
         {
           title: "AI And Machine Learning",
           description:
-            "Courses can help learners understand Python, ML foundations, applied AI tools, model workflows, and responsible use.",
+            "Courses can help job seekers understand Python, ML foundations, applied AI tools, model workflows, and responsible use.",
         },
         {
           title: "Cyber Security",
@@ -380,193 +380,222 @@ export const translations = {
       whyTitle:
         "Many graduates need practical skills that match real entry-level technology work.",
       whyTextOne:
-        "Ucan can use course data, learner behavior, SEO signals, and Oman open-data statistics to decide which learning paths matter most.",
+        "Ucan can use course data, job seeker behavior, SEO signals, and Oman open-data statistics to decide which learning paths matter most.",
       whyTextTwo: "The current platform will be gradually transformed from service requests into courses, enrollments, and learning progress.",
       ctaKicker: "Start Your Career Path",
       ctaTitle: "Explore the first course categories for Oman’s digital economy.",
       ctaText:
-        "Ucan is becoming a marketplace where learners can buy focused courses that improve employability in technology fields.",
+        "Ucan is becoming a marketplace where job seekers can buy focused courses that improve employability in technology fields.",
       ctaButton: "Explore Courses",
       requestModal: {
-        kicker: "Tutoring Request",
-        title: "Send a tutoring request to {name}",
+        kicker: "Support Request",
+        title: "Send a support request to {name}",
         intro:
-          "Please save your tutoring request below and attach any helpful files so the instructor can contact you directly and arrange the session with you.",
-        studentAccount: "Learner account",
+          "Please save your support request below and attach any helpful files so the instructor can contact you directly and arrange the session with you.",
+        studentAccount: "Job Seeker account",
         name: "Name:",
         email: "Email:",
         accountNote:
-          "These details are pulled automatically from your logged-in learner account and shown to the instructor with this request.",
+          "These details are pulled automatically from your logged-in job seeker account and shown to the instructor with this request.",
         titleLabel: "Title",
         titlePlaceholder: "Example: Help with MAT255 midterm review",
-        instituteLabel: "Learner university name",
+        instituteLabel: "Job seeker organization name",
         institutePlaceholder: "Example: MCBS",
         courseLabel: "Course",
-        topicsLabel: "Topics need help with",
+        topicsLabel: "Topics you need help with",
         topicsPlaceholder:
           "Describe the topics, concepts, assignments, or exam areas you need help with.",
         attachFiles: "Attach files",
         attachmentNotes: "Attachment notes",
         attachmentPlaceholder:
           "Mention any files, screenshots, or notes you plan to include in your email.",
-        feedbackTitle: "Tutoring request update",
+        feedbackTitle: "Support request update",
         saving: "Saving Request...",
-        save: "Save Tutoring Request",
+        save: "Save Support Request",
       },
       messages: {
         directoryNotConfigured:
           "database is not configured yet. Add your environment variables before using the live instructor directory.",
         loginAndCourse: "Please log in and choose a course before submitting a request.",
-        requiredTitleInstitute: "Please complete the required title and learner institute fields.",
+        requiredTitleInstitute: "Please complete the required title and job seeker institute fields.",
         attachmentRequired:
-          "Please attach at least one file before submitting your tutoring request.",
+          "Please attach at least one file before submitting your support request.",
         validCourse: "Please choose a valid course for this instructor.",
         requestSuccess:
-          "Your tutoring request was saved successfully. The instructor can now contact you directly to arrange the session.",
-        requestError: "We could not save your tutoring request.",
+          "Your support request was saved successfully. The instructor can now contact you directly to arrange the session.",
+        requestError: "We could not save your support request.",
       },
     },
     terms: {
       heroKicker: "Platform Policies",
-      heroTitle: "Ucan Platform Policies",
+      heroTitle: "Ucan User Agreement",
       heroText:
-        "These policies apply to learner access, instructor applications, course participation, and responsible use of the Ucan platform.",
+        "A simplified agreement for using Ucan as a job seeker or instructor in a career-focused e-learning marketplace.",
       heroCardText:
-        "Please review these policies carefully before creating a learner account or applying to become an instructor.",
-      documentKicker: "Policy Document",
-      documentTitle: "Read the platform rules and responsibilities",
+        "This page summarizes the main rules for accounts, course access, payments, content, conduct, privacy, and platform safety.",
+      documentKicker: "Simplified Legal Terms",
+      documentTitle: "User agreement by account type",
       policies: [
         {
-          title: "Professional Conduct Policy",
+          title: "Job Seeker User Agreement",
           body:
-            "All instructors registered under Ucan are expected to maintain professional behavior while interacting with learners, administrators, and other instructors.",
+            "These terms apply to users who create a Ucan account to browse, purchase, enroll in, or complete career-focused courses. By creating an account, enrolling in a course, submitting payment proof, or using course materials, the job seeker agrees to use the platform responsibly.",
           columns: [
             {
-              title: "Tutors Must",
+              title: "Job Seekers May",
               items: [
-                "Treat all students respectfully and professionally.",
-                "Communicate politely and appropriately at all times.",
-                "Arrive on time for tutoring sessions.",
-                "Provide honest academic support to the best of their abilities.",
-                "Maintain a positive and supportive learning environment.",
-                "Dress and behave appropriately during online or physical sessions.",
-                "Follow the rules and regulations of their educational institution.",
+                "Create one personal account using accurate information.",
+                "Browse available courses, course details, prices, and learning materials.",
+                "Enroll in courses after completing profile and payment requirements.",
+                "Use course videos, lessons, quizzes, downloadable resources, and support tools for personal learning.",
+                "Contact Ucan support about access, payment confirmation, course issues, or account questions.",
               ],
             },
             {
-              title: "Tutors Must Not",
+              title: "Job Seekers Must Not",
               items: [
-                "Use offensive, discriminatory, or inappropriate language.",
-                "Share harmful, illegal, or unethical content.",
-                "Mislead students regarding qualifications or academic abilities.",
-                "Request inappropriate personal information from students.",
-                "Engage in behavior that damages the reputation of Ucan.",
+                "Share, resell, copy, record, redistribute, or publicly upload paid course content.",
+                "Give another person access to their account or use someone else's account.",
+                "Submit false payment proof, fake identity details, or misleading profile information.",
+                "Harass, threaten, discriminate against, or abuse instructors, staff, or other users.",
+                "Use Ucan for illegal activity, spam, scraping, security testing, or platform misuse.",
               ],
             },
           ],
-          closing:
-            "Violation of this policy may result in suspension or permanent removal from the Ucan platform.",
-        },
-        {
-          title: "Anti-Harassment Policy",
-          body:
-            "Ucan is committed to providing a safe, respectful, and inclusive environment for all users. Harassment of any kind is strictly prohibited.",
           sections: [
             {
-              title: "Prohibited Behavior Includes",
+              title: "Accounts And Profile Information",
               items: [
-                "Bullying or intimidation",
-                "Sexual harassment or inappropriate comments",
-                "Discriminatory remarks related to gender, nationality, religion, race, or disability",
-                "Repeated unwanted communication",
-                "Threats, abusive language, or hostile behavior",
-                "Sharing offensive or explicit content",
+                "Job seekers are responsible for keeping login details secure.",
+                "Profile information such as name, organization, target job role, and email should be accurate.",
+                "Ucan may require profile completion before allowing enrollment, support requests, or personalized recommendations.",
+                "Ucan may suspend accounts that appear fake, duplicated, abusive, or used for unauthorized access.",
               ],
             },
             {
-              title: "Reporting Harassment",
+              title: "Course Access And Payments",
               text:
-                "Users may report incidents directly to the Ucan administration team. All reports will be treated seriously and investigated confidentially.",
-            },
-            {
-              title: "Consequences",
+                "Paid courses are accessed only after payment is submitted and approved through the platform process. Manual bank transfer or local payment confirmation may be used before automated payment gateways are added.",
               items: [
-                "Warning notices",
-                "Temporary suspension",
-                "Permanent account termination",
-                "Reporting to educational institutions if necessary",
+                "Course prices, access rules, and availability may change before purchase.",
+                "Submitting payment proof does not guarantee access until the admin review is completed.",
+                "If payment is rejected, cancelled, refunded, or not confirmed, course access may be withheld or removed.",
+                "Refund handling depends on platform policy, payment status, and whether course access has already been granted.",
               ],
             },
-          ],
-        },
-        {
-          title: "Academic Honesty Policy",
-          body: "Ucan promotes ethical learning and professional integrity.",
-          sections: [
             {
-              title: "Tutors Must",
+              title: "Learning Content And Certificates",
               items: [
-                "Guide students in understanding academic concepts.",
-                "Encourage independent learning and problem solving.",
-                "Avoid completing assignments, exams, or quizzes on behalf of students.",
-                "Avoid sharing unauthorized exam materials or answer keys.",
-                "Provide accurate and truthful academic assistance.",
+                "Course materials are provided for personal education, employability, and skill development only.",
+                "Ucan does not guarantee employment, salary, interview success, immigration benefits, or admission to any external organization.",
+                "Progress tracking may be used to improve the learning experience and future course recommendations.",
+                "Certificates may be added later and may depend on completion status, assessments, payment status, and platform rules.",
+              ],
+            },
+            {
+              title: "Privacy And Communications",
+              items: [
+                "Ucan may store account details, course activity, enrollment history, support requests, and payment records.",
+                "Ucan may contact job seekers about course access, support, platform updates, payment status, and account notices.",
+                "Job seekers must not publish private instructor, admin, or user information without permission.",
               ],
             },
           ],
           closing:
-            "Academic dishonesty, cheating assistance, plagiarism, or exam misconduct is strictly prohibited. Violations may lead to immediate removal from the platform.",
+            "Ucan may warn, restrict, suspend, or close a job seeker account if these terms are violated or if platform security, payment integrity, or user safety is at risk.",
         },
         {
-          title: "Privacy & Confidentiality Policy",
-          body: "Ucan respects the privacy of all users and protects submitted information.",
+          title: "Instructor User Agreement",
+          body:
+            "These terms apply to approved instructors, instructor applicants, and course creators who submit applications, propose course topics, upload learning content, or teach through Ucan. Instructors are expected to meet a higher standard because they influence job seeker learning outcomes and platform trust.",
           columns: [
             {
-              title: "Collected Information May Include",
+              title: "Instructors May",
               items: [
-                "Omani ID",
-                "University ID",
-                "Academic transcripts",
-                "Contact information",
-                "Tutoring qualifications",
+                "Apply to teach by submitting professional background, portfolio links, proposed topics, and sample materials.",
+                "Submit course proposals for admin review before publication.",
+                "Create lessons, videos, resources, quizzes, and practical projects for approved courses.",
+                "Receive platform-approved payments or revenue arrangements when payment features are formally enabled.",
+                "Communicate with Ucan admins about course quality, updates, learner support, and publishing status.",
               ],
             },
             {
-              title: "Ucan Will",
+              title: "Instructors Must Not",
               items: [
-                "Use submitted documents only for instructor verification purposes.",
-                "Restrict access to sensitive information to authorized administrators only.",
-                "Avoid sharing personal information with third parties without permission.",
-                "Take reasonable measures to protect user data and confidentiality.",
+                "Upload copied, pirated, plagiarized, illegal, harmful, offensive, or misleading content.",
+                "Claim false qualifications, fake work experience, fake certifications, or misleading employment outcomes.",
+                "Contact job seekers for unauthorized private sales, external payments, or off-platform arrangements without Ucan approval.",
+                "Promise guaranteed jobs, salaries, interviews, visas, admissions, or employment outcomes.",
+                "Collect unnecessary personal data from job seekers or misuse learner information.",
               ],
             },
           ],
           sections: [
             {
-              title: "Users Must",
+              title: "Instructor Application And Approval",
               items: [
-                "Respect the privacy of students and tutors.",
-                "Avoid recording or sharing tutoring sessions without permission.",
-                "Avoid distributing personal or academic information belonging to others.",
+                "Submitting an instructor application does not guarantee approval.",
+                "Ucan may review background, portfolio links, sample videos, proposed topics, teaching experience, and payment details.",
+                "Ucan may reject, delay, request edits, or revoke instructor approval at its discretion.",
+                "Approved instructors may still need admin review before any course is published.",
+              ],
+            },
+            {
+              title: "Course Ownership And Content License",
+              items: [
+                "Instructors must own their submitted content or have the legal right to use it.",
+                "By submitting course content, instructors give Ucan permission to host, display, stream, promote, review, and sell access to that content through the platform.",
+                "Instructors remain responsible for copyright, licensing, third-party materials, code samples, images, videos, and external resources they submit.",
+                "Ucan may edit formatting, request changes, unpublish, restrict, or remove content for quality, legal, safety, or business reasons.",
+              ],
+            },
+            {
+              title: "Teaching Quality And Professional Conduct",
+              items: [
+                "Courses should be accurate, practical, organized, and suitable for the stated skill level.",
+                "Instructors should respond professionally to admin requests and platform communications.",
+                "Instructors must treat job seekers respectfully and avoid harassment, discrimination, intimidation, or inappropriate communication.",
+                "Instructors should not complete assessments, quizzes, portfolio work, or job tasks on behalf of job seekers.",
+                "Instructors should disclose major course limitations and avoid misleading marketing claims.",
+              ],
+            },
+            {
+              title: "Payments, Taxes, And Business Terms",
+              items: [
+                "Instructor payment terms may depend on Ucan's current business model, manual payment process, future gateway integration, and separate written agreement.",
+                "Instructor bank/payment details may be collected later for payout readiness and verification.",
+                "Instructors are responsible for their own tax, licensing, professional, and legal obligations unless otherwise agreed in writing.",
+                "Ucan may pause payouts or course publication if fraud, refund disputes, copyright issues, or policy violations are suspected.",
+              ],
+            },
+            {
+              title: "Platform Enforcement",
+              items: [
+                "Ucan may request edits, reject proposals, unpublish courses, restrict dashboard access, suspend an instructor account, or remove an instructor from the platform.",
+                "Serious violations may be reported to relevant authorities, payment providers, platform partners, or affected rights holders where appropriate.",
+                "Ucan may update instructor terms as the platform adds payments, certificates, AI recommendations, analytics, or new course delivery tools.",
               ],
             },
           ],
-          closing: "Violation of confidentiality expectations may result in disciplinary action.",
+          closing:
+            "Instructor participation is a privilege based on trust, professional conduct, content quality, and compliance with Ucan platform rules.",
         },
       ],
-      requiredTitle: "When agreement is required",
+      requiredTitle: "Important legal note",
       requiredItems: [
-        "Learner users must agree before creating a learner account.",
-        "Instructor applicants must agree before submitting the instructor application form.",
+        "This is a simplified user agreement draft for the Ucan platform and should be reviewed by a qualified lawyer before commercial launch.",
+        "Job seekers must agree before creating an account, enrolling, submitting payment proof, or using paid course materials.",
+        "Instructor applicants must agree before submitting an application, course proposal, sample file, or teaching content.",
+        "Ucan may update these terms as payments, certificates, AI recommendations, analytics, and course publishing features mature.",
       ],
     },
     accessPages: {
       student: {
-        audienceLabel: "Learner Access",
-        title: "Log in or sign up to access Ucan learner features.",
+        audienceLabel: "Job Seeker Access",
+        title: "Log in or sign up to access Ucan job seeker features.",
         description:
-          "This page is designed for learners who want to create an account, access courses, and prepare for practical technology careers.",
-        signupHeading: "Create a learner account",
+          "This page is designed for job seekers who want to create an account, access courses, and prepare for practical technology careers.",
+        signupHeading: "Create a job seeker account",
         imageAlt: "Middle East College campus in Oman",
       },
       tutor: {
@@ -590,7 +619,7 @@ export const translations = {
       supabaseMissing:
         "database is not configured yet. Add your database environment variables in .env.local.",
       studentSignupFirst:
-        "We could not find a learner account with those login details. Please sign up first if you have not created an account yet.",
+        "We could not find a job seeker account with those login details. Please sign up first if you have not created an account yet.",
       profileLoadError: "We could not load your account profile yet. Please try again in a moment.",
       wrongRole:
         "This account is registered as a {role}. Please use the {role} access page instead.",
@@ -658,7 +687,7 @@ export const translations = {
         "Instructor signup is handled through a separate application review process. Submit your background, proposed teaching areas, and supporting documents first, then approved instructors can be onboarded into the platform.",
       needsTitle: "You will need",
       needs: [
-        "Full name and professional or academic background",
+        "Full name and professional or training background",
         "Your proposed course topics",
         "Email and WhatsApp phone number",
         "Supporting documents or portfolio links",
@@ -666,35 +695,37 @@ export const translations = {
       button: "Open Instructor Application Form",
     },
     studentDashboard: {
-      fallbackName: "Learner",
-      heroKicker: "Learner Dashboard",
+      fallbackName: "Job Seeker",
+      heroKicker: "Job Seeker Dashboard",
       welcome: "Welcome, {name}",
       heroText:
-        "Complete your learner profile first, then use this protected dashboard as your home base for courses and career-focused learning.",
-      profileKicker: "Learner Profile",
+        "Complete your job seeker profile first, then use this protected dashboard as your home base for courses and career-focused learning.",
+      profileKicker: "Job Seeker Profile",
       profileComplete: "Profile complete",
       completeProfile: "Complete your profile",
-      profileText: "Enter your learner name and university name before enrolling in courses.",
-      feedbackTitle: "Learner profile update",
-      studentName: "Learner name",
+      profileText: "Enter your job seeker name, university name, and target job role before enrolling in courses.",
+      feedbackTitle: "Job Seeker profile update",
+      studentName: "Job Seeker name",
       studentNamePlaceholder: "Enter your full name",
       universityName: "University name",
       universityPlaceholder: "Example: MCBS",
+      targetJobRole: "Target job role",
+      targetJobRolePlaceholder: "Example: Frontend Developer",
       email: "Email:",
       role: "Role:",
-      roleStudent: "Learner",
+      roleStudent: "Job Seeker",
       notSet: "Not set",
       saving: "Saving Profile...",
-      save: "Save Learner Profile",
-      actionsKicker: "Learner Actions",
-      lockedTitle: "Complete your profile to unlock learner tools",
+      save: "Save Job Seeker Profile",
+      actionsKicker: "Job Seeker Actions",
+      lockedTitle: "Complete your profile to unlock job seeker tools",
       lockedText:
-        "Save your learner name and university name first, then course tools will become available.",
+        "Save your job seeker name, university name, and target job role first, then course tools will become available.",
       messages: {
-        notConfigured: "Your learner profile cannot be saved until database is configured.",
-        required: "Please enter your learner name and university name to complete your profile.",
-        success: "Your learner profile was saved. You can now enroll in courses.",
-        error: "We could not save your learner profile right now.",
+        notConfigured: "Your job seeker profile cannot be saved until database is configured.",
+        required: "Please enter your job seeker name, university name, and target job role to complete your profile.",
+        success: "Your job seeker profile was saved. You can now enroll in courses.",
+        error: "We could not save your job seeker profile right now.",
       },
       quickLinks: [
         {
@@ -731,7 +762,7 @@ export const translations = {
       heroKicker: "Admin Dashboard",
       welcome: "Welcome, {name}",
       heroText:
-        "This protected dashboard gives you one operating hub for Ucan content, learners, enrollments, market signals, and platform performance.",
+        "This protected dashboard gives you one operating hub for Ucan content, job seekers, enrollments, market signals, and platform performance.",
       profileKicker: "Profile",
       labels: {
         fullName: "Full name:",
@@ -763,14 +794,14 @@ export const translations = {
         {
           title: "Enrollments",
           description:
-            "Review learner course enrollments, payment readiness, progress status, and access issues.",
+            "Review job seeker course enrollments, payment readiness, progress status, and access issues.",
           action: "View Enrollments",
         },
         {
-          title: "Learner Accounts",
+          title: "Job Seeker Accounts",
           description:
-            "Review learner profiles, account completion, access status, and support needs.",
-          action: "View Learners",
+            "Review job seeker profiles, account completion, access status, and support needs.",
+          action: "View Job Seekers",
         },
         {
           title: "Market Insights",
@@ -787,7 +818,7 @@ export const translations = {
       ],
       workflowTitle: "Simple Admin Workflow",
       workflowText:
-        "Use the dashboard as a compact control center for content quality, learner support, and market alignment.",
+        "Use the dashboard as a compact control center for content quality, job seeker support, and market alignment.",
       contactWorkflowTitle: "Contact Messages",
       contactWorkflow: [
         "1. Open pending messages first.",
@@ -798,8 +829,8 @@ export const translations = {
       platformWorkflowTitle: "Platform Operations",
       platformWorkflow: [
         "1. Review instructor applications and course proposals.",
-        "2. Keep live courses accurate, published, and aligned with learner demand.",
-        "3. Monitor enrollments and learner account readiness.",
+        "2. Keep live courses accurate, published, and aligned with job seeker demand.",
+        "3. Monitor enrollments and job seeker account readiness.",
         "4. Use market and SEO signals to decide what Ucan should improve next.",
       ],
       statusTags: [
@@ -817,13 +848,13 @@ export const translations = {
         kicker: "Admin Records",
         title: "Enrollments",
         text:
-          "This section is reserved for reviewing learner course enrollments, payment readiness, course access, and completion progress.",
+          "This section is reserved for reviewing job seeker course enrollments, payment readiness, course access, and completion progress.",
       },
       learnerAccounts: {
         kicker: "Admin Records",
-        title: "Learner Accounts",
+        title: "Job Seeker Accounts",
         text:
-          "This section is reserved for reviewing learner profiles, account completion, access support, and role-related account checks.",
+          "This section is reserved for reviewing job seeker profiles, account completion, access support, and role-related account checks.",
       },
       marketInsights: {
         kicker: "Market Intelligence",
@@ -835,7 +866,7 @@ export const translations = {
         kicker: "Growth Analytics",
         title: "SEO/Course Performance",
         text:
-          "This section is reserved for tracking course visibility, organic search performance, learner conversion signals, and content gaps.",
+          "This section is reserved for tracking course visibility, organic search performance, job seeker conversion signals, and content gaps.",
       },
       back: "Back to Admin Dashboard",
       comingSoon: "Workspace prepared",
@@ -916,7 +947,7 @@ export const translations = {
       private: "Private",
       institutes: "Institutes",
       notProvided: "Not provided",
-      notProvidedStudent: "Unknown learner",
+      notProvidedStudent: "Unknown job seeker",
       noEmail: "No email",
       submitted: "Submitted:",
       status: "Status:",
@@ -961,27 +992,27 @@ export const translations = {
         message: "Message",
       },
       tutoring: {
-        fetchError: "Unable to load tutoring requests right now.",
-        statusSaved: "Tutoring request marked as {status}.",
-        statusError: "Unable to update this tutoring request status right now.",
+        fetchError: "Unable to load support requests right now.",
+        statusSaved: "Support request marked as {status}.",
+        statusError: "Unable to update this support request status right now.",
         kicker: "Instructor Records",
-        title: "Submitted Tutoring Requests",
+        title: "Submitted Support Requests",
         description:
-          "Open your assigned tutoring requests in separate popup windows, update their status, and download the attached study files directly from this page.",
+          "Open your assigned support requests in separate popup windows, update their status, and download the attached files directly from this page.",
         back: "Back to Instructor Dashboard",
         feedbackTitle: "Instructor request update",
-        loadingTitle: "Loading tutoring requests...",
-        loadingText: "Fetching the latest learner requests assigned to your instructor account.",
-        errorTitle: "Unable to load tutoring requests",
-        emptyTitle: "No active tutoring requests",
+        loadingTitle: "Loading support requests...",
+        loadingText: "Fetching the latest job seeker requests assigned to your instructor account.",
+        errorTitle: "Unable to load support requests",
+        emptyTitle: "No active support requests",
         emptyText:
-          "Completed and cancelled tutoring requests are hidden from the dashboard, but still remain stored in database.",
-        studentLine: "Learner {name} via {email}",
-        student: "Learner:",
-        studentInstitute: "Learner institute:",
+          "Completed and cancelled support requests are hidden from the dashboard, but still remain stored in database.",
+        studentLine: "Job Seeker {name} via {email}",
+        student: "Job Seeker:",
+        studentInstitute: "Job Seeker organization:",
         sessionType: "Session Type:",
-        openHint: "Click to open this tutoring request in a separate popup window.",
-        popupKicker: "Tutoring Request",
+        openHint: "Click to open this support request in a separate popup window.",
+        popupKicker: "Support Request",
         topics: "Topics Need Help With",
         courseFallback: "Course",
       },

@@ -580,8 +580,8 @@ export default function AuthAccessPage({
                   alt={
                     accessImageAlt ||
                     (role === "instructor"
-                      ? "Traditional Omani fort scenery"
-                      : "Students in a quiet study space")
+                      ? "Modern learning workspace in Oman"
+                      : "Job Seekers in a quiet technology study space")
                   }
                 />
               </div>

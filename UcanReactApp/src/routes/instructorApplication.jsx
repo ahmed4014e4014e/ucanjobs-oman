@@ -187,7 +187,7 @@ export default function InstructorApplication() {
               <div className="oman-photo-frame aspect-[4/5]">
                 <img
                   src={themeImages.studentsStudyHall}
-                  alt="Students in a bright academic study hall"
+                  alt="Job seekers in a bright career-readiness workspace"
                 />
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">

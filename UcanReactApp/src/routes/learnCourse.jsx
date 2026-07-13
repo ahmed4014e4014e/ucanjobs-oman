@@ -11,6 +11,55 @@ import {
 } from "../lib/learningContentApi";
 import { themeImages } from "../lib/themeImages";
 
+function getEmbeddableVideoUrl(value) {
+  if (!value) return "";
+
+  try {
+    const url = new URL(value);
+    const host = url.hostname.replace(/^www\./, "");
+
+    if (host === "youtube.com" || host === "m.youtube.com") {
+      const videoId = url.searchParams.get("v");
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+    }
+
+    if (host === "youtu.be") {
+      const videoId = url.pathname.split("/").filter(Boolean)[0];
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+    }
+
+    if (host === "vimeo.com") {
+      const videoId = url.pathname.split("/").filter(Boolean)[0];
+      return videoId ? `https://player.vimeo.com/video/${videoId}` : "";
+    }
+
+    if (host === "drive.google.com") {
+      const pathParts = url.pathname.split("/").filter(Boolean);
+      const fileIndex = pathParts.indexOf("d");
+      const fileId =
+        fileIndex >= 0 ? pathParts[fileIndex + 1] : url.searchParams.get("id");
+      return fileId ? `https://drive.google.com/file/d/${fileId}/preview` : "";
+    }
+  } catch {
+    return "";
+  }
+
+  return "";
+}
+
+function isDirectVideoUrl(value) {
+  if (!value) return false;
+
+  try {
+    const path = new URL(value).pathname.toLowerCase();
+    return [".mp4", ".webm", ".ogg", ".mov", ".m4v"].some((extension) =>
+      path.endsWith(extension)
+    );
+  } catch {
+    return false;
+  }
+}
+
 export default function LearnCourse() {
   const { slug } = useParams();
   const { user } = useAuth();
@@ -26,6 +75,7 @@ export default function LearnCourse() {
   const [quizSubmitting, setQuizSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState({ type: "idle", message: "" });
+  const [videoPlaybackError, setVideoPlaybackError] = useState("");
 
   const activeLesson = useMemo(
     () => lessons.find((lesson) => lesson.id === activeLessonId) || lessons[0] || null,
@@ -36,6 +86,14 @@ export default function LearnCourse() {
     () => lessons.filter((lesson) => lesson.isComplete).length,
     [lessons]
   );
+  const progressPercent = enrollment?.progressPercent ?? 0;
+  const completionStatus = progressPercent >= 100 ? "Completed" : progressPercent > 0 ? "In progress" : "Not started";
+  const moduleList = course?.en?.modules?.length ? course.en.modules : lessons.map((lesson) => lesson.title);
+  const downloadableResources = lessons.filter((lesson) => lesson.resourceUrl);
+  const embeddedVideoUrl = getEmbeddableVideoUrl(activeLesson?.videoUrl);
+  const canPlayInlineVideo =
+    Boolean(activeLesson?.videoUrl) &&
+    (activeLesson.videoIsUpload || isDirectVideoUrl(activeLesson.videoUrl));
 
   useEffect(() => {
     let ignore = false;
@@ -109,6 +167,10 @@ export default function LearnCourse() {
     return () => {
       ignore = true;
     };
+  }, [activeLesson?.id]);
+
+  useEffect(() => {
+    setVideoPlaybackError("");
   }, [activeLesson?.id]);
 
   const handleLessonCompletion = async (lesson) => {
@@ -229,16 +291,35 @@ export default function LearnCourse() {
           <div className="mt-6 max-w-xl">
             <div className="flex items-center justify-between gap-4 text-sm font-semibold text-[#f4e8d6]">
               <span>{completedCount} of {lessons.length} lessons complete</span>
-              <span>{enrollment?.progressPercent ?? 0}%</span>
+              <span>{progressPercent}%</span>
             </div>
             <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/20">
               <div
                 className="h-full rounded-full bg-[var(--oman-brass)] transition-all"
-                style={{ width: `${enrollment?.progressPercent ?? 0}%` }}
+                style={{ width: `${progressPercent}%` }}
               />
             </div>
+            <p className="mt-3 text-sm font-semibold text-[#f4e8d6]">
+              Completion status: {completionStatus}
+            </p>
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto grid max-w-6xl gap-4 px-4 pt-10 sm:px-6 lg:grid-cols-4">
+        {[
+          ["Course overview", course?.en?.summary || course?.en?.subtitle || "Follow the lessons below to build practical skills."],
+          ["Modules", `${moduleList.length} module${moduleList.length === 1 ? "" : "s"} planned`],
+          ["Resources", `${downloadableResources.length} downloadable resource${downloadableResources.length === 1 ? "" : "s"}`],
+          ["Certificate", progressPercent >= 100 ? "Certificate feature will be added later." : "Complete the course first. Certificate feature comes later."],
+        ].map(([title, value]) => (
+          <article key={title} className="rounded-3xl oman-card p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+              {title}
+            </p>
+            <p className="mt-3 text-sm leading-6 text-[var(--oman-ink)]/75">{value}</p>
+          </article>
+        ))}
       </section>
 
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[0.8fr_1.2fr]">
@@ -290,12 +371,34 @@ export default function LearnCourse() {
                     </span>
                     <span className="mt-2 block text-sm text-[var(--oman-ink)]/65">
                       {lesson.isComplete ? "Complete" : "Not complete"}
+                      {lesson.videoUrl ? " · Video" : ""}
+                      {lesson.resourceUrl ? " · Resource" : ""}
                     </span>
                   </button>
                 </li>
               ))}
             </ol>
           )}
+
+          <div className="mt-8 rounded-3xl oman-outline-panel p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+              Module List
+            </p>
+            {moduleList.length ? (
+              <ol className="mt-4 space-y-3">
+                {moduleList.map((module, index) => (
+                  <li key={`${module}-${index}`} className="text-sm leading-6 text-[var(--oman-ink)]/75">
+                    <span className="font-semibold text-[var(--oman-ink)]">Module {index + 1}:</span>{" "}
+                    {module}
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/75">
+                Modules will appear here after the course outline is published.
+              </p>
+            )}
+          </div>
         </aside>
 
         <section className="rounded-[1.75rem] oman-card p-6 sm:p-8">
@@ -308,33 +411,83 @@ export default function LearnCourse() {
                 {activeLesson.title}
               </h2>
 
+              <div className="mt-5 flex flex-wrap gap-2">
+                <span className="oman-chip rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em]">
+                  {activeLesson.isComplete ? "Completed" : "In progress"}
+                </span>
+                <span className="rounded-full bg-[rgba(244,232,214,0.54)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--oman-terracotta-dark)]">
+                  {activeLesson.videoUrl ? "Video lesson" : "Text lesson"}
+                </span>
+              </div>
+
               <div className="mt-6 rounded-3xl oman-outline-panel p-5">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                  Text Lesson
+                </p>
                 <p className="whitespace-pre-wrap text-base leading-8 text-[var(--oman-ink)]/80">
                   {activeLesson.body || "Lesson content is being prepared."}
                 </p>
               </div>
 
-              {activeLesson.videoIsUpload && activeLesson.videoUrl ? (
-                <video
-                  controls
-                  preload="metadata"
-                  className="mt-5 aspect-video w-full rounded-2xl bg-black"
-                  src={activeLesson.videoUrl}
-                >
-                  Your browser does not support video playback.
-                </video>
+              {activeLesson.videoUrl ? (
+                <div className="mt-5">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                    Lesson Player
+                  </p>
+                  {canPlayInlineVideo ? (
+                    <div className="lesson-player-frame">
+                      <video
+                        key={activeLesson.videoUrl}
+                        controls
+                        playsInline
+                        preload="metadata"
+                        className="lesson-player-media"
+                        src={activeLesson.videoUrl}
+                        onError={() =>
+                          setVideoPlaybackError(
+                            "This video could not play inside the lesson. Try opening it directly, or upload it again as MP4/WebM."
+                          )
+                        }
+                      >
+                        Your browser does not support video playback.
+                      </video>
+                    </div>
+                  ) : embeddedVideoUrl ? (
+                    <div className="lesson-player-frame">
+                      <iframe
+                        title={`${activeLesson.title} video`}
+                        src={embeddedVideoUrl}
+                        className="lesson-player-media"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl oman-outline-panel p-5">
+                      <p className="text-sm leading-6 text-[var(--oman-ink)]/75">
+                        This video link cannot be embedded safely inside the lesson. Open it in a
+                        new tab, or use an uploaded MP4/WebM file for in-page playback.
+                      </p>
+                    </div>
+                  )}
+                  {videoPlaybackError && (
+                    <p className="mt-3 rounded-2xl bg-[rgba(255,239,232,0.92)] px-4 py-3 text-sm font-semibold text-[var(--oman-terracotta-dark)]">
+                      {videoPlaybackError}
+                    </p>
+                  )}
+                </div>
               ) : null}
 
               {(activeLesson.videoUrl || activeLesson.resourceUrl) && (
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {activeLesson.videoUrl && !activeLesson.videoIsUpload && (
+                  {activeLesson.videoUrl && (
                     <a
                       href={activeLesson.videoUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
                     >
-                      Open Video
+                      Open Video In New Tab
                     </a>
                   )}
                   {activeLesson.resourceUrl && (
@@ -342,11 +495,34 @@ export default function LearnCourse() {
                       href={activeLesson.resourceUrl}
                       target="_blank"
                       rel="noreferrer"
+                      download
                       className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
                     >
-                      Open Resource
+                      Download Resource
                     </a>
                   )}
+                </div>
+              )}
+
+              {downloadableResources.length > 0 && (
+                <div className="mt-6 rounded-3xl oman-outline-panel p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                    Downloadable Resources
+                  </p>
+                  <div className="mt-4 grid gap-3">
+                    {downloadableResources.map((lesson) => (
+                      <a
+                        key={lesson.id}
+                        href={lesson.resourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        download
+                        className="rounded-2xl bg-[rgba(255,252,247,0.92)] px-4 py-3 text-sm font-semibold text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.1)] transition hover:bg-white"
+                      >
+                        {lesson.title}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -384,6 +560,16 @@ export default function LearnCourse() {
                     ? "Mark Lesson Incomplete"
                     : "Mark Lesson Complete"}
               </button>
+
+              <div className="mt-6 rounded-3xl bg-[rgba(244,232,214,0.34)] p-5">
+                <p className="text-sm font-semibold text-[var(--oman-ink)]">
+                  Completion status: {completionStatus}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/70">
+                  Certificate generation is planned for a later phase. For now, this page tracks
+                  lesson completion and course progress.
+                </p>
+              </div>
             </>
           ) : (
             <div className="rounded-3xl oman-outline-panel p-6 text-center">

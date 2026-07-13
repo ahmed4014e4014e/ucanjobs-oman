@@ -79,7 +79,7 @@ begin
       proposal_record.target_level,
       coalesce(nullif(proposal_record.suggested_duration, ''), 'Self-paced'),
       'English',
-      coalesce(proposal_record.suggested_price_omr, 0),
+      least(15, greatest(8, coalesce(proposal_record.suggested_price_omr, 8))),
       false,
       'draft',
       proposal_record.instructor_id,

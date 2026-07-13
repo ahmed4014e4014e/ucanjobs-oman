@@ -71,11 +71,11 @@ export function buildInstructorCards(offerings, sessionType) {
           courseIds: [],
           bio:
             entry.instructor.bio ||
-            `Offers free ${sessionType === "private" ? "one-on-one" : "group"} tutoring sessions.`,
+            `Offers free ${sessionType === "private" ? "one-on-one" : "group"} career-readiness support sessions.`,
           availability:
             sessionType === "private"
-              ? "Available for private tutoring"
-              : "Available for group tutoring",
+              ? "Available for private career support"
+              : "Available for group career support",
           sessionType,
         });
       }

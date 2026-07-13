@@ -1,4 +1,5 @@
 import { courseCatalog } from "./courseCatalog";
+import { formatCoursePriceOmr, normalizeCoursePriceOmr } from "./coursePricing";
 import { isSupabaseConfigured, supabase } from "./supabase";
 
 const COURSE_COLUMNS = `
@@ -16,13 +17,7 @@ const COURSE_COLUMNS = `
 `;
 
 function formatPrice(price) {
-  const numericPrice = Number(price);
-
-  if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
-    return "Free";
-  }
-
-  return `${numericPrice.toFixed(0)} OMR`;
+  return formatCoursePriceOmr(price);
 }
 
 function sortByOrder(left, right) {
@@ -39,7 +34,7 @@ function mapCourseRow(row, outcomes = [], modules = []) {
     slug: row.slug,
     category: categoryNameEn,
     level: row.level,
-    priceOmr: Number(row.price_omr) || 0,
+    priceOmr: normalizeCoursePriceOmr(row.price_omr),
     price: formatPrice(row.price_omr),
     duration: row.duration,
     language: row.language,
@@ -175,7 +170,7 @@ export async function enrollInCourse({ learnerId, courseId }) {
   }
 
   if (!learnerId || !courseId) {
-    throw new Error("A learner account and course are required before enrollment.");
+    throw new Error("A job seeker account and course are required before enrollment.");
   }
 
   const { data, error } = await supabase
@@ -225,7 +220,7 @@ export async function updateCourseProgress({ learnerId, courseId, progressPercen
   }
 
   if (!learnerId || !courseId) {
-    throw new Error("A learner account and course are required before updating progress.");
+    throw new Error("A job seeker account and course are required before updating progress.");
   }
 
   const normalizedProgress = Math.max(0, Math.min(100, Number(progressPercent) || 0));

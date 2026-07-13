@@ -24,6 +24,7 @@ import LearnerAccess from "./routes/learnerAccess";
 import AdminAccess from "./routes/adminAccess";
 import ResetPassword from "./routes/resetPassword";
 import Account from "./routes/account";
+import Profile from "./routes/profile";
 import LearnerDashboard from "./routes/learnerDashboard";
 import InstructorDashboard from "./routes/instructorDashboard";
 import InstructorCourses from "./routes/instructorCourses";
@@ -127,6 +128,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Account />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         ),
       },

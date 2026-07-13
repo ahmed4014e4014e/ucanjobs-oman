@@ -4,6 +4,7 @@ import ActionFeedback from "../components/ActionFeedback";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { fetchLearnerEnrollments, fetchPublishedCourses } from "../lib/courseApi";
+import { fetchLearnerOrders } from "../lib/paymentApi";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
 import { BANK_MUSCAT_PAYMENT_METHOD, BANK_MUSCAT_PAYMENT_PHONE } from "../lib/paymentConfig";
@@ -17,6 +18,41 @@ const quickLinkTargets = [
   },
 ];
 
+function formatStatus(value) {
+  return String(value || "pending").replaceAll("_", " ");
+}
+
+function formatDate(value) {
+  if (!value) {
+    return "Not set";
+  }
+
+  return new Date(value).toLocaleString("en-OM", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function getOrderMessage(status) {
+  switch (status) {
+    case "pending_payment":
+      return "Payment proof has not been submitted yet.";
+    case "payment_submitted":
+      return "Already paid but waiting for access. Your payment proof was sent and is waiting for admin review.";
+    case "paid":
+      return "Your access was approved. The course should appear in your enrolled courses.";
+    case "cancelled":
+      return "This access request was cancelled. Contact support if this was unexpected.";
+    case "refunded":
+      return "This order was refunded and course access is not active.";
+    default:
+      return "This access request is being processed.";
+  }
+}
+
 export default function LearnerDashboard() {
   const { user, profile, refreshProfile } = useAuth();
   const { t } = useLanguage();
@@ -27,24 +63,37 @@ export default function LearnerDashboard() {
   }));
   const [fullName, setFullName] = useState("");
   const [universityName, setUniversityName] = useState("");
+  const [targetJobRole, setTargetJobRole] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
   const [enrollments, setEnrollments] = useState([]);
+  const [paymentOrders, setPaymentOrders] = useState([]);
   const [availableCourses, setAvailableCourses] = useState([]);
   const [loadingAvailableCourses, setLoadingAvailableCourses] = useState(false);
   const [availableCoursesError, setAvailableCoursesError] = useState("");
   const [loadingEnrollments, setLoadingEnrollments] = useState(false);
   const [enrollmentError, setEnrollmentError] = useState("");
+  const [loadingPaymentOrders, setLoadingPaymentOrders] = useState(false);
+  const [paymentOrderError, setPaymentOrderError] = useState("");
   const [feedback, setFeedback] = useState({
     type: "idle",
     message: "",
   });
   const name = profile?.full_name || copy.fallbackName;
-  const profileComplete = Boolean(profile?.full_name?.trim() && profile?.institute?.trim());
+  const profileComplete = Boolean(
+    profile?.full_name?.trim() &&
+      profile?.institute?.trim() &&
+      profile?.target_job_role?.trim()
+  );
+  const visiblePaymentOrders = paymentOrders.filter((order) => order.status !== "paid");
+  const enrolledCourseIds = new Set(enrollments.map((enrollment) => enrollment.course?.id).filter(Boolean));
+  const availableUnenrolledCourses = availableCourses.filter((course) => !enrolledCourseIds.has(course.id));
+  const loadingCourseAvailability = loadingAvailableCourses || loadingEnrollments;
 
   useEffect(() => {
     setFullName(profile?.full_name || "");
     setUniversityName(profile?.institute || "");
-  }, [profile?.full_name, profile?.institute]);
+    setTargetJobRole(profile?.target_job_role || user?.user_metadata?.target_job_role || "");
+  }, [profile?.full_name, profile?.institute, profile?.target_job_role, user?.user_metadata?.target_job_role]);
 
   useEffect(() => {
     let active = true;
@@ -105,8 +154,39 @@ export default function LearnerDashboard() {
       }
     }
 
+    async function loadPaymentOrders() {
+      if (!user?.id) {
+        setPaymentOrders([]);
+        return;
+      }
+
+      setLoadingPaymentOrders(true);
+      setPaymentOrderError("");
+
+      try {
+        const nextOrders = await fetchLearnerOrders(user.id);
+
+        if (!active) {
+          return;
+        }
+
+        setPaymentOrders(nextOrders);
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+
+        setPaymentOrderError(error?.message || "We could not load your payment access requests.");
+      } finally {
+        if (active) {
+          setLoadingPaymentOrders(false);
+        }
+      }
+    }
+
     loadAvailableCourses();
     loadEnrollments();
+    loadPaymentOrders();
 
     return () => {
       active = false;
@@ -124,7 +204,7 @@ export default function LearnerDashboard() {
       return;
     }
 
-    if (!fullName.trim() || !universityName.trim()) {
+    if (!fullName.trim() || !universityName.trim() || !targetJobRole.trim()) {
       setFeedback({
         type: "error",
         message: copy.messages.required,
@@ -143,6 +223,7 @@ export default function LearnerDashboard() {
         id: user.id,
         full_name: fullName.trim(),
         institute: universityName.trim(),
+        target_job_role: targetJobRole.trim(),
         email: user.email || profile?.email || null,
         role: "learner",
       };
@@ -157,6 +238,7 @@ export default function LearnerDashboard() {
         data: {
           full_name: profilePayload.full_name,
           institute: profilePayload.institute,
+          target_job_role: profilePayload.target_job_role,
           role: "learner",
         },
       });
@@ -256,6 +338,20 @@ export default function LearnerDashboard() {
               />
             </label>
 
+            <label className="flex flex-col gap-2">
+              <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
+                {copy.targetJobRole} <span aria-hidden="true" className="text-[var(--oman-terracotta)]">*</span>
+              </span>
+              <input
+                type="text"
+                value={targetJobRole}
+                onChange={(event) => setTargetJobRole(event.target.value)}
+                placeholder={copy.targetJobRolePlaceholder}
+                required
+                className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
+              />
+            </label>
+
             <div className="rounded-2xl bg-[rgba(244,232,214,0.34)] px-4 py-4 text-sm leading-6 text-[var(--oman-ink)]/80">
               <p>
                 <span className="font-semibold text-[var(--oman-ink)]">{copy.email}</span>{" "}
@@ -312,6 +408,97 @@ export default function LearnerDashboard() {
       <section className="mx-auto mt-10 max-w-6xl">
         <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+            Access Requests
+          </p>
+          <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
+            Paid course payment status
+          </h2>
+          <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
+            Track payment proofs you submitted for paid courses. Course lessons unlock after admin
+            approval.
+          </p>
+
+          {loadingPaymentOrders && (
+            <div className="mt-6 rounded-3xl oman-outline-panel p-5 text-[var(--oman-ink)]/75">
+              Loading your access requests...
+            </div>
+          )}
+
+          {paymentOrderError && (
+            <ActionFeedback
+              type="error"
+              message={paymentOrderError}
+              title="Access Requests"
+              className="mt-6"
+            />
+          )}
+
+          {!loadingPaymentOrders && !paymentOrderError && visiblePaymentOrders.length === 0 && (
+            <div className="mt-6 rounded-3xl oman-outline-panel p-5 text-center">
+              <h3 className="text-lg font-semibold text-[var(--oman-ink)]">
+                No pending paid access requests
+              </h3>
+              <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
+                Paid courses move to your enrolled courses after admin approval.
+              </p>
+            </div>
+          )}
+
+          {visiblePaymentOrders.length > 0 && (
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {visiblePaymentOrders.map((order) => (
+                <article key={order.id} className="rounded-3xl oman-outline-panel p-5">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="oman-chip rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em]">
+                      {order.status === "payment_submitted"
+                        ? "already paid but waiting for access"
+                        : formatStatus(order.status)}
+                    </span>
+                    <span className="rounded-full bg-[rgba(244,232,214,0.54)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)]">
+                      {order.totalLabel}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-xl font-semibold text-[var(--oman-ink)]">
+                    {order.course?.title || "Paid course access"}
+                  </h3>
+                  <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
+                    {getOrderMessage(order.status)}
+                  </p>
+                  <div className="mt-4 grid gap-2 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
+                    <p>
+                      <span className="font-semibold text-[var(--oman-ink)]">Order:</span>{" "}
+                      {order.orderNumber}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-[var(--oman-ink)]">Created:</span>{" "}
+                      {formatDate(order.createdAt)}
+                    </p>
+                  </div>
+                  {order.status === "paid" && order.course?.slug ? (
+                    <Link
+                      to={`/learn/${order.course.slug}/`}
+                      className="oman-button-primary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+                    >
+                      Open Course Lessons
+                    </Link>
+                  ) : order.course?.slug ? (
+                    <Link
+                      to={`/courses/${order.course.slug}/`}
+                      className="oman-button-secondary mt-5 inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
+                    >
+                      View Course
+                    </Link>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="mx-auto mt-10 max-w-6xl">
+        <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
+          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
             Available Live Courses
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
@@ -322,7 +509,7 @@ export default function LearnerDashboard() {
             test the enrollment flow.
           </p>
 
-          {loadingAvailableCourses && (
+          {loadingCourseAvailability && (
             <div className="mt-6 rounded-3xl oman-outline-panel p-5 text-[var(--oman-ink)]/75">
               Loading live database courses...
             </div>
@@ -337,22 +524,21 @@ export default function LearnerDashboard() {
             />
           )}
 
-          {!loadingAvailableCourses && !availableCoursesError && availableCourses.length === 0 && (
+          {!loadingCourseAvailability && !availableCoursesError && availableUnenrolledCourses.length === 0 && (
             <div className="mt-6 rounded-3xl oman-outline-panel p-5 text-center">
               <h3 className="text-lg font-semibold text-[var(--oman-ink)]">
-                No live database courses loaded
+                No available live courses right now
               </h3>
               <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
-                The dashboard could not read published courses from the database yet. If you can see
-                the rows in Supabase, check that this local app is using the same project URL and
-                anon key.
+                Published database courses will appear here only when you are not already enrolled
+                in them.
               </p>
             </div>
           )}
 
-          {availableCourses.length > 0 && (
+          {!loadingCourseAvailability && availableUnenrolledCourses.length > 0 && (
             <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {availableCourses.map((course) => {
+              {availableUnenrolledCourses.map((course) => {
                 const content = course.en;
 
                 return (

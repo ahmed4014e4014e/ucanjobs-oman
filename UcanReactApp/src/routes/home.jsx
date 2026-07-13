@@ -97,7 +97,7 @@ export default function Home() {
           <div className="oman-photo-frame oman-photo-frame--top mt-8 aspect-[5/6]">
             <img
               src={themeImages.brandJourney}
-              alt="Omani graduates collaborating on digital skills in a modern learning space"
+              alt="Job Seekers collaborating on digital skills in a modern learning space"
             />
           </div>
         </div>

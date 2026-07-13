@@ -11,7 +11,7 @@ export const courseCatalog = [
     slug: "frontend-engineering-for-omani-graduates",
     category: "Software Engineering",
     level: "Beginner to Intermediate",
-    price: "29 OMR",
+    price: "12 OMR",
     duration: "8 weeks",
     language: "English",
     en: {
@@ -36,7 +36,7 @@ export const courseCatalog = [
     slug: "backend-api-development-with-database",
     category: "Software Engineering",
     level: "Intermediate",
-    price: "35 OMR",
+    price: "15 OMR",
     duration: "7 weeks",
     language: "English",
     en: {
@@ -61,14 +61,14 @@ export const courseCatalog = [
     slug: "applied-ai-for-business-and-productivity",
     category: "Artificial Intelligence",
     level: "Beginner",
-    price: "25 OMR",
+    price: "10 OMR",
     duration: "5 weeks",
     language: "English",
     en: {
       title: "Applied AI For Business And Productivity",
       subtitle: "Use AI tools responsibly for research, automation, writing, analysis, and workplace productivity.",
       summary:
-        "A practical AI literacy course for learners who want useful AI skills without needing advanced math first.",
+        "A practical AI literacy course for job seekers who want useful AI skills without needing advanced math first.",
       outcomes: [
         "Use AI tools for structured work tasks",
         "Design better prompts and review AI outputs",
@@ -86,14 +86,14 @@ export const courseCatalog = [
     slug: "cyber-security-foundations-for-junior-roles",
     category: "Cyber Security",
     level: "Beginner",
-    price: "32 OMR",
+    price: "13 OMR",
     duration: "6 weeks",
     language: "English",
     en: {
       title: "Cyber Security Foundations For Junior Roles",
       subtitle: "Learn security fundamentals, risk thinking, defensive basics, and practical entry-level workflows.",
       summary:
-        "A foundation course for learners considering cyber security support, SOC, governance, or IT security roles.",
+        "A foundation course for job seekers considering cyber security support, SOC, governance, or IT security roles.",
       outcomes: [
         "Understand common threats and controls",
         "Read security alerts and basic logs",
@@ -111,14 +111,14 @@ export const courseCatalog = [
     slug: "data-analytics-with-excel-sql-and-dashboards",
     category: "Data Analytics",
     level: "Beginner to Intermediate",
-    price: "30 OMR",
+    price: "11 OMR",
     duration: "6 weeks",
     language: "English",
     en: {
       title: "Data Analytics With Excel, SQL, And Dashboards",
       subtitle: "Turn raw data into useful reports, dashboards, and business insights.",
       summary:
-        "A job-focused data analytics path for learners who want practical reporting and decision-support skills.",
+        "A job-focused data analytics path for job seekers who want practical reporting and decision-support skills.",
       outcomes: [
         "Clean and analyze data in Excel",
         "Write useful SQL queries",
@@ -136,7 +136,7 @@ export const courseCatalog = [
     slug: "graduate-tech-job-readiness",
     category: "Career Readiness",
     level: "Beginner",
-    price: "18 OMR",
+    price: "8 OMR",
     duration: "4 weeks",
     language: "English",
     en: {

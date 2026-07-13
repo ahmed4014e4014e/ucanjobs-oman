@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import ActionFeedback from "../components/ActionFeedback";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -31,6 +31,23 @@ function getVisibleRoleLabel(role, t) {
   return t("roles.member");
 }
 
+function getProfileInitials(profile, user) {
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email || "U";
+  const parts = displayName.split(/[\s@._-]+/).filter(Boolean);
+
+  return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "U";
+}
+
+function getProfilePhotoUrl(profile, user) {
+  return (
+    profile?.avatar_url ||
+    profile?.profile_photo_url ||
+    user?.user_metadata?.avatar_url ||
+    user?.user_metadata?.picture ||
+    ""
+  );
+}
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [logoutMessage, setLogoutMessage] = useState("");
@@ -38,6 +55,8 @@ export default function Navbar() {
   const { user, profile, signOut, loading } = useAuth();
   const { t } = useLanguage();
   const role = getUserRole(profile, user);
+  const profilePhotoUrl = getProfilePhotoUrl(profile, user);
+  const profileInitials = getProfileInitials(profile, user);
 
   const baseLinks = [
     { name: t("nav.home"), to: "/home/" },
@@ -120,6 +139,21 @@ export default function Navbar() {
             </ul>
 
             {!loading && user && (
+              <Link
+                to="/profile/"
+                className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-[rgba(197,154,68,0.35)] bg-[rgba(244,232,214,0.72)] text-sm font-bold text-[var(--oman-terracotta-dark)] shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--oman-brass)]"
+                aria-label="Open profile"
+                title="Profile"
+              >
+                {profilePhotoUrl ? (
+                  <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span>{profileInitials}</span>
+                )}
+              </Link>
+            )}
+
+            {!loading && user && (
               <button
                 type="button"
                 onClick={handleLogout}
@@ -131,6 +165,21 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 lg:hidden">
+            {!loading && user && (
+              <Link
+                to="/profile/"
+                onClick={() => setOpen(false)}
+                className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-[rgba(197,154,68,0.35)] bg-[rgba(244,232,214,0.72)] text-sm font-bold text-[var(--oman-terracotta-dark)] shadow-sm"
+                aria-label="Open profile"
+              >
+                {profilePhotoUrl ? (
+                  <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span>{profileInitials}</span>
+                )}
+              </Link>
+            )}
+
             <button
               type="button"
               onClick={() => setOpen((value) => !value)}

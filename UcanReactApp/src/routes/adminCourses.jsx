@@ -7,6 +7,7 @@ import {
   saveAdminCourse,
   updateAdminCoursePublishStatus,
 } from "../lib/adminCourseApi";
+import { COURSE_PRICE_MAX_OMR, COURSE_PRICE_MIN_OMR } from "../lib/coursePricing";
 
 const blankCourse = {
   id: "",
@@ -18,7 +19,7 @@ const blankCourse = {
   level: "Beginner",
   duration: "Self-paced",
   language: "English",
-  price_omr: 0,
+  price_omr: COURSE_PRICE_MIN_OMR,
   is_published: false,
   sort_order: 0,
 };
@@ -184,6 +185,20 @@ export default function AdminCourses() {
 
   const handleSave = async (event) => {
     event.preventDefault();
+    const priceOmr = Number(form.course.price_omr);
+
+    if (
+      !Number.isFinite(priceOmr) ||
+      priceOmr < COURSE_PRICE_MIN_OMR ||
+      priceOmr > COURSE_PRICE_MAX_OMR
+    ) {
+      setFeedback({
+        type: "error",
+        message: `Please enter a course price between ${COURSE_PRICE_MIN_OMR} OMR and ${COURSE_PRICE_MAX_OMR} OMR.`,
+      });
+      return;
+    }
+
     setSaving(true);
     setFeedback({ type: "idle", message: "" });
 
@@ -518,15 +533,17 @@ export default function AdminCourses() {
 
                   <label>
                     <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                      Price OMR
+                      Price OMR ({COURSE_PRICE_MIN_OMR}-{COURSE_PRICE_MAX_OMR})
                     </span>
                     <input
                       type="number"
-                      min="0"
+                      min={COURSE_PRICE_MIN_OMR}
+                      max={COURSE_PRICE_MAX_OMR}
                       step="0.001"
                       value={form.course.price_omr}
                       onChange={(event) => updateCourseField("price_omr", event.target.value)}
                       className="mt-2 min-h-12 w-full rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
+                      required
                     />
                   </label>
 

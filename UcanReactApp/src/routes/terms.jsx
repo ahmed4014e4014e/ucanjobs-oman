@@ -54,8 +54,8 @@ export default function Terms() {
             <div className="oman-card rounded-[1.75rem] p-4 text-[var(--oman-ink)] sm:p-5">
               <div className="oman-photo-frame oman-photo-frame--contain aspect-[16/10]">
                 <img
-                  src={themeImages.brandSlogan}
-                  alt="UcanJobs employability slogan visual"
+                  src={themeImages.policiesCampus}
+                  alt="Ucan policies and job seeker protection visual"
                 />
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">

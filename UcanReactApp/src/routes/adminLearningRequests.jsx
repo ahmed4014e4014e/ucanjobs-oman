@@ -58,7 +58,7 @@ export default function AdminLearningRequests() {
         }
       } catch (fetchError) {
         if (!ignore) {
-          setError(fetchError.message || "Unable to load tutoring requests right now.");
+          setError(fetchError.message || "Unable to load support requests right now.");
         }
       } finally {
         if (!ignore) {
@@ -190,12 +190,12 @@ export default function AdminLearningRequests() {
       }
       setFeedback({
         type: "success",
-        message: `Tutoring request marked as ${formatStatusLabel(statusDraft)}.`,
+        message: `Support request marked as ${formatStatusLabel(statusDraft)}.`,
       });
     } catch (statusError) {
       setFeedback({
         type: "error",
-        message: statusError.message || "Unable to update this tutoring request status right now.",
+        message: statusError.message || "Unable to update this support request status right now.",
       });
     } finally {
       setStatusSaving(false);
@@ -212,10 +212,10 @@ export default function AdminLearningRequests() {
                 Admin Records
               </p>
               <h1 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-                Submitted Tutoring Requests
+                Submitted Support Requests
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
-                Review learner course requests and download submitted files directly from this page.
+                Review job seeker course requests and download submitted files directly from this page.
               </p>
             </div>
             <Link
@@ -229,7 +229,7 @@ export default function AdminLearningRequests() {
           <ActionFeedback
             type={feedback.type}
             message={feedback.message}
-            title="Tutoring records update"
+            title="Support records update"
             className="mt-6"
           />
 
@@ -261,7 +261,7 @@ export default function AdminLearningRequests() {
                   Request Workflow
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/75">
-                  Review pending tutoring requests first, then move them through reviewed,
+                  Review pending support requests first, then move them through reviewed,
                   scheduled, completed, or cancelled as each case progresses.
                 </p>
               </div>
@@ -287,31 +287,31 @@ export default function AdminLearningRequests() {
 
           {loading ? (
             <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
-              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">Loading tutoring requests...</h3>
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">Loading support requests...</h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Fetching the latest learner course submissions from database.
+                Fetching the latest job seeker course submissions from database.
               </p>
             </div>
           ) : error ? (
             <div className="mt-8 rounded-3xl border border-[rgba(155,77,49,0.22)] bg-[rgba(255,239,232,0.95)] p-6 text-[var(--oman-terracotta-dark)]">
-              <h3 className="text-xl font-semibold">Unable to load tutoring requests</h3>
+              <h3 className="text-xl font-semibold">Unable to load support requests</h3>
               <p className="mt-4 leading-7">{error}</p>
             </div>
           ) : visibleRequests.length === 0 ? (
             <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
-              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No active tutoring requests</h3>
+              <h3 className="text-xl font-semibold text-[var(--oman-ink)]">No active support requests</h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Completed and cancelled tutoring requests are hidden from the dashboard, but still
+                Completed and cancelled support requests are hidden from the dashboard, but still
                 kept in database.
               </p>
             </div>
           ) : filteredRequests.length === 0 ? (
             <div className="mt-8 rounded-3xl oman-outline-panel p-6 text-center">
               <h3 className="text-xl font-semibold text-[var(--oman-ink)]">
-                No {formatStatusLabel(statusFilter).toLowerCase()} tutoring requests
+                No {formatStatusLabel(statusFilter).toLowerCase()} support requests
               </h3>
               <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Try another status filter to continue handling tutoring workflows.
+                Try another status filter to continue handling support workflows.
               </p>
             </div>
           ) : (
@@ -329,9 +329,9 @@ export default function AdminLearningRequests() {
                         {getRequestHeading(request)}
                       </h3>
                       <p className="mt-2 text-sm text-[var(--oman-ink)]/70">
-                        Learner{" "}
+                        Job Seeker{" "}
                         <span className="font-semibold">
-                          {request.learner?.full_name || "Unknown learner"}
+                          {request.learner?.full_name || "Unknown job seeker"}
                         </span>{" "}
                         via {request.learner?.email || "No email"}
                       </p>
@@ -361,7 +361,7 @@ export default function AdminLearningRequests() {
                     </p>
                   </div>
                   <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
-                    Click to open this tutoring request in a separate popup window.
+                    Click to open this support request in a separate popup window.
                   </p>
                 </button>
               ))}
@@ -383,7 +383,7 @@ export default function AdminLearningRequests() {
             </button>
 
             <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              Tutoring Request
+              Support Request
             </p>
             <h2 className="oman-title-accent mt-4 pr-16 text-2xl font-semibold sm:text-3xl">
               {getRequestHeading(activeRequest)}
@@ -391,8 +391,8 @@ export default function AdminLearningRequests() {
 
             <div className="mt-6 grid gap-3 text-sm leading-6 text-[var(--oman-ink)]/75 sm:grid-cols-2">
               <p>
-                <span className="font-semibold text-[var(--oman-ink)]">Learner:</span>{" "}
-                {activeRequest.learner?.full_name || "Unknown learner"}
+                <span className="font-semibold text-[var(--oman-ink)]">Job Seeker:</span>{" "}
+                {activeRequest.learner?.full_name || "Unknown job seeker"}
               </p>
               <p>
                 <span className="font-semibold text-[var(--oman-ink)]">Email:</span>{" "}

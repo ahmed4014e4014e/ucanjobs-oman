@@ -1,7 +1,7 @@
 import { useLanguage } from "../context/LanguageContext";
 import { themeImages } from "../lib/themeImages";
 import founderCasualPhoto from "../assets/founder/founder-casual.jpg";
-import founderEventPhoto from "../assets/founder/founder-event.jpg";
+import founderEventPhoto from "../assets/founder/founder-wa0014.jpg";
 
 export default function About() {
   const { t } = useLanguage();
@@ -43,39 +43,6 @@ export default function About() {
                 A unified visual system centered on employability, graduates, practical skills, and career transition in one recognizable UcanJobs style.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <div className="grid items-center gap-8 rounded-[1.75rem] oman-card p-6 sm:p-8 lg:grid-cols-[0.86fr_1.14fr] lg:gap-10">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="oman-photo-frame aspect-[4/5]">
-              <img
-                src={founderCasualPhoto}
-                alt="Ahmed R in a casual portrait"
-              />
-            </div>
-            <div className="oman-photo-frame aspect-[4/5]">
-              <img
-                src={founderEventPhoto}
-                alt="Ahmed R at a university event"
-              />
-            </div>
-          </div>
-
-          <div className="text-center lg:text-left">
-            <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-              {t("about.founderKicker")}
-            </p>
-            <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-              Ahmed R
-            </h2>
-            <p className="mt-5 text-base leading-7 text-[var(--oman-ink)]/80 sm:text-lg sm:leading-8">
-              This platform was built by Ahmed R - a college student from Muscat focused on
-              solving the international problem with the big gab between fresh college graduates
-              and entry market requirements to be accepted in a job
-            </p>
           </div>
         </div>
       </section>
@@ -149,8 +116,38 @@ export default function About() {
           <div className="oman-photo-frame aspect-[5/4]">
             <img
               src={themeImages.brandWorkers}
-              alt="Students collaborating in a modern university study environment"
+              alt="Job seekers collaborating in a modern career-readiness environment"
             />
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+        <div className="grid items-center gap-8 rounded-[1.75rem] oman-card p-6 sm:p-8 lg:grid-cols-[0.86fr_1.14fr] lg:gap-10">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="oman-photo-frame aspect-[4/5]">
+              <img
+                src={founderCasualPhoto}
+                alt="Ahmed R in a casual portrait"
+              />
+            </div>
+            <div className="oman-photo-frame aspect-[4/5]">
+              <img
+                src={founderEventPhoto}
+                alt="Ahmed R at an entrepreneurship event"
+              />
+            </div>
+          </div>
+
+          <div className="text-center lg:text-left">
+            <h2 className="oman-title-accent text-2xl font-semibold sm:text-3xl">
+              Ahmed R
+            </h2>
+            <p className="mt-5 text-base leading-7 text-[var(--oman-ink)]/80 sm:text-lg sm:leading-8">
+              This career-readiness platform was built by Ahmed R from Muscat to help reduce
+              the gap between fresh graduates and the practical skills expected for entry-level
+              technology jobs.
+            </p>
           </div>
         </div>
       </section>

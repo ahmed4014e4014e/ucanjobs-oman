@@ -25,25 +25,17 @@ const initialFilters = {
 };
 
 function getCoursePriceBand(course) {
-  if (course.price === "Free") {
-    return "Free";
-  }
-
   const amount = Number.parseFloat(String(course.price).replace(/[^\d.]/g, ""));
 
-  if (!Number.isFinite(amount) || amount <= 0) {
-    return "Free";
+  if (!Number.isFinite(amount) || amount <= 10) {
+    return "8-10 OMR";
   }
 
-  if (amount <= 20) {
-    return "20 OMR or less";
+  if (amount <= 13) {
+    return "11-13 OMR";
   }
 
-  if (amount <= 30) {
-    return "21-30 OMR";
-  }
-
-  return "31 OMR or more";
+  return "14-15 OMR";
 }
 
 function getCourseCareerPath(course) {

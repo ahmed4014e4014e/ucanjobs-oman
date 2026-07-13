@@ -1,3 +1,4 @@
+import { normalizeCoursePriceOmr } from "./coursePricing";
 import { isSupabaseConfigured, supabase } from "./supabase";
 
 const COURSE_ADMIN_COLUMNS = `
@@ -30,6 +31,7 @@ function sortByOrder(left, right) {
 function mapAdminCourse(row, categories = [], outcomes = [], modules = []) {
   return {
     ...row,
+    price_omr: normalizeCoursePriceOmr(row.price_omr),
     category: categories.find((category) => category.id === row.category_id) || null,
     outcomes: outcomes.filter((outcome) => outcome.course_id === row.id).sort(sortByOrder),
     modules: modules.filter((module) => module.course_id === row.id).sort(sortByOrder),
@@ -118,7 +120,7 @@ export async function saveAdminCourse({ course, outcomes, modules }) {
     level: course.level || "Beginner",
     duration: course.duration || "Self-paced",
     language: course.language || "English",
-    price_omr: Number(course.price_omr) || 0,
+    price_omr: normalizeCoursePriceOmr(course.price_omr),
     is_published: Boolean(course.is_published),
     sort_order: Number(course.sort_order) || 0,
   };

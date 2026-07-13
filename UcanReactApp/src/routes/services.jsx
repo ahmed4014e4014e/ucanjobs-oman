@@ -22,41 +22,41 @@ import { themeImages } from "../lib/themeImages";
 
 const services = [
   {
-    title: "Free Individual Tutoring",
+    title: "Individual Course Support",
     description:
-      "Students can schedule individualized tutoring sessions for free when they need focused help in a course.",
+      "Job seekers can request focused course support when they need help understanding practical learning material.",
   },
   {
-    title: "Free Group Tutoring",
+    title: "Group Course Support",
     description:
-      "Students can attend group tutoring sessions for free and learn together around shared course topics.",
+      "Job seekers can learn together around shared course topics and practical career-preparation skills.",
   },
   {
-    title: "Online Learner Community",
+    title: "Online Job Seeker Community",
     description:
-      "College students can ask questions, explain ideas, and help each other understand coursework in a supportive space.",
+      "Job seekers can ask questions, explain ideas, and help each other build practical career-readiness skills in a supportive space.",
   },
   {
     title: "Document Library",
     description:
-      "Access a free library of documents that helps students review lessons, assignments, and course concepts more clearly.",
+      "Access course documents that help job seekers review lessons, assignments, and practical concepts more clearly.",
   },
   {
     title: "Useful Videos",
     description:
-      "Find useful videos that improve understanding of college course material and make difficult topics easier to follow.",
+      "Find useful videos that improve practical skill understanding and make difficult career concepts easier to follow.",
   },
   {
     title: "Course WhatsApp Groups",
     description:
-      "Access collections of WhatsApp group chats made for specific college courses so students can get help more easily.",
+      "Access collections of WhatsApp group chats made for specific career-readiness courses so job seekers can get help more easily.",
   },
 ];
 
 const serviceHighlights = [
-  { number: "Live", label: "tutors, courses, and filters loaded from database" },
+  { number: "Live", label: "instructors, courses, and filters loaded from database" },
   { number: "2", label: "session types for private and group support" },
-  { number: "Saved", label: "tutoring requests stored in the database" },
+  { number: "Saved", label: "support requests stored in the database" },
 ];
 
 function getInstructorInitials(name) {
@@ -625,7 +625,7 @@ export default function Services() {
         institute_name_snapshot: learnerInstitute.trim(),
         topics_needed_help_with: [
           `Title: ${requestTitle.trim()}`,
-          `Learner Institute: ${learnerInstitute.trim()}`,
+          `Job Seeker Institute: ${learnerInstitute.trim()}`,
           "",
           "Topics Need Help With:",
           topicsNeededHelpWith.trim(),

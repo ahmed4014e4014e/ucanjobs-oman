@@ -1,3 +1,4 @@
+import { normalizeCoursePriceOmr } from "./coursePricing";
 import { isSupabaseConfigured, supabase } from "./supabase";
 
 const INSTRUCTOR_COURSE_COLUMNS = `
@@ -42,7 +43,10 @@ export async function fetchInstructorCourses(instructorId) {
     throw error;
   }
 
-  return data ?? [];
+  return (data ?? []).map((course) => ({
+    ...course,
+    price_omr: normalizeCoursePriceOmr(course.price_omr),
+  }));
 }
 
 export async function fetchInstructorCourseKit({ courseId, instructorId }) {
@@ -122,7 +126,10 @@ export async function fetchInstructorCourseKit({ courseId, instructorId }) {
   );
 
   return {
-    course: courseResult.data,
+    course: {
+      ...courseResult.data,
+      price_omr: normalizeCoursePriceOmr(courseResult.data?.price_omr),
+    },
     lessons: (lessonResult.data ?? []).map((lesson) => ({
       ...lesson,
       quiz: quizzesByLesson[lesson.id] || null,
@@ -209,7 +216,10 @@ export async function saveInstructorCourseKit({ course, lessons }) {
   });
 
   return {
-    course: savedCourse,
+    course: {
+      ...savedCourse,
+      price_omr: normalizeCoursePriceOmr(savedCourse?.price_omr),
+    },
     lessons: refreshed.lessons.length ? refreshed.lessons : savedLessons,
   };
 }

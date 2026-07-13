@@ -72,7 +72,7 @@ export default function NotFound() {
               to="/learner-access/"
               className="rounded-3xl oman-outline-panel px-5 py-6 font-semibold text-[var(--oman-ink)] transition hover:-translate-y-0.5 hover:text-[var(--oman-terracotta)]"
             >
-              Learner Access
+              Job Seeker Access
             </Link>
             <Link
               to="/instructor-access/"
@@ -85,7 +85,7 @@ export default function NotFound() {
       </section>
 
       <footer className="border-t border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.9)] px-4 py-8 text-center text-sm text-[var(--oman-ink)]/70 sm:px-6">
-        Copyright {new Date().getFullYear()} Ucan. Career-focused e-learning for Oman.
+        Copyright {new Date().getFullYear()} Ucan. Career-readiness for Oman.
       </footer>
     </main>
   );

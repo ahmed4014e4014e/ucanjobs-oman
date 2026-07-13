@@ -96,7 +96,7 @@ export default function AdminEnrollments() {
         type: "success",
         message:
           status === "paid"
-            ? `Order ${updatedOrder.orderNumber} marked paid and learner enrollment activated.`
+            ? `Order ${updatedOrder.orderNumber} marked paid and job seeker enrollment activated.`
             : `Order ${updatedOrder.orderNumber} marked ${formatStatus(status)}.`,
       });
     } catch (updateError) {
@@ -189,7 +189,7 @@ export default function AdminEnrollments() {
                 No manual payment orders yet
               </h2>
               <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
-                Paid-course orders will appear here after learners request enrollment.
+                Paid-course orders will appear here after job seekers request enrollment.
               </p>
             </div>
           )}

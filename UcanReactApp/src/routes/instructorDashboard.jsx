@@ -4,11 +4,12 @@ import ActionFeedback from "../components/ActionFeedback";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { submitInstructorCourseProposal } from "../lib/courseProposalApi";
+import { COURSE_PRICE_MAX_OMR, COURSE_PRICE_MIN_OMR } from "../lib/coursePricing";
 import { isSupabaseConfigured } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
 
 const creationKit = [
-  "Course title and target learner level",
+  "Course title and target job seeker level",
   "Career outcome the course supports",
   "Course summary and learning outcomes",
   "Module-by-module course outline",
@@ -30,12 +31,12 @@ const reviewSteps = [
   "Submit your course proposal from this dashboard.",
   "Ucan reviews the instructor profile and course fit.",
   "Admin requests edits if the proposal needs refinement.",
-  "Approved courses are prepared for learner enrollment.",
+  "Approved courses are prepared for job seeker enrollment.",
 ];
 
 const futureTools = [
   "Course publishing dashboard",
-  "Learner enrollment overview",
+  "Job Seeker enrollment overview",
   "Course performance analytics",
   "AI-assisted topic recommendations",
 ];
@@ -112,6 +113,7 @@ export default function InstructorDashboard() {
       "courseSummary",
       "learningOutcomes",
       "moduleOutline",
+      "suggestedDuration",
       "suggestedPriceOmr",
     ];
     const missingRequiredField = requiredFields.some((field) => !proposalForm[field].trim());
@@ -126,10 +128,14 @@ export default function InstructorDashboard() {
 
     const suggestedPrice = Number(proposalForm.suggestedPriceOmr);
 
-    if (!Number.isFinite(suggestedPrice) || suggestedPrice < 5 || suggestedPrice > 15) {
+    if (
+      !Number.isFinite(suggestedPrice) ||
+      suggestedPrice < COURSE_PRICE_MIN_OMR ||
+      suggestedPrice > COURSE_PRICE_MAX_OMR
+    ) {
       setFeedback({
         type: "error",
-        message: "Please enter a suggested price between 5 OMR and 15 OMR.",
+        message: `Please enter a suggested price between ${COURSE_PRICE_MIN_OMR} OMR and ${COURSE_PRICE_MAX_OMR} OMR.`,
       });
       return;
     }
@@ -195,7 +201,7 @@ export default function InstructorDashboard() {
             </div>
             <div className="oman-card rounded-3xl p-4 text-[var(--oman-ink)]">
               <div className="oman-photo-frame aspect-[4/3]">
-                <img src={themeImages.mountainFort} alt="Historic Omani fort with mountain scenery" />
+                <img src={themeImages.mountainFort} alt="Modern learning workspace in Oman" />
               </div>
             </div>
           </div>
@@ -388,7 +394,7 @@ export default function InstructorDashboard() {
                 type="text"
                 value={proposalForm.careerOutcome}
                 onChange={(event) => updateProposalField("careerOutcome", event.target.value)}
-                placeholder="Example: Prepare learners for junior frontend developer roles"
+                placeholder="Example: Prepare job seekers for junior frontend developer roles"
                 className="mt-2 min-h-12 w-full rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
                 required
               />
@@ -463,7 +469,7 @@ export default function InstructorDashboard() {
 
             <label>
               <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                Number of hours of course delivered video content (approximated)
+                Number of hours of course delivered video content (approximated) *
               </span>
               <input
                 type="text"
@@ -471,17 +477,18 @@ export default function InstructorDashboard() {
                 onChange={(event) => updateProposalField("suggestedDuration", event.target.value)}
                 placeholder="Example: 8 hours"
                 className="mt-2 min-h-12 w-full rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)]"
+                required
               />
             </label>
 
             <label>
               <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                Suggested price OMR * (5-15 OMR)
+                Suggested price OMR * ({COURSE_PRICE_MIN_OMR}-{COURSE_PRICE_MAX_OMR} OMR)
               </span>
               <input
                 type="number"
-                min="5"
-                max="15"
+                min={COURSE_PRICE_MIN_OMR}
+                max={COURSE_PRICE_MAX_OMR}
                 step="0.001"
                 value={proposalForm.suggestedPriceOmr}
                 onChange={(event) => updateProposalField("suggestedPriceOmr", event.target.value)}
