@@ -8,7 +8,7 @@ export const supportedLanguages = {
 
 const shared = {
   en: {
-    footer: "Copyright {year} Ucan. Career-readiness for Oman.",
+    footer: "Copyright {year} UcanJobs. AI-Powered Employability Training.",
     fieldsRequired: "Fields marked with * are required.",
     acceptedFiles: "Accepted files: {types}. Maximum size: {size} MB per file.",
     close: "Close",
@@ -19,8 +19,8 @@ const shared = {
 export const translations = {
   en: {
     brand: {
-      kicker: "Career Readiness",
-      name: "Ucan",
+      kicker: "AI-Powered Employability Training",
+      name: "UcanJobs",
     },
     nav: {
       home: "Home",
@@ -49,22 +49,22 @@ export const translations = {
     },
     common: shared.en,
     home: {
-      heroKicker: "Welcome to Ucan",
-      heroTitle: "Career-readiness built for Oman’s next generation of tech talent.",
+      heroKicker: "Welcome to UcanJobs",
+      heroTitle: "AI-Powered Employability Training built for Oman’s next generation of tech talent.",
       heroText:
-        "Ucan helps fresh graduates and job seekers build practical skills for Oman’s technology sector through structured courses in software engineering, AI, cyber security, data analytics, and job readiness.",
+        "UcanJobs helps fresh graduates and job seekers build practical skills for Oman’s technology sector through structured courses in software engineering, AI, cyber security, data analytics, and job readiness.",
       exploreServices: "Explore Courses",
       cardKicker: "Omani Market, Modern Skills",
       cardTitle:
-        "A commercial career-readiness platform shaped around employability, practical portfolios, and high-demand digital careers.",
+        "A commercial AI-Powered Employability Training platform shaped around employability, practical portfolios, and high-demand digital careers.",
       stats: [
         { number: "Tech", label: "courses aligned with in-demand career paths" },
         { number: "AI", label: "future recommendations shaped by market signals" },
         { number: "Oman", label: "content tailored to local graduate employment needs" },
       ],
-      featuresKicker: "Why Choose Ucan",
+      featuresKicker: "Why Choose UcanJobs",
       featuresTitle:
-        "A practical career-readiness platform for graduates who need job-ready technology skills.",
+        "A practical AI-Powered Employability Training platform for graduates who need job-ready technology skills.",
       features: [
         {
           title: "Career-Focused Courses",
@@ -74,12 +74,12 @@ export const translations = {
         {
           title: "Built For Oman",
           description:
-            "Ucan focuses on the needs of Omani graduates, diploma holders, and job seekers entering the local tech sector.",
+            "UcanJobs focuses on the needs of Omani graduates, diploma holders, and job seekers entering the local tech sector.",
         },
         {
           title: "Data-Informed Direction",
           description:
-            "The career-readiness platform is being prepared to use AI, SEO, and open-data insights to identify high-demand skill paths.",
+            "The AI-Powered Employability Training platform is being prepared to use AI, SEO, and open-data insights to identify high-demand skill paths.",
         },
       ],
       howKicker: "How It Works",
@@ -104,7 +104,7 @@ export const translations = {
       toolsKicker: "Career-Readiness Tools",
       toolsTitle: "Digital tools that support career preparation and professional collaboration.",
       toolsText:
-        "Ucan courses can use modern meeting, planning, and collaboration tools to help job seekers practice the same workflows used in real technology teams.",
+        "UcanJobs courses can use modern meeting, planning, and collaboration tools to help job seekers practice the same workflows used in real technology teams.",
       toolGroups: [
         {
           title: "Live Career Workshops",
@@ -120,7 +120,7 @@ export const translations = {
       tutorKicker: "Join Our Instructor Team",
       tutorTitle: "Become an instructor and help prepare Oman’s next tech workforce.",
       tutorText:
-        "Ucan will welcome instructors and industry practitioners who can teach practical, employment-focused digital skills.",
+        "UcanJobs will welcome instructors and industry practitioners who can teach practical, employment-focused digital skills.",
       tutorAccess: "Instructor Access",
       tutorCardTitle: "Log in or apply to create your instructor account.",
       tutorCardText:
@@ -132,21 +132,21 @@ export const translations = {
         "Job Seekers can create an account to access career-focused courses, learning resources, and future personalized recommendations.",
       studentCardTitle: "Log in or sign up to create your job seeker account.",
       studentCardText:
-        "Use the job seeker account page to create your profile and prepare for the Ucan course marketplace.",
+        "Use the job seeker account page to create your profile and prepare for the UcanJobs course marketplace.",
       studentButton: "Job Seeker Login / Sign Up",
       ctaKicker: "Start Learning",
       ctaTitle:
         "Build the skills needed for Oman’s growing technology sector.",
       ctaText:
-        "Ucan is transforming into a commercial career-readiness platform for software engineering, AI, cyber security, data analytics, and job readiness.",
+        "UcanJobs is transforming into a commercial AI-Powered Employability Training platform for software engineering, AI, cyber security, data analytics, and job readiness.",
       ctaButton: "Explore Courses",
     },
     about: {
-      heroKicker: "About Ucan",
+      heroKicker: "About UcanJobs",
       heroTitle:
-        "A career-readiness platform focused on Oman’s graduate employability gap.",
+        "An AI-Powered Employability Training platform focused on Oman’s graduate employability gap.",
       heroText:
-        "Ucan is being built to help computer science graduates, diploma holders, and job seekers move from theory into practical, market-ready technology skills.",
+        "UcanJobs is being built to help computer science graduates, diploma holders, and job seekers move from theory into practical, market-ready technology skills.",
       ucf: "University of Central Florida",
       ucfText:
         "We imagine career preparation as practical, dignified, locally relevant, and connected to real employment outcomes.",
@@ -155,7 +155,7 @@ export const translations = {
       founderTextOne:
         "Grew up in UK... Migrated to USA... and now in Oman. You know the rest of the story ... LETS GO EVERYONE!!",
       founderTextTwo:
-        'Ahmed is a 25 year old beginner software developer who was inspired by the movie "The Social Network" to create this platform to help graduates build practical confidence, digital skills, and career readiness.',
+        'Ahmed is a 25 year old beginner software developer who was inspired by the movie "The Social Network" to create this platform to help graduates build practical confidence, digital skills, and AI-Powered Employability Training readiness.',
       founderLocation: "Qurum Beach, Muscat, Oman.",
       highlights: [
         { number: "Career", label: "learning paths for technology roles" },
@@ -165,11 +165,11 @@ export const translations = {
       missionKicker: "Our Mission",
       missionTitle: "Help Omani tech graduates become more employable through practical online courses.",
       missionTextOne:
-        "Ucan exists to bridge the gap between formal study and entry-level technology work by focusing on practical skills, projects, tools, and career readiness.",
+        "UcanJobs exists to bridge the gap between formal study and entry-level technology work by focusing on practical skills, projects, tools, and AI-Powered Employability Training.",
       missionTextTwo:
         "The long-term vision is to use AI, SEO, and Oman open-data sources to identify what job seekers should study and which course topics matter most for the market.",
       valuesKicker: "Core Values",
-      valuesTitle: "The ideas shaping Ucan’s career-readiness marketplace.",
+      valuesTitle: "The ideas shaping UcanJobs' AI-Powered Employability Training marketplace.",
       values: [
         {
           title: "Employability First",
@@ -191,18 +191,18 @@ export const translations = {
       communityTitle:
         "Graduates, job seekers, instructors, and employers connected by practical digital skills.",
       communityText:
-        "Ucan is built for job seekers who want more than certificates: they need confidence, project experience, and skills that make sense in Oman’s job market.",
+        "UcanJobs is built for job seekers who want more than certificates: they need confidence, project experience, and skills that make sense in Oman’s job market.",
     },
     contact: {
-      heroKicker: "Contact Ucan",
+      heroKicker: "Contact UcanJobs",
       heroTitle:
-        "Reach a career-readiness platform built for Oman.",
+        "Reach an AI-Powered Employability Training platform built for Oman.",
       heroText:
-        "Whether you are a job seeker, instructor, employer, or partner, use this page to contact Ucan about courses, skills, and digital learning opportunities.",
+        "Whether you are a job seeker, instructor, employer, or partner, use this page to contact UcanJobs about courses, skills, and digital learning opportunities.",
       heroCardText:
         "We want the platform to feel as dependable and recognizable as the landmarks that shape Oman's identity.",
       formKicker: "Contact Form",
-      formTitle: "Send your message directly to Ucan.",
+      formTitle: "Send your message directly to UcanJobs.",
       formText:
         "Fill in the form below and your message will be saved in database so the team can review it properly.",
       labels: {
@@ -233,34 +233,34 @@ export const translations = {
         "Your message was submitted successfully. We will review it through database.",
       error: "We could not submit your message right now.",
       methodsKicker: "Other Ways to Reach Us",
-      methodsTitle: "Clear ways to connect with the Ucan team.",
+      methodsTitle: "Clear ways to connect with the UcanJobs team.",
       methods: [
         {
           title: "Email",
           value: "20258971@mcbs.edu.om",
           description:
-            "Reach out with questions about courses, instructor opportunities, partnerships, or the Ucan career-readiness platform.",
+            "Reach out with questions about courses, instructor opportunities, partnerships, or the UcanJobs AI-Powered Employability Training platform.",
         },
         {
           title: "Location",
           value: "Qurum Beach, Muscat, Oman",
           description:
-            "Ucan serves job seekers online while focusing on Oman’s graduate employment and digital skills needs.",
+            "UcanJobs serves job seekers online while focusing on Oman’s graduate employment and digital skills needs.",
         },
       ],
       ctaKicker: "We Are Here to Help",
-      ctaTitle: "Reach out whenever you need better support for your career-readiness journey.",
+      ctaTitle: "Reach out whenever you need better support for your AI-Powered Employability Training journey.",
       ctaText:
-        "Ucan is here to help job seekers build practical digital skills for stronger career opportunities.",
+        "UcanJobs is here to help job seekers build practical digital skills for stronger career opportunities.",
     },
     servicesPage: {
       heroKicker: "Courses",
       heroTitle:
         "Career-focused courses for Oman’s technology job market.",
       heroText:
-        "Ucan is transforming this page into a course marketplace for software engineering, AI, machine learning, cyber security, data analytics, and job readiness.",
+        "UcanJobs is transforming this page into a course marketplace for software engineering, AI, machine learning, cyber security, data analytics, and job readiness.",
       heroCardText:
-        "Explore the first course categories and learning paths that will shape the future Ucan marketplace.",
+        "Explore the first course categories and learning paths that will shape the future UcanJobs marketplace.",
       highlights: [
         { number: "Skills", label: "learning paths for high-demand digital fields" },
         { number: "AI", label: "future recommendations based on market statistics" },
@@ -282,7 +282,7 @@ export const translations = {
         {
           kicker: "Market Intelligence",
           title:
-            "Use AI and open-data signals to guide which courses Ucan should create and promote.",
+            "Use AI and open-data signals to guide which courses UcanJobs should create and promote.",
           text: "Future course planning can respond to actual labor-market demand and job seeker preferences.",
         },
       ],
@@ -330,7 +330,7 @@ export const translations = {
         multiInstitute: "Multi Institute",
         sessionType: "Session Type",
         privateSession: "Private one-on-one career coaching",
-        groupSession: "Group career-readiness session",
+        groupSession: "Group AI-Powered Employability Training session",
         availability: "Availability",
         courses: "Courses",
         offered: "{count} offered",
@@ -343,7 +343,7 @@ export const translations = {
           "Once more instructors and course offerings are added in database, this directory will update automatically.",
       },
       otherKicker: "Future Course Areas",
-      otherTitle: "High-demand subjects Ucan can develop for Oman’s digital workforce.",
+      otherTitle: "High-demand subjects UcanJobs can develop for Oman’s digital workforce.",
       services: [
         {
           title: "Frontend Software Engineering",
@@ -380,12 +380,12 @@ export const translations = {
       whyTitle:
         "Many graduates need practical skills that match real entry-level technology work.",
       whyTextOne:
-        "Ucan can use course data, job seeker behavior, SEO signals, and Oman open-data statistics to decide which learning paths matter most.",
+        "UcanJobs can use course data, job seeker behavior, SEO signals, and Oman open-data statistics to decide which learning paths matter most.",
       whyTextTwo: "The current platform will be gradually transformed from service requests into courses, enrollments, and learning progress.",
       ctaKicker: "Start Your Career Path",
       ctaTitle: "Explore the first course categories for Oman’s digital economy.",
       ctaText:
-        "Ucan is becoming a marketplace where job seekers can buy focused courses that improve employability in technology fields.",
+        "UcanJobs is becoming a marketplace where job seekers can buy focused courses that improve employability in technology fields.",
       ctaButton: "Explore Courses",
       requestModal: {
         kicker: "Support Request",
@@ -428,9 +428,9 @@ export const translations = {
     },
     terms: {
       heroKicker: "Platform Policies",
-      heroTitle: "Ucan User Agreement",
+      heroTitle: "UcanJobs User Agreement",
       heroText:
-        "A simplified agreement for using Ucan as a job seeker or instructor in a career-focused e-learning marketplace.",
+        "A simplified agreement for using UcanJobs as a job seeker or instructor in a career-focused AI-Powered Employability Training marketplace.",
       heroCardText:
         "This page summarizes the main rules for accounts, course access, payments, content, conduct, privacy, and platform safety.",
       documentKicker: "Simplified Legal Terms",
@@ -439,7 +439,7 @@ export const translations = {
         {
           title: "Job Seeker User Agreement",
           body:
-            "These terms apply to users who create a Ucan account to browse, purchase, enroll in, or complete career-focused courses. By creating an account, enrolling in a course, submitting payment proof, or using course materials, the job seeker agrees to use the platform responsibly.",
+            "These terms apply to users who create a UcanJobs account to browse, purchase, enroll in, or complete career-focused courses. By creating an account, enrolling in a course, submitting payment proof, or using course materials, the job seeker agrees to use the platform responsibly.",
           columns: [
             {
               title: "Job Seekers May",
@@ -448,7 +448,7 @@ export const translations = {
                 "Browse available courses, course details, prices, and learning materials.",
                 "Enroll in courses after completing profile and payment requirements.",
                 "Use course videos, lessons, quizzes, downloadable resources, and support tools for personal learning.",
-                "Contact Ucan support about access, payment confirmation, course issues, or account questions.",
+                "Contact UcanJobs support about access, payment confirmation, course issues, or account questions.",
               ],
             },
             {
@@ -458,7 +458,7 @@ export const translations = {
                 "Give another person access to their account or use someone else's account.",
                 "Submit false payment proof, fake identity details, or misleading profile information.",
                 "Harass, threaten, discriminate against, or abuse instructors, staff, or other users.",
-                "Use Ucan for illegal activity, spam, scraping, security testing, or platform misuse.",
+                "Use UcanJobs for illegal activity, spam, scraping, security testing, or platform misuse.",
               ],
             },
           ],
@@ -468,8 +468,8 @@ export const translations = {
               items: [
                 "Job seekers are responsible for keeping login details secure.",
                 "Profile information such as name, organization, target job role, and email should be accurate.",
-                "Ucan may require profile completion before allowing enrollment, support requests, or personalized recommendations.",
-                "Ucan may suspend accounts that appear fake, duplicated, abusive, or used for unauthorized access.",
+                "UcanJobs may require profile completion before allowing enrollment, support requests, or personalized recommendations.",
+                "UcanJobs may suspend accounts that appear fake, duplicated, abusive, or used for unauthorized access.",
               ],
             },
             {
@@ -487,7 +487,7 @@ export const translations = {
               title: "Learning Content And Certificates",
               items: [
                 "Course materials are provided for personal education, employability, and skill development only.",
-                "Ucan does not guarantee employment, salary, interview success, immigration benefits, or admission to any external organization.",
+                "UcanJobs does not guarantee employment, salary, interview success, immigration benefits, or admission to any external organization.",
                 "Progress tracking may be used to improve the learning experience and future course recommendations.",
                 "Certificates may be added later and may depend on completion status, assessments, payment status, and platform rules.",
               ],
@@ -495,19 +495,19 @@ export const translations = {
             {
               title: "Privacy And Communications",
               items: [
-                "Ucan may store account details, course activity, enrollment history, support requests, and payment records.",
-                "Ucan may contact job seekers about course access, support, platform updates, payment status, and account notices.",
+                "UcanJobs may store account details, course activity, enrollment history, support requests, and payment records.",
+                "UcanJobs may contact job seekers about course access, support, platform updates, payment status, and account notices.",
                 "Job seekers must not publish private instructor, admin, or user information without permission.",
               ],
             },
           ],
           closing:
-            "Ucan may warn, restrict, suspend, or close a job seeker account if these terms are violated or if platform security, payment integrity, or user safety is at risk.",
+            "UcanJobs may warn, restrict, suspend, or close a job seeker account if these terms are violated or if platform security, payment integrity, or user safety is at risk.",
         },
         {
           title: "Instructor User Agreement",
           body:
-            "These terms apply to approved instructors, instructor applicants, and course creators who submit applications, propose course topics, upload learning content, or teach through Ucan. Instructors are expected to meet a higher standard because they influence job seeker learning outcomes and platform trust.",
+            "These terms apply to approved instructors, instructor applicants, and course creators who submit applications, propose course topics, upload learning content, or teach through UcanJobs. Instructors are expected to meet a higher standard because they influence job seeker learning outcomes and platform trust.",
           columns: [
             {
               title: "Instructors May",
@@ -516,7 +516,7 @@ export const translations = {
                 "Submit course proposals for admin review before publication.",
                 "Create lessons, videos, resources, quizzes, and practical projects for approved courses.",
                 "Receive platform-approved payments or revenue arrangements when payment features are formally enabled.",
-                "Communicate with Ucan admins about course quality, updates, learner support, and publishing status.",
+                "Communicate with UcanJobs admins about course quality, updates, learner support, and publishing status.",
               ],
             },
             {
@@ -524,7 +524,7 @@ export const translations = {
               items: [
                 "Upload copied, pirated, plagiarized, illegal, harmful, offensive, or misleading content.",
                 "Claim false qualifications, fake work experience, fake certifications, or misleading employment outcomes.",
-                "Contact job seekers for unauthorized private sales, external payments, or off-platform arrangements without Ucan approval.",
+                "Contact job seekers for unauthorized private sales, external payments, or off-platform arrangements without UcanJobs approval.",
                 "Promise guaranteed jobs, salaries, interviews, visas, admissions, or employment outcomes.",
                 "Collect unnecessary personal data from job seekers or misuse learner information.",
               ],
@@ -535,8 +535,8 @@ export const translations = {
               title: "Instructor Application And Approval",
               items: [
                 "Submitting an instructor application does not guarantee approval.",
-                "Ucan may review background, portfolio links, sample videos, proposed topics, teaching experience, and payment details.",
-                "Ucan may reject, delay, request edits, or revoke instructor approval at its discretion.",
+                "UcanJobs may review background, portfolio links, sample videos, proposed topics, teaching experience, and payment details.",
+                "UcanJobs may reject, delay, request edits, or revoke instructor approval at its discretion.",
                 "Approved instructors may still need admin review before any course is published.",
               ],
             },
@@ -544,9 +544,9 @@ export const translations = {
               title: "Course Ownership And Content License",
               items: [
                 "Instructors must own their submitted content or have the legal right to use it.",
-                "By submitting course content, instructors give Ucan permission to host, display, stream, promote, review, and sell access to that content through the platform.",
+                "By submitting course content, instructors give UcanJobs permission to host, display, stream, promote, review, and sell access to that content through the platform.",
                 "Instructors remain responsible for copyright, licensing, third-party materials, code samples, images, videos, and external resources they submit.",
-                "Ucan may edit formatting, request changes, unpublish, restrict, or remove content for quality, legal, safety, or business reasons.",
+                "UcanJobs may edit formatting, request changes, unpublish, restrict, or remove content for quality, legal, safety, or business reasons.",
               ],
             },
             {
@@ -562,37 +562,37 @@ export const translations = {
             {
               title: "Payments, Taxes, And Business Terms",
               items: [
-                "Instructor payment terms may depend on Ucan's current business model, manual payment process, future gateway integration, and separate written agreement.",
+                "Instructor payment terms may depend on UcanJobs' current business model, manual payment process, future gateway integration, and separate written agreement.",
                 "Instructor bank/payment details may be collected later for payout readiness and verification.",
                 "Instructors are responsible for their own tax, licensing, professional, and legal obligations unless otherwise agreed in writing.",
-                "Ucan may pause payouts or course publication if fraud, refund disputes, copyright issues, or policy violations are suspected.",
+                "UcanJobs may pause payouts or course publication if fraud, refund disputes, copyright issues, or policy violations are suspected.",
               ],
             },
             {
               title: "Platform Enforcement",
               items: [
-                "Ucan may request edits, reject proposals, unpublish courses, restrict dashboard access, suspend an instructor account, or remove an instructor from the platform.",
+                "UcanJobs may request edits, reject proposals, unpublish courses, restrict dashboard access, suspend an instructor account, or remove an instructor from the platform.",
                 "Serious violations may be reported to relevant authorities, payment providers, platform partners, or affected rights holders where appropriate.",
-                "Ucan may update instructor terms as the platform adds payments, certificates, AI recommendations, analytics, or new course delivery tools.",
+                "UcanJobs may update instructor terms as the platform adds payments, certificates, AI recommendations, analytics, or new course delivery tools.",
               ],
             },
           ],
           closing:
-            "Instructor participation is a privilege based on trust, professional conduct, content quality, and compliance with Ucan platform rules.",
+            "Instructor participation is a privilege based on trust, professional conduct, content quality, and compliance with UcanJobs platform rules.",
         },
       ],
       requiredTitle: "Important legal note",
       requiredItems: [
-        "This is a simplified user agreement draft for the Ucan platform and should be reviewed by a qualified lawyer before commercial launch.",
+        "This is a simplified user agreement draft for the UcanJobs platform and should be reviewed by a qualified lawyer before commercial launch.",
         "Job seekers must agree before creating an account, enrolling, submitting payment proof, or using paid course materials.",
         "Instructor applicants must agree before submitting an application, course proposal, sample file, or teaching content.",
-        "Ucan may update these terms as payments, certificates, AI recommendations, analytics, and course publishing features mature.",
+        "UcanJobs may update these terms as payments, certificates, AI recommendations, analytics, and course publishing features mature.",
       ],
     },
     accessPages: {
       student: {
         audienceLabel: "Job Seeker Access",
-        title: "Log in or sign up to access Ucan job seeker features.",
+        title: "Log in or sign up to access UcanJobs job seeker features.",
         description:
           "This page is designed for job seekers who want to create an account, access courses, and prepare for practical technology careers.",
         signupHeading: "Create a job seeker account",
@@ -608,7 +608,7 @@ export const translations = {
       },
       admin: {
         audienceLabel: "Admin Access",
-        title: "Log in to manage Ucan as an administrator.",
+        title: "Log in to manage UcanJobs as an administrator.",
         description:
           "This page is for platform administrators who need access to submissions, account oversight, and future course marketplace tools.",
         imageAlt: "Admin access card for platform administrators",
@@ -673,7 +673,7 @@ export const translations = {
       institutePlaceholder: "Enter your institute name",
       createPasswordPlaceholder: "Create a password",
       termsAgreementPrefix: "I have read and agree to the",
-      termsAgreementLink: "Ucan Platform Policies",
+      termsAgreementLink: "UcanJobs Platform Policies",
       openingGoogle: "Opening Google...",
       continueWithGoogle: "Continue with Google",
       or: "Or",
@@ -736,7 +736,7 @@ export const translations = {
         {
           title: "Contact Support",
           description: "Reach out if you need guidance finding the right course support.",
-          action: "Contact Ucan",
+          action: "Contact UcanJobs",
         },
       ],
     },
@@ -746,7 +746,7 @@ export const translations = {
       heroKicker: "Instructor Dashboard",
       welcome: "Welcome, {name}",
       heroText:
-        "This protected dashboard is your instructor home base for Ucan course publishing, content preparation, and platform updates.",
+        "This protected dashboard is your instructor home base for UcanJobs course publishing, content preparation, and platform updates.",
       profileKicker: "Profile",
       labels: {
         fullName: "Full name:",
@@ -762,7 +762,7 @@ export const translations = {
       heroKicker: "Admin Dashboard",
       welcome: "Welcome, {name}",
       heroText:
-        "This protected dashboard gives you one operating hub for Ucan content, job seekers, enrollments, market signals, and platform performance.",
+        "This protected dashboard gives you one operating hub for UcanJobs content, job seekers, enrollments, market signals, and platform performance.",
       profileKicker: "Profile",
       labels: {
         fullName: "Full name:",
@@ -788,7 +788,7 @@ export const translations = {
         {
           title: "Courses Management",
           description:
-            "Create, edit, publish, unpublish, and organize live Ucan courses.",
+            "Create, edit, publish, unpublish, and organize live UcanJobs courses.",
           action: "Manage Courses",
         },
         {
@@ -831,7 +831,7 @@ export const translations = {
         "1. Review instructor applications and course proposals.",
         "2. Keep live courses accurate, published, and aligned with job seeker demand.",
         "3. Monitor enrollments and job seeker account readiness.",
-        "4. Use market and SEO signals to decide what Ucan should improve next.",
+        "4. Use market and SEO signals to decide what UcanJobs should improve next.",
       ],
       statusTags: [
         "pending",
@@ -879,7 +879,7 @@ export const translations = {
       shortPassword: "Your new password must be at least 6 characters.",
       success: "Your password was updated successfully. You can now log in.",
       heroKicker: "Password Reset",
-      heroTitle: "Create a new password for your Ucan account.",
+      heroTitle: "Create a new password for your UcanJobs account.",
       heroText: "Use this page after opening the database password recovery email.",
       formKicker: "New Password",
       formTitle: "Reset your password",
@@ -892,7 +892,7 @@ export const translations = {
     },
     tutorApplicationPage: {
       heroKicker: "Instructor Application",
-      heroTitle: "Apply separately before joining the Ucan instructor team.",
+      heroTitle: "Apply separately before joining the UcanJobs instructor team.",
       heroText:
         "Complete this form with your professional background, proposed course topic, portfolio, and sample material so the platform can review your instructor application properly.",
       heroCardText:
@@ -920,18 +920,18 @@ export const translations = {
       requiredAttachments: "Required Attachments",
       attachFiles: "Attach files",
       termsPrefix: "I have read and agree to the",
-      termsLink: "Ucan Platform Policies",
+      termsLink: "UcanJobs Platform Policies",
       submitting: "Submitting Application...",
       submit: "Submit Instructor Application",
       attachments: [
         "Sample teaching video, course outline, portfolio PDF, or other file that shows your ability to teach this topic",
       ],
       messages: {
-        terms: "Please read and agree to the Ucan Platform Policies before submitting your instructor application.",
+        terms: "Please read and agree to the UcanJobs Platform Policies before submitting your instructor application.",
         notConfigured: "database is not configured yet, so the instructor application cannot submit right now.",
         files: "Please attach at least one sample video or file before submitting your instructor application.",
         success:
-          "Your instructor application was submitted successfully. The Ucan team can now review your form and attachments. You will receive a reply in less than 24 hours.",
+          "Your instructor application was submitted successfully. The UcanJobs team can now review your form and attachments. You will receive a reply in less than 24 hours.",
         error: "We could not submit your instructor application right now.",
         applicationSubmittedBy: "Instructor application submitted by {name}.",
         email: "Email: {email}",

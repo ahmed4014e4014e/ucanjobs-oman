@@ -3,7 +3,7 @@ export const courseCategories = [
   "Artificial Intelligence",
   "Cyber Security",
   "Data Analytics",
-  "Career Readiness",
+  "Job Readiness",
 ];
 
 export const courseCatalog = [
@@ -134,7 +134,7 @@ export const courseCatalog = [
   },
   {
     slug: "graduate-tech-job-readiness",
-    category: "Career Readiness",
+    category: "Job Readiness",
     level: "Beginner",
     price: "8 OMR",
     duration: "4 weeks",
@@ -143,7 +143,7 @@ export const courseCatalog = [
       title: "Graduate Tech Job Readiness",
       subtitle: "Prepare your CV, portfolio, interviews, LinkedIn, and junior tech role strategy.",
       summary:
-        "A career-readiness course for graduates who need to present their skills more clearly to employers.",
+        "A job-readiness course for graduates who need to present their skills more clearly to employers.",
       outcomes: [
         "Improve your CV and LinkedIn profile",
         "Prepare for entry-level technical interviews",

@@ -42,7 +42,7 @@ function formatRole(role) {
 export default function Profile() {
   const { user, profile } = useAuth();
   const role = getUserRole(profile, user);
-  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email || "Ucan Member";
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email || "UcanJobs Member";
   const photoUrl = getProfilePhotoUrl(profile, user);
   const initials = getProfileInitials(displayName, user?.email);
 
@@ -96,7 +96,7 @@ export default function Profile() {
               Profile details
             </h2>
             <p className="mt-4 max-w-3xl leading-7 text-[var(--oman-ink)]/75">
-              This page gives each Ucan member a dedicated profile area. The profile photo shortcut
+              This page gives each UcanJobs member a dedicated profile area. The profile photo shortcut
               in the website header opens this page.
             </p>
 

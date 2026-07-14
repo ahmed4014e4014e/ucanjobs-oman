@@ -275,7 +275,7 @@ export default function AdminCourses() {
                 Course Management
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
-                Create, edit, publish, and unpublish Ucan courses directly from the admin dashboard.
+                Create, edit, publish, and unpublish UcanJobs courses directly from the admin dashboard.
               </p>
             </div>
             <Link

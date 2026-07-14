@@ -1,4 +1,4 @@
-# Ucan Course Marketplace Seed Run Guide
+# UcanJobs Course Marketplace Seed Run Guide
 
 You already ran `STEP 01` through `STEP 21` successfully.
 

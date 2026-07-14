@@ -14,6 +14,7 @@ export default function InstructorAccess() {
       description={copy.description}
       signupHeading={copy.signupHeading}
       role="instructor"
+      enableGoogleAuth
       accessImage={themeImages.brandWorkers}
       accessImageAlt={copy.imageAlt}
       signupPanel={<InstructorApplicationSignupPanel />}

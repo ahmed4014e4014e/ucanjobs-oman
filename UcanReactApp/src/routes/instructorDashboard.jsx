@@ -29,7 +29,7 @@ const publicationChecklist = [
 const reviewSteps = [
   "Prepare your course proposal and teaching materials.",
   "Submit your course proposal from this dashboard.",
-  "Ucan reviews the instructor profile and course fit.",
+  "UcanJobs reviews the instructor profile and course fit.",
   "Admin requests edits if the proposal needs refinement.",
   "Approved courses are prepared for job seeker enrollment.",
 ];
@@ -64,7 +64,7 @@ const courseCategories = [
   "Cyber Security",
   "Data Analytics",
   "Cloud and DevOps",
-  "Career Readiness",
+  "Job Readiness",
 ];
 
 const targetLevels = ["Beginner", "Beginner to Intermediate", "Intermediate", "Advanced"];
@@ -237,7 +237,7 @@ export default function InstructorDashboard() {
             Build career-preparation courses for Oman&apos;s next tech workforce.
           </h2>
           <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-            Ucan is moving toward a controlled course marketplace. At this stage,
+            UcanJobs is moving toward a controlled course marketplace. At this stage,
             instructors submit course proposals while admin review keeps publishing
             quality consistent before courses go live.
           </p>
@@ -325,7 +325,7 @@ export default function InstructorDashboard() {
             Submit a course idea for admin review
           </h2>
           <p className="mt-4 max-w-3xl leading-7 text-[var(--oman-ink)]/75">
-            Use this form to propose a practical course for Ucan. Fields marked with * are
+            Use this form to propose a practical course for UcanJobs. Fields marked with * are
             required, and detailed module/outcome text helps admin assess the course faster.
           </p>
 

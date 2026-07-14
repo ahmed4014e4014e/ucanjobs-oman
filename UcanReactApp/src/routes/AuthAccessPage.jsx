@@ -502,8 +502,8 @@ export default function AuthAccessPage({
     setSignupLoading(false);
   };
 
-  const handleGoogleAuth = async () => {
-    if (requireTermsAgreement && !signupAcceptedTerms) {
+  const handleGoogleAuth = async ({ shouldRequireTerms = false } = {}) => {
+    if (shouldRequireTerms && requireTermsAgreement && !signupAcceptedTerms) {
       showMessage(
         "error",
         copy.termsRequiredGoogle
@@ -666,6 +666,23 @@ export default function AuthAccessPage({
             </form>
           ) : (
             <form className="mt-6 space-y-4" onSubmit={handleLogin}>
+              {enableGoogleAuth && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleGoogleAuth()}
+                    disabled={googleLoading}
+                    className="inline-flex w-full items-center justify-center rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-6 py-3 text-center font-semibold text-[var(--oman-ink)] shadow-sm transition hover:bg-[rgba(244,232,214,0.32)] disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {googleLoading ? copy.openingGoogle : copy.continueWithGoogle}
+                  </button>
+                  <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--oman-ink)]/45">
+                    <span className="h-px flex-1 bg-[rgba(111,49,29,0.14)]" />
+                    <span>{copy.or}</span>
+                    <span className="h-px flex-1 bg-[rgba(111,49,29,0.14)]" />
+                  </div>
+                </>
+              )}
               <label className="flex flex-col gap-2">
                 <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">{copy.email}</span>
                 <input
@@ -787,7 +804,7 @@ export default function AuthAccessPage({
                     <>
                       <button
                         type="button"
-                        onClick={handleGoogleAuth}
+                        onClick={() => handleGoogleAuth({ shouldRequireTerms: true })}
                         disabled={googleLoading}
                         className="inline-flex w-full items-center justify-center rounded-2xl border border-[rgba(111,49,29,0.14)] bg-white px-6 py-3 text-center font-semibold text-[var(--oman-ink)] shadow-sm transition hover:bg-[rgba(244,232,214,0.32)] disabled:cursor-not-allowed disabled:opacity-70"
                       >

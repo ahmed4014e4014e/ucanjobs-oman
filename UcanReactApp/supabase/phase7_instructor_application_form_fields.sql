@@ -1,4 +1,4 @@
--- Phase 7: update instructor applications for the commercial Ucan instructor form.
+-- Phase 7: update instructor applications for the commercial UcanJobs instructor form.
 -- Run this after phase6_learner_instructor_database_rename.sql.
 -- It keeps old columns for historical records but makes them optional.
 

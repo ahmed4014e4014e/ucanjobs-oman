@@ -34,7 +34,7 @@ const services = [
   {
     title: "Online Job Seeker Community",
     description:
-      "Job seekers can ask questions, explain ideas, and help each other build practical career-readiness skills in a supportive space.",
+      "Job seekers can ask questions, explain ideas, and help each other build practical AI-Powered Employability Training skills in a supportive space.",
   },
   {
     title: "Document Library",
@@ -49,7 +49,7 @@ const services = [
   {
     title: "Course WhatsApp Groups",
     description:
-      "Access collections of WhatsApp group chats made for specific career-readiness courses so job seekers can get help more easily.",
+      "Access collections of WhatsApp group chats made for specific AI-Powered Employability Training courses so job seekers can get help more easily.",
   },
 ];
 

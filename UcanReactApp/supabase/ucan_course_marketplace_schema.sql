@@ -1,4 +1,4 @@
--- Ucan course marketplace schema
+-- UcanJobs course marketplace schema
 -- Run each STEP block sequentially in the database SQL editor.
 -- If a step succeeds, continue to the next one. If a step fails, stop and fix that step first.
 
@@ -351,7 +351,7 @@ values
   ('artificial-intelligence', 'Artificial Intelligence', 'الذكاء الاصطناعي', 'Applied AI and machine learning skills for business and product work.', 'مهارات تطبيقية في الذكاء الاصطناعي وتعلم الآلة للأعمال والمنتجات.', 20, true),
   ('cyber-security', 'Cyber Security', 'الأمن السيبراني', 'Security foundations for junior technology roles.', 'أساسيات الأمن السيبراني للوظائف التقنية المبتدئة.', 30, true),
   ('data-analytics', 'Data Analytics', 'تحليل البيانات', 'Excel, SQL, dashboards, and practical reporting skills.', 'مهارات Excel وSQL ولوحات البيانات والتقارير العملية.', 40, true),
-  ('career-readiness', 'Career Readiness', 'الاستعداد الوظيفي', 'Portfolio, CV, interview, and workplace readiness skills.', 'مهارات الملف المهني والسيرة الذاتية والمقابلات والاستعداد لسوق العمل.', 50, true)
+  ('career-readiness', 'Job Readiness', 'الاستعداد الوظيفي', 'Portfolio, CV, interview, and workplace readiness skills.', 'مهارات الملف المهني والسيرة الذاتية والمقابلات والاستعداد لسوق العمل.', 50, true)
 on conflict (slug) do update
 set
   name_en = excluded.name_en,

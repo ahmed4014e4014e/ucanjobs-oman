@@ -605,7 +605,7 @@ export default function LearnerDashboard() {
             Enrolled Courses
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
-            Your Ucan learning path
+            Your UcanJobs learning path
           </h2>
           <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
             Courses you enroll in will appear here. Detailed progress tracking will be added in a

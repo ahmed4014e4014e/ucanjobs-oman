@@ -46,8 +46,8 @@ values
   ),
   (
     'career-readiness',
-    'Career Readiness',
-    'Career Readiness',
+    'Job Readiness',
+    'Job Readiness',
     'Portfolio, CV, interview, and workplace readiness skills.',
     'Portfolio, CV, interview, and workplace readiness skills.',
     50,

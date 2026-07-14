@@ -18,7 +18,7 @@
   <path d="M279 455C288.801 431.969 305.774 420 328 420C350.226 420 367.199 431.969 377 455C365.281 468.961 348.319 477 328 477C307.681 477 290.719 468.961 279 455Z" fill="#0F5132"/>
   <path d="M648 166L712 198V268C712 314 686 357 648 376C610 357 584 314 584 268V198L648 166Z" fill="#F7EFE3" stroke="#C59A44" stroke-width="8" stroke-linejoin="round"/>
   <path d="M622 267L644 289L680 239" stroke="#0F5132" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="480" y="650" fill="#6F311D" font-family="Georgia, 'Times New Roman', serif" font-size="34" font-weight="700" text-anchor="middle">Ucan Oman Admin</text>
+  <text x="480" y="650" fill="#6F311D" font-family="Georgia, 'Times New Roman', serif" font-size="34" font-weight="700" text-anchor="middle">UcanJobs Admin</text>
   <defs>
     <linearGradient id="bg" x1="150" y1="80" x2="820" y2="650" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FFF9F0"/>

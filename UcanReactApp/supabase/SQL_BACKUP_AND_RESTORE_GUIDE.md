@@ -1,6 +1,6 @@
 # SQL Backup And Restore Guide
 
-Use the `supabase/` folder as the local backup pack for rebuilding the Ucan Oman database and storage policies.
+Use the `supabase/` folder as the local backup pack for rebuilding the UcanJobs database and storage policies.
 
 ## Backup Rule
 

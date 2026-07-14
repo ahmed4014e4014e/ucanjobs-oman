@@ -55,7 +55,7 @@ export default function Terms() {
               <div className="oman-photo-frame oman-photo-frame--contain aspect-[16/10]">
                 <img
                   src={themeImages.policiesCampus}
-                  alt="Ucan policies and job seeker protection visual"
+                  alt="UcanJobs policies and job seeker protection visual"
                 />
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">

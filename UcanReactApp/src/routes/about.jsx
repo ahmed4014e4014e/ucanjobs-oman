@@ -116,7 +116,7 @@ export default function About() {
           <div className="oman-photo-frame aspect-[5/4]">
             <img
               src={themeImages.brandWorkers}
-              alt="Job seekers collaborating in a modern career-readiness environment"
+              alt="Job seekers collaborating in a modern AI-Powered Employability Training environment"
             />
           </div>
         </div>
@@ -144,7 +144,7 @@ export default function About() {
               Ahmed R
             </h2>
             <p className="mt-5 text-base leading-7 text-[var(--oman-ink)]/80 sm:text-lg sm:leading-8">
-              This career-readiness platform was built by Ahmed R from Muscat to help reduce
+              This AI-Powered Employability Training platform was built by Ahmed R from Muscat to help reduce
               the gap between fresh graduates and the practical skills expected for entry-level
               technology jobs.
             </p>

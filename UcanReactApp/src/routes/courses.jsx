@@ -47,7 +47,7 @@ function getCourseCareerPath(course) {
   if (slug.includes("ai") || category.includes("Artificial Intelligence")) return "AI and Automation";
   if (slug.includes("cyber") || category.includes("Cyber")) return "Cyber Security";
   if (slug.includes("data") || category.includes("Data")) return "Data Analytics";
-  if (slug.includes("job") || category.includes("Career")) return "Career Readiness";
+  if (slug.includes("job") || category.includes("Career") || category.includes("Job")) return "Job Readiness";
   if (slug.includes("test")) return "Testing";
 
   return "General Tech Skills";
@@ -89,7 +89,7 @@ function getCourseCategory(course) {
 function getCourseRelevance(course) {
   const careerPath = getCourseCareerPath(course);
 
-  if (careerPath === "Career Readiness") {
+  if (careerPath === "Job Readiness") {
     return "Graduate job search";
   }
 
@@ -226,7 +226,7 @@ export default function Courses() {
                 Practical courses built around Oman&apos;s technology employment needs.
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#f4e8d6] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
-                This is the first structure for the Ucan course marketplace. In later phases,
+                This is the first structure for the UcanJobs course marketplace. In later phases,
                 these courses will come from database with enrollment, payments, and progress tracking.
               </p>
             </div>
