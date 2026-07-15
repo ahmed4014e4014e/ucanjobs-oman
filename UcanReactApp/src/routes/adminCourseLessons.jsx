@@ -137,7 +137,7 @@ export default function AdminCourseLessons() {
                 {course?.title_en || "Lesson Content"}
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
-                Build the actual learning content job seekers see after enrolling in this course.
+                Add lessons and materials learners see after enrollment.
               </p>
             </div>
             <Link

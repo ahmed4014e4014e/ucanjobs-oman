@@ -1,10 +1,11 @@
-import { courseCatalog } from "./courseCatalog";
-import { formatCoursePriceOmr, normalizeCoursePriceOmr } from "./coursePricing";
-import { isSupabaseConfigured, supabase } from "./supabase";
+import { courseCatalog } from "./courseCatalog.js";
+import { formatCoursePriceOmr, normalizeCoursePriceOmr } from "./coursePricing.js";
+import { isSupabaseConfigured, supabase } from "./supabase.js";
 
 const COURSE_COLUMNS = `
   id,
   category_id,
+  instructor_id,
   slug,
   title_en,
   subtitle_en,
@@ -32,6 +33,7 @@ function mapCourseRow(row, outcomes = [], modules = []) {
   return {
     id: row.id,
     slug: row.slug,
+    instructor_id: row.instructor_id || null,
     category: categoryNameEn,
     level: row.level,
     priceOmr: normalizeCoursePriceOmr(row.price_omr),
@@ -195,12 +197,13 @@ export async function enrollInCourse({ learnerId, courseId }) {
   return mapEnrollmentRecord(data);
 }
 
-export async function fetchCourseEnrollment({ learnerId, courseId }) {
-  if (!isSupabaseConfigured || !supabase || !learnerId || !courseId) {
+export async function fetchCourseEnrollment({ learnerId, courseId, client = null }) {
+  const db = client || supabase;
+  if ((!client && !isSupabaseConfigured) || !db || !learnerId || !courseId) {
     return null;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("course_enrollments")
     .select("id, status, progress_percent, enrolled_at")
     .eq("learner_id", learnerId)
@@ -214,8 +217,14 @@ export async function fetchCourseEnrollment({ learnerId, courseId }) {
   return mapEnrollmentRecord(data);
 }
 
-export async function updateCourseProgress({ learnerId, courseId, progressPercent }) {
-  if (!isSupabaseConfigured || !supabase) {
+export async function updateCourseProgress({
+  learnerId,
+  courseId,
+  progressPercent,
+  client = null,
+}) {
+  const db = client || supabase;
+  if (!db || (!client && !isSupabaseConfigured)) {
     throw new Error("database is not configured yet.");
   }
 
@@ -227,7 +236,7 @@ export async function updateCourseProgress({ learnerId, courseId, progressPercen
   const nextStatus =
     normalizedProgress >= 100 ? "completed" : normalizedProgress > 0 ? "in_progress" : "enrolled";
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("course_enrollments")
     .update({
       progress_percent: normalizedProgress,

@@ -71,7 +71,7 @@ export function buildInstructorCards(offerings, sessionType) {
           courseIds: [],
           bio:
             entry.instructor.bio ||
-            `Offers ${sessionType === "private" ? "one-on-one" : "group"} AI-Powered Employability Training support sessions.`,
+            `Offers ${sessionType === "private" ? "one-on-one" : "group"} support sessions.`,
           availability:
             sessionType === "private"
               ? "Available for private career support"

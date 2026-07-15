@@ -1,162 +1,106 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import ActionFeedback from "../components/ActionFeedback";
-import LessonQuiz from "../components/LessonQuiz";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import CurriculumSidebar from "../components/domain/CurriculumSidebar";
+import LecturePlayerPanel from "../components/domain/LecturePlayerPanel";
+import { Alert, Button, Card } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import {
+  collectCurriculumResources,
   fetchLearningCourse,
   fetchLessonQuiz,
   submitLessonQuiz,
   updateLessonCompletion,
 } from "../lib/learningContentApi";
-import { themeImages } from "../lib/themeImages";
-
-function getEmbeddableVideoUrl(value) {
-  if (!value) return "";
-
-  try {
-    const url = new URL(value);
-    const host = url.hostname.replace(/^www\./, "");
-
-    if (host === "youtube.com" || host === "m.youtube.com") {
-      const videoId = url.searchParams.get("v");
-      return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
-    }
-
-    if (host === "youtu.be") {
-      const videoId = url.pathname.split("/").filter(Boolean)[0];
-      return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
-    }
-
-    if (host === "vimeo.com") {
-      const videoId = url.pathname.split("/").filter(Boolean)[0];
-      return videoId ? `https://player.vimeo.com/video/${videoId}` : "";
-    }
-
-    if (host === "drive.google.com") {
-      const pathParts = url.pathname.split("/").filter(Boolean);
-      const fileIndex = pathParts.indexOf("d");
-      const fileId =
-        fileIndex >= 0 ? pathParts[fileIndex + 1] : url.searchParams.get("id");
-      return fileId ? `https://drive.google.com/file/d/${fileId}/preview` : "";
-    }
-  } catch {
-    return "";
-  }
-
-  return "";
-}
-
-function isDirectVideoUrl(value) {
-  if (!value) return false;
-
-  try {
-    const path = new URL(value).pathname.toLowerCase();
-    return [".mp4", ".webm", ".ogg", ".mov", ".m4v"].some((extension) =>
-      path.endsWith(extension)
-    );
-  } catch {
-    return false;
-  }
-}
+import { flattenCurriculum } from "../lib/curriculumModel";
 
 export default function LearnCourse() {
   const { slug } = useParams();
-  const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { user, profile } = useAuth();
+  const previewMode = searchParams.get("preview") === "1";
+  const role = profile?.role || user?.user_metadata?.role;
+  const isInstructorRole = role === "instructor" || role === "tutor";
+
   const [course, setCourse] = useState(null);
   const [enrollment, setEnrollment] = useState(null);
-  const [lessons, setLessons] = useState([]);
-  const [activeLessonId, setActiveLessonId] = useState("");
+  const [sections, setSections] = useState([]);
+  const [activeLectureId, setActiveLectureId] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [feedback, setFeedback] = useState({ type: "idle", message: "" });
   const [updatingLessonId, setUpdatingLessonId] = useState("");
   const [quiz, setQuiz] = useState(null);
   const [quizResult, setQuizResult] = useState(null);
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizSubmitting, setQuizSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [feedback, setFeedback] = useState({ type: "idle", message: "" });
-  const [videoPlaybackError, setVideoPlaybackError] = useState("");
+  const [showOverview, setShowOverview] = useState(false);
+  const [isInstructorPreview, setIsInstructorPreview] = useState(false);
 
-  const activeLesson = useMemo(
-    () => lessons.find((lesson) => lesson.id === activeLessonId) || lessons[0] || null,
-    [activeLessonId, lessons]
-  );
-
-  const completedCount = useMemo(
-    () => lessons.filter((lesson) => lesson.isComplete).length,
-    [lessons]
-  );
+  const flat = useMemo(() => flattenCurriculum(sections), [sections]);
+  const activeIndex = flat.findIndex((item) => item.id === activeLectureId);
+  const activeLecture = activeIndex >= 0 ? flat[activeIndex] : flat[0] || null;
   const progressPercent = enrollment?.progressPercent ?? 0;
-  const completionStatus = progressPercent >= 100 ? "Completed" : progressPercent > 0 ? "In progress" : "Not started";
-  const moduleList = course?.en?.modules?.length ? course.en.modules : lessons.map((lesson) => lesson.title);
-  const downloadableResources = lessons.filter((lesson) => lesson.resourceUrl);
-  const embeddedVideoUrl = getEmbeddableVideoUrl(activeLesson?.videoUrl);
-  const canPlayInlineVideo =
-    Boolean(activeLesson?.videoUrl) &&
-    (activeLesson.videoIsUpload || isDirectVideoUrl(activeLesson.videoUrl));
+  const completedCount = flat.filter((item) => item.isComplete).length;
+  const allResources = useMemo(() => collectCurriculumResources(sections), [sections]);
 
   useEffect(() => {
     let ignore = false;
 
-    const loadLearningCourse = async () => {
-      if (!user?.id) {
-        return;
-      }
-
+    const load = async () => {
+      if (!user?.id) return;
       setLoading(true);
       setError("");
-
       try {
         const result = await fetchLearningCourse({
           slug,
           learnerId: user.id,
+          previewAsInstructorId:
+            previewMode && isInstructorRole ? user.id : null,
         });
-
-        if (!ignore) {
-          setCourse(result.course);
-          setEnrollment(result.enrollment);
-          setLessons(result.lessons);
-          setActiveLessonId(result.lessons[0]?.id || "");
-        }
+        if (ignore) return;
+        setCourse(result.course);
+        setEnrollment(result.enrollment);
+        setSections(result.sections);
+        setIsInstructorPreview(Boolean(result.isInstructorPreview));
+        const lectures = flattenCurriculum(result.sections);
+        const resume =
+          lectures.find((item) => !item.isComplete) || lectures[0] || null;
+        setActiveLectureId(resume?.id || "");
       } catch (loadError) {
         if (!ignore) {
-          setError(loadError.message || "Unable to open this learning page right now.");
+          setError(loadError.message || "Unable to open this course.");
         }
       } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
+        if (!ignore) setLoading(false);
       }
     };
 
-    loadLearningCourse();
-
+    load();
     return () => {
       ignore = true;
     };
-  }, [slug, user?.id]);
+  }, [slug, user?.id, previewMode, isInstructorRole]);
 
   useEffect(() => {
     let ignore = false;
 
     const loadQuiz = async () => {
-      if (!activeLesson?.id) {
+      if (!activeLecture?.id || isInstructorPreview) {
         setQuiz(null);
+        setQuizResult(null);
         return;
       }
-
       setQuizLoading(true);
-      setQuizResult(null);
       try {
-        const lessonQuiz = await fetchLessonQuiz(activeLesson.id);
-        if (!ignore) setQuiz(lessonQuiz);
-      } catch (quizError) {
+        const data = await fetchLessonQuiz(activeLecture.id);
+        if (!ignore) {
+          setQuiz(data);
+          setQuizResult(data?.latestAttempt || null);
+        }
+      } catch {
         if (!ignore) {
           setQuiz(null);
-          setFeedback({
-            type: "error",
-            message: quizError.message || "Unable to load this lesson quiz.",
-          });
+          setQuizResult(null);
         }
       } finally {
         if (!ignore) setQuizLoading(false);
@@ -167,46 +111,82 @@ export default function LearnCourse() {
     return () => {
       ignore = true;
     };
-  }, [activeLesson?.id]);
+  }, [activeLecture?.id, isInstructorPreview]);
 
-  useEffect(() => {
-    setVideoPlaybackError("");
-  }, [activeLesson?.id]);
+  const toggleSection = (sectionId) => {
+    setSections((current) =>
+      current.map((section) =>
+        section.id === sectionId ? { ...section, expanded: !section.expanded } : section
+      )
+    );
+  };
 
-  const handleLessonCompletion = async (lesson) => {
-    if (!user?.id || !course?.id || !enrollment?.id) {
+  const selectLecture = (lectureId) => {
+    setActiveLectureId(lectureId);
+    setSections((current) =>
+      current.map((section) =>
+        section.lectures.some((l) => l.id === lectureId)
+          ? { ...section, expanded: true }
+          : section
+      )
+    );
+    setShowOverview(false);
+  };
+
+  const goRelative = (delta) => {
+    const next = flat[activeIndex + delta];
+    if (next) selectLecture(next.id);
+  };
+
+  const handleToggleComplete = async () => {
+    if (!activeLecture || !enrollment?.id || !user?.id || isInstructorPreview) {
+      if (isInstructorPreview) {
+        setFeedback({
+          type: "info",
+          message: "Completion is disabled in instructor preview.",
+        });
+      }
       return;
     }
 
-    setUpdatingLessonId(lesson.id);
+    setUpdatingLessonId(activeLecture.id);
     setFeedback({ type: "idle", message: "" });
-
     try {
       const nextEnrollment = await updateLessonCompletion({
         learnerId: user.id,
         courseId: course.id,
         enrollmentId: enrollment.id,
-        lessonId: lesson.id,
-        isComplete: !lesson.isComplete,
+        lessonId: activeLecture.id,
+        isComplete: !activeLecture.isComplete,
       });
 
-      const nextLessons = lessons.map((item) =>
-        item.id === lesson.id ? { ...item, isComplete: !lesson.isComplete } : item
+      setEnrollment((current) => ({
+        ...current,
+        ...nextEnrollment,
+        progressPercent: nextEnrollment.progressPercent ?? current.progressPercent,
+      }));
+
+      setSections((current) =>
+        current.map((section) => ({
+          ...section,
+          lectures: section.lectures.map((lecture) =>
+            lecture.id === activeLecture.id
+              ? { ...lecture, isComplete: !activeLecture.isComplete }
+              : lecture
+          ),
+        }))
       );
 
-      setLessons(nextLessons);
-      setEnrollment({
-        ...nextEnrollment,
-        progressPercent: nextEnrollment.progressPercent,
-      });
       setFeedback({
         type: "success",
-        message: !lesson.isComplete ? "Lesson marked complete." : "Lesson marked incomplete.",
+        message: !activeLecture.isComplete
+          ? "Lecture marked complete."
+          : "Lecture marked incomplete.",
       });
     } catch (updateError) {
       setFeedback({
         type: "error",
-        message: updateError.message || "Unable to update lesson progress right now.",
+        message: updateError.message || "Unable to update progress.",
       });
     } finally {
       setUpdatingLessonId("");
@@ -215,7 +195,6 @@ export default function LearnCourse() {
 
   const handleQuizSubmit = async (answers) => {
     if (!quiz?.id) return;
-
     setQuizSubmitting(true);
     setFeedback({ type: "idle", message: "" });
     try {
@@ -225,8 +204,8 @@ export default function LearnCourse() {
       setFeedback({
         type: result.passed ? "success" : "error",
         message: result.passed
-          ? "Quiz passed. You can complete this lesson."
-          : `Your score was ${result.scorePercent}%. Review the lesson and try again.`,
+          ? "Quiz passed."
+          : `Score ${result.scorePercent}%. Review and try again.`,
       });
     } catch (quizError) {
       setFeedback({
@@ -240,26 +219,18 @@ export default function LearnCourse() {
 
   if (loading) {
     return (
-      <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
-        <section className="mx-auto max-w-3xl rounded-[1.75rem] oman-card p-6 text-center sm:p-8">
-          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Learning Page
-          </p>
-          <h1 className="oman-title-accent mt-4 text-3xl font-semibold">
-            Loading your course...
-          </h1>
-        </section>
+      <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-center sm:px-6 sm:pt-28">
+        <p className="oman-section-kicker text-xs font-semibold uppercase">Learning</p>
+        <h1 className="oman-title-accent mt-4 text-3xl font-semibold">Loading your course...</h1>
       </main>
     );
   }
 
   if (error) {
     return (
-      <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
+      <main className="oman-page min-h-screen px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
         <section className="mx-auto max-w-3xl rounded-[1.75rem] oman-card p-6 text-center sm:p-8">
-          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Course Access
-          </p>
+          <p className="oman-section-kicker text-xs font-semibold uppercase">Course access</p>
           <h1 className="oman-title-accent mt-4 text-3xl font-semibold">
             We could not open this course.
           </h1>
@@ -268,321 +239,178 @@ export default function LearnCourse() {
             to={`/courses/${slug}/`}
             className="oman-button-primary mt-6 inline-flex rounded-2xl px-6 py-3 font-semibold transition"
           >
-            Back to Course
+            Back to course
           </Link>
         </section>
       </main>
     );
   }
 
+  const courseTitle = course?.en?.title || course?.title_en || "Course";
+
   return (
-    <main className="oman-page min-h-screen text-slate-900">
-      <section
-        className="oman-hero text-white"
-        style={{ backgroundImage: `url(${themeImages.mountainFort})` }}
-      >
-        <div className="mx-auto max-w-6xl px-4 pb-12 pt-24 sm:px-6 sm:pb-14 sm:pt-28">
-          <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-            Learning Workspace
-          </p>
-          <h1 className="max-w-4xl text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-            {course?.en?.title || "Course"}
-          </h1>
-          <div className="mt-6 max-w-xl">
-            <div className="flex items-center justify-between gap-4 text-sm font-semibold text-[#f4e8d6]">
-              <span>{completedCount} of {lessons.length} lessons complete</span>
-              <span>{progressPercent}%</span>
-            </div>
-            <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/20">
-              <div
-                className="h-full rounded-full bg-[var(--oman-brass)] transition-all"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <p className="mt-3 text-sm font-semibold text-[#f4e8d6]">
-              Completion status: {completionStatus}
+    <main className="min-h-screen bg-[#1a1410] text-slate-900">
+      <div className="border-b border-white/10 bg-[#241a16] pt-20 text-white">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[var(--oman-brass)]">
+              {isInstructorPreview ? "Instructor preview" : "Learning player"}
             </p>
+            <h1 className="truncate text-lg font-bold sm:text-xl">{courseTitle}</h1>
+            <div className="mt-2 flex max-w-md items-center gap-3">
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/15">
+                <div
+                  className="h-full rounded-full bg-[var(--oman-brass)] transition-all"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <span className="text-xs font-semibold text-white/75">{progressPercent}%</span>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="!border-white/20 !text-white"
+              onClick={() => setShowOverview((value) => !value)}
+            >
+              {showOverview ? "Back to player" : "Course overview"}
+            </Button>
+            <Button to={`/courses/${slug}/`} variant="secondary" size="sm">
+              Course page
+            </Button>
+            <Button to="/learner-dashboard/" variant="primary" size="sm">
+              Dashboard
+            </Button>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section className="mx-auto grid max-w-6xl gap-4 px-4 pt-10 sm:px-6 lg:grid-cols-4">
-        {[
-          ["Course overview", course?.en?.summary || course?.en?.subtitle || "Follow the lessons below to build practical skills."],
-          ["Modules", `${moduleList.length} module${moduleList.length === 1 ? "" : "s"} planned`],
-          ["Resources", `${downloadableResources.length} downloadable resource${downloadableResources.length === 1 ? "" : "s"}`],
-          ["Certificate", progressPercent >= 100 ? "Certificate feature will be added later." : "Complete the course first. Certificate feature comes later."],
-        ].map(([title, value]) => (
-          <article key={title} className="rounded-3xl oman-card p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-              {title}
-            </p>
-            <p className="mt-3 text-sm leading-6 text-[var(--oman-ink)]/75">{value}</p>
-          </article>
-        ))}
-      </section>
-
-      <section className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="rounded-[1.75rem] oman-card p-5 sm:p-6">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                Lessons
+      <div className="mx-auto grid max-w-7xl gap-0 lg:grid-cols-[minmax(17rem,22rem)_1fr]">
+        <div className="min-h-[70vh] border-r border-[rgba(111,49,29,0.1)] bg-[rgba(247,239,223,0.98)] lg:min-h-[calc(100vh-8rem)]">
+          <div className="sticky top-20 flex h-[calc(100vh-5.5rem)] flex-col p-3 sm:p-4">
+            <Card variant="soft" padding="sm" rounded="lg" className="mb-3 shrink-0">
+              <p className="text-xs font-semibold text-[var(--oman-ink)]/70">Your progress</p>
+              <p className="mt-1 text-sm font-semibold text-[var(--oman-ink)]">
+                {completedCount} of {flat.length} lectures complete
               </p>
-              <h2 className="oman-title-accent mt-3 text-xl font-semibold">
-                Course Path
-              </h2>
-            </div>
-            <Link
-              to="/learner-dashboard/"
-              className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.12)] transition hover:bg-[rgba(244,232,214,0.4)]"
-            >
-              Dashboard
-            </Link>
-          </div>
-
-          {lessons.length === 0 ? (
-            <div className="mt-6 rounded-3xl oman-outline-panel p-5 text-center">
-              <h3 className="text-lg font-semibold text-[var(--oman-ink)]">
-                No lessons published yet
-              </h3>
-              <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
-                The admin team can add lesson content from the admin course lesson editor.
-              </p>
-            </div>
-          ) : (
-            <ol className="mt-6 space-y-3">
-              {lessons.map((lesson, index) => (
-                <li key={lesson.id}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveLessonId(lesson.id)}
-                    className={`w-full rounded-2xl px-4 py-4 text-left ring-1 transition ${
-                      activeLesson?.id === lesson.id
-                        ? "bg-[rgba(197,154,68,0.14)] ring-[rgba(197,154,68,0.35)]"
-                        : "bg-[rgba(255,252,247,0.92)] ring-[rgba(111,49,29,0.1)] hover:bg-white"
-                    }`}
-                  >
-                    <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-                      Lesson {index + 1}
-                    </span>
-                    <span className="mt-2 block font-semibold text-[var(--oman-ink)]">
-                      {lesson.title}
-                    </span>
-                    <span className="mt-2 block text-sm text-[var(--oman-ink)]/65">
-                      {lesson.isComplete ? "Complete" : "Not complete"}
-                      {lesson.videoUrl ? " · Video" : ""}
-                      {lesson.resourceUrl ? " · Resource" : ""}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ol>
-          )}
-
-          <div className="mt-8 rounded-3xl oman-outline-panel p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-              Module List
-            </p>
-            {moduleList.length ? (
-              <ol className="mt-4 space-y-3">
-                {moduleList.map((module, index) => (
-                  <li key={`${module}-${index}`} className="text-sm leading-6 text-[var(--oman-ink)]/75">
-                    <span className="font-semibold text-[var(--oman-ink)]">Module {index + 1}:</span>{" "}
-                    {module}
-                  </li>
-                ))}
-              </ol>
-            ) : (
-              <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/75">
-                Modules will appear here after the course outline is published.
-              </p>
-            )}
-          </div>
-        </aside>
-
-        <section className="rounded-[1.75rem] oman-card p-6 sm:p-8">
-          {activeLesson ? (
-            <>
-              <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                Lesson
-              </p>
-              <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-                {activeLesson.title}
-              </h2>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                <span className="oman-chip rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em]">
-                  {activeLesson.isComplete ? "Completed" : "In progress"}
-                </span>
-                <span className="rounded-full bg-[rgba(244,232,214,0.54)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--oman-terracotta-dark)]">
-                  {activeLesson.videoUrl ? "Video lesson" : "Text lesson"}
-                </span>
-              </div>
-
-              <div className="mt-6 rounded-3xl oman-outline-panel p-5">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-                  Text Lesson
+              {isInstructorPreview ? (
+                <p className="mt-1 text-xs text-[var(--oman-terracotta)]">
+                  Preview mode — enrollment not required
                 </p>
-                <p className="whitespace-pre-wrap text-base leading-8 text-[var(--oman-ink)]/80">
-                  {activeLesson.body || "Lesson content is being prepared."}
-                </p>
-              </div>
-
-              {activeLesson.videoUrl ? (
-                <div className="mt-5">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-                    Lesson Player
-                  </p>
-                  {canPlayInlineVideo ? (
-                    <div className="lesson-player-frame">
-                      <video
-                        key={activeLesson.videoUrl}
-                        controls
-                        playsInline
-                        preload="metadata"
-                        className="lesson-player-media"
-                        src={activeLesson.videoUrl}
-                        onError={() =>
-                          setVideoPlaybackError(
-                            "This video could not play inside the lesson. Try opening it directly, or upload it again as MP4/WebM."
-                          )
-                        }
-                      >
-                        Your browser does not support video playback.
-                      </video>
-                    </div>
-                  ) : embeddedVideoUrl ? (
-                    <div className="lesson-player-frame">
-                      <iframe
-                        title={`${activeLesson.title} video`}
-                        src={embeddedVideoUrl}
-                        className="lesson-player-media"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                      />
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl oman-outline-panel p-5">
-                      <p className="text-sm leading-6 text-[var(--oman-ink)]/75">
-                        This video link cannot be embedded safely inside the lesson. Open it in a
-                        new tab, or use an uploaded MP4/WebM file for in-page playback.
-                      </p>
-                    </div>
-                  )}
-                  {videoPlaybackError && (
-                    <p className="mt-3 rounded-2xl bg-[rgba(255,239,232,0.92)] px-4 py-3 text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                      {videoPlaybackError}
-                    </p>
-                  )}
-                </div>
               ) : null}
+            </Card>
+            <CurriculumSidebar
+              sections={sections}
+              activeLectureId={activeLecture?.id}
+              onSelectLecture={selectLecture}
+              onToggleSection={toggleSection}
+              mode="learner"
+              className="min-h-0 flex-1 !rounded-xl"
+            />
+          </div>
+        </div>
 
-              {(activeLesson.videoUrl || activeLesson.resourceUrl) && (
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {activeLesson.videoUrl && (
-                    <a
-                      href={activeLesson.videoUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
-                    >
-                      Open Video In New Tab
-                    </a>
-                  )}
-                  {activeLesson.resourceUrl && (
-                    <a
-                      href={activeLesson.resourceUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      download
-                      className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
-                    >
-                      Download Resource
-                    </a>
-                  )}
+        <div className="min-w-0 bg-[linear-gradient(180deg,#f7efdf_0%,#efe1c9_100%)] px-4 py-5 sm:px-6 sm:py-6">
+          <Alert type={feedback.type} message={feedback.message} title="Learning update" className="mb-4" />
+
+          {showOverview ? (
+            <div className="space-y-4">
+              <Card variant="default" padding="lg" rounded="xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--oman-terracotta)]">
+                  Overview
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold">{courseTitle}</h2>
+                <p className="mt-4 leading-7 text-[var(--oman-ink)]/80">
+                  {course?.en?.summary ||
+                    course?.summary_en ||
+                    course?.en?.subtitle ||
+                    "Course summary"}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2 text-sm">
+                  <span className="rounded-full bg-[rgba(197,154,68,0.14)] px-3 py-1 font-semibold">
+                    {course?.level || "Level"}
+                  </span>
+                  <span className="rounded-full bg-[rgba(197,154,68,0.14)] px-3 py-1 font-semibold">
+                    {course?.duration || course?.en?.duration || "Self-paced"}
+                  </span>
+                  <span className="rounded-full bg-[rgba(197,154,68,0.14)] px-3 py-1 font-semibold">
+                    {progressPercent}% complete
+                  </span>
                 </div>
-              )}
+              </Card>
 
-              {downloadableResources.length > 0 && (
-                <div className="mt-6 rounded-3xl oman-outline-panel p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-                    Downloadable Resources
-                  </p>
-                  <div className="mt-4 grid gap-3">
-                    {downloadableResources.map((lesson) => (
-                      <a
-                        key={lesson.id}
-                        href={lesson.resourceUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        download
-                        className="rounded-2xl bg-[rgba(255,252,247,0.92)] px-4 py-3 text-sm font-semibold text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.1)] transition hover:bg-white"
-                      >
-                        {lesson.title}
-                      </a>
+              <Card variant="default" padding="lg" rounded="xl">
+                <h3 className="text-lg font-semibold">Full curriculum</h3>
+                <ol className="mt-4 space-y-4">
+                  {sections.map((section, sIndex) => (
+                    <li key={section.id}>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                        Section {sIndex + 1}: {section.title}
+                      </p>
+                      <ul className="mt-2 space-y-1 pl-2">
+                        {section.lectures.map((lecture, lIndex) => (
+                          <li key={lecture.id}>
+                            <button
+                              type="button"
+                              className="text-left text-sm font-medium text-[var(--oman-ink)] hover:text-[var(--oman-terracotta)]"
+                              onClick={() => selectLecture(lecture.id)}
+                            >
+                              {lIndex + 1}. {lecture.title || lecture.title_en}
+                              {lecture.isComplete ? " ✓" : ""}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ol>
+              </Card>
+
+              <Card variant="default" padding="lg" rounded="xl">
+                <h3 className="text-lg font-semibold">All resources</h3>
+                {allResources.length ? (
+                  <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {allResources.map((file) => (
+                      <li key={`${file.lectureId}-${file.id}`}>
+                        <a
+                          href={file.resolvedUrl || file.fileUrl || file.file_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-2 rounded-xl border border-[rgba(111,49,29,0.12)] bg-white px-3 py-2 text-sm font-medium"
+                        >
+                          📎 {file.name}
+                          <span className="ml-auto text-xs text-[var(--oman-ink)]/50">
+                            {file.lectureTitle}
+                          </span>
+                        </a>
+                      </li>
                     ))}
-                  </div>
-                </div>
-              )}
-
-              {quizLoading ? (
-                <p className="mt-6 text-sm text-[var(--oman-ink)]/65">Loading lesson quiz...</p>
-              ) : (
-                <LessonQuiz
-                  key={quiz?.id || activeLesson.id}
-                  quiz={quiz}
-                  submitting={quizSubmitting}
-                  result={quizResult}
-                  onSubmit={handleQuizSubmit}
-                />
-              )}
-
-              <ActionFeedback
-                type={feedback.type}
-                message={feedback.message}
-                title="Lesson progress"
-                className="mt-6"
-              />
-
-              <button
-                type="button"
-                onClick={() => handleLessonCompletion(activeLesson)}
-                disabled={
-                  updatingLessonId === activeLesson.id ||
-                  (Boolean(quiz) && !(quizResult?.passed || quiz?.latestAttempt?.passed))
-                }
-                className="oman-button-primary mt-6 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
-              >
-                {updatingLessonId === activeLesson.id
-                  ? "Updating..."
-                  : activeLesson.isComplete
-                    ? "Mark Lesson Incomplete"
-                    : "Mark Lesson Complete"}
-              </button>
-
-              <div className="mt-6 rounded-3xl bg-[rgba(244,232,214,0.34)] p-5">
-                <p className="text-sm font-semibold text-[var(--oman-ink)]">
-                  Completion status: {completionStatus}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/70">
-                  Certificate generation is planned for a later phase. For now, this page tracks
-                  lesson completion and course progress.
-                </p>
-              </div>
-            </>
-          ) : (
-            <div className="rounded-3xl oman-outline-panel p-6 text-center">
-              <h2 className="text-xl font-semibold text-[var(--oman-ink)]">
-                Choose a lesson
-              </h2>
-              <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-                Select a lesson from the course path to begin learning.
-              </p>
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-sm text-[var(--oman-ink)]/65">No downloads in this course yet.</p>
+                )}
+              </Card>
             </div>
+          ) : (
+            <LecturePlayerPanel
+              lecture={activeLecture}
+              sectionTitle={activeLecture?.sectionTitle}
+              onPrev={() => goRelative(-1)}
+              onNext={() => goRelative(1)}
+              onToggleComplete={handleToggleComplete}
+              hasPrev={activeIndex > 0}
+              hasNext={activeIndex >= 0 && activeIndex < flat.length - 1}
+              showComplete={!isInstructorPreview && Boolean(enrollment?.id)}
+              quiz={quizLoading ? null : quiz}
+              quizResult={quizResult}
+              quizSubmitting={quizSubmitting || Boolean(updatingLessonId)}
+              onQuizSubmit={isInstructorPreview ? null : handleQuizSubmit}
+            />
           )}
-        </section>
-      </section>
+        </div>
+      </div>
     </main>
   );
 }

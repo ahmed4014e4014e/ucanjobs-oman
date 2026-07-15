@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 import { courseCatalog } from "../lib/courseCatalog";
 import { fetchPublishedCourses } from "../lib/courseApi";
 import { themeImages } from "../lib/themeImages";
+import { Alert, Button, Card, Field } from "../components/ui";
+import { Hero, Page, PageHeader, Section, SiteFooter } from "../components/layout";
 
 const FILTER_ALL = "All";
 const UCAN_COURSE_CATEGORIES = [
@@ -155,7 +156,6 @@ export default function Courses() {
       }),
     [courses, filters]
   );
-  const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
 
   const updateFilter = (key, value) => {
     setFilters((currentFilters) => ({
@@ -211,67 +211,54 @@ export default function Courses() {
   }, []);
 
   return (
-    <main className="oman-page min-h-screen text-slate-900">
-      <section
-        className="oman-hero text-white"
-        style={{ backgroundImage: `url(${themeImages.brandWorkers})` }}
-      >
-        <div className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
-          <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
-            <div className="text-center lg:text-left">
-              <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-                Course Catalog
-              </p>
-              <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:mx-0 lg:text-5xl">
-                Practical courses built around Oman&apos;s technology employment needs.
-              </h1>
-              <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#f4e8d6] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
-                This is the first structure for the UcanJobs course marketplace. In later phases,
-                these courses will come from database with enrollment, payments, and progress tracking.
-              </p>
-            </div>
-
-            <div className="oman-card rounded-[1.75rem] p-4 text-[var(--oman-ink)] sm:p-5">
-              <div className="oman-photo-frame oman-photo-frame--contain aspect-[16/10]">
-                <img src={themeImages.brandWordmark} alt="UcanJobs branded learning identity" />
-              </div>
-              <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
-                Start with high-demand tech categories, then expand them later using market data and AI.
-              </p>
-            </div>
+    <Page>
+      <Hero backgroundImage={themeImages.brandWorkers}>
+        <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
+          <div className="text-center lg:text-left">
+            <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
+              {t("servicesPage.heroKicker")}
+            </p>
+            <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:mx-0 lg:text-5xl">
+              {t("servicesPage.heroTitle")}
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#f4e8d6] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
+              {t("servicesPage.heroText")}
+            </p>
           </div>
-        </div>
-      </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+          <Card variant="default" padding="sm" rounded="xl" className="text-[var(--oman-ink)]">
+            <div className="oman-photo-frame oman-photo-frame--contain aspect-[16/10]">
+              <img src={themeImages.brandWordmark} alt="UcanJobs" />
+            </div>
+            <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
+              {t("servicesPage.heroCardText")}
+            </p>
+          </Card>
+        </div>
+      </Hero>
+
+      <Section spacing="md">
         <div className="flex flex-wrap justify-center gap-2 lg:justify-start">
           {categories.map((category) => (
             <span
               key={category}
-              className="rounded-full bg-[rgba(197,154,68,0.12)] px-4 py-2 text-sm font-semibold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.12)]"
+              className="oman-chip rounded-full px-4 py-2 text-sm font-semibold"
             >
               {category}
             </span>
           ))}
         </div>
 
-        <div className="mt-8 rounded-[1.75rem] oman-card p-5 sm:p-6">
+        <Card variant="default" padding="md" rounded="xl" className="mt-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                Course Filters
-              </p>
-              <h2 className="oman-title-accent mt-3 text-2xl font-semibold">
-                Find the right course faster
-              </h2>
-            </div>
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="oman-button-secondary inline-flex items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition"
-            >
+            <PageHeader
+              kicker="Course filters"
+              title="Find the right course faster"
+              className="max-w-none"
+            />
+            <Button type="button" variant="secondary" size="sm" onClick={resetFilters}>
               Reset Filters
-            </button>
+            </Button>
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -281,34 +268,36 @@ export default function Courses() {
               ["price", "Price"],
               ["language", "Language"],
             ].map(([key, label]) => (
-              <label key={key} className="flex min-w-0 flex-col gap-2">
-                <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                  {label}
-                </span>
-                <select
-                  value={filters[key]}
-                  onChange={(event) => updateFilter(key, event.target.value)}
-                  className="min-h-12 w-full rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                >
-                  {filterOptions[key].map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <Field
+                key={key}
+                as="select"
+                label={label}
+                name={key}
+                value={filters[key]}
+                onChange={(event) => updateFilter(key, event.target.value)}
+                controlClassName="min-h-12"
+              >
+                {filterOptions[key].map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </Field>
             ))}
           </div>
 
           <p className="mt-5 text-sm font-semibold text-[var(--oman-ink)]/70">
             Showing {filteredCourses.length} of {courses.length} courses.
           </p>
-        </div>
+        </Card>
 
         {(loadingCourses || courseLoadMessage) && (
-          <div className="mt-6 rounded-2xl bg-[rgba(255,252,247,0.9)] px-4 py-3 text-sm font-semibold text-[var(--oman-terracotta-dark)] ring-1 ring-[rgba(111,49,29,0.1)]">
-            {loadingCourses ? "Loading courses..." : courseLoadMessage}
-          </div>
+          <Alert
+            type="info"
+            title={loadingCourses ? "Loading" : "Catalog note"}
+            message={loadingCourses ? "Loading courses..." : courseLoadMessage}
+            className="mt-6"
+          />
         )}
 
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
@@ -317,7 +306,7 @@ export default function Courses() {
             const meta = buildCourseFilterMeta(course);
 
             return (
-              <article key={course.slug} className="rounded-[1.75rem] oman-card p-6 sm:p-8">
+              <Card key={course.slug} as="article" variant="default" padding="lg" rounded="xl">
                 <div className="flex flex-wrap gap-2">
                   <span className="oman-chip rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em]">
                     {meta.category}
@@ -327,55 +316,50 @@ export default function Courses() {
                   </span>
                 </div>
 
-                <h2 className="oman-title-accent mt-5 text-2xl font-semibold">
-                  {content.title}
-                </h2>
+                <h2 className="oman-title-accent mt-5 text-2xl font-semibold">{content.title}</h2>
                 <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">{content.subtitle}</p>
 
                 <div className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
-                  <p className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-3 font-semibold text-[var(--oman-ink)]">
-                    {course.price}
-                  </p>
-                  <p className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-3 font-semibold text-[var(--oman-ink)]">
-                    {course.duration}
-                  </p>
-                  <p className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-3 font-semibold text-[var(--oman-ink)]">
-                    {course.language}
-                  </p>
+                  {[course.price, course.duration, course.language].map((item) => (
+                    <p
+                      key={item}
+                      className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-3 font-semibold text-[var(--oman-ink)]"
+                    >
+                      {item}
+                    </p>
+                  ))}
                 </div>
 
-                <ul className="mt-5 space-y-2 text-sm leading-6 text-[var(--oman-ink)]/75">
+                <ul className="mt-5 list-disc space-y-2 pl-5 text-sm leading-6 text-[var(--oman-ink)]/75">
                   {content.outcomes.slice(0, 2).map((outcome) => (
-                    <li key={outcome}>- {outcome}</li>
+                    <li key={outcome}>{outcome}</li>
                   ))}
                 </ul>
 
-                <Link
-                  to={`/courses/${course.slug}/`}
-                  className="oman-button-primary mt-6 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition sm:w-auto"
-                >
+                <Button to={`/courses/${course.slug}/`} variant="primary" className="mt-6 w-full sm:w-auto">
                   View Course Details
-                </Link>
-              </article>
+                </Button>
+              </Card>
             );
           })}
         </div>
 
-        {!loadingCourses && filteredCourses.length === 0 && (
-          <div className="mt-10 rounded-[1.75rem] oman-card p-6 text-center sm:p-8">
+        {!loadingCourses && filteredCourses.length === 0 ? (
+          <Card variant="default" padding="lg" rounded="xl" className="mt-10 text-center">
             <h2 className="text-xl font-semibold text-[var(--oman-ink)]">
               No courses match these filters
             </h2>
             <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
               Reset the filters or choose a broader option to see more courses.
             </p>
-          </div>
-        )}
-      </section>
+            <Button type="button" variant="secondary" className="mt-6" onClick={resetFilters}>
+              Reset Filters
+            </Button>
+          </Card>
+        ) : null}
+      </Section>
 
-      <footer className="border-t border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.9)] px-4 py-8 text-center text-sm text-[var(--oman-ink)]/70 sm:px-6">
-        {footerText}
-      </footer>
-    </main>
+      <SiteFooter />
+    </Page>
   );
 }

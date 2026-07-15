@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  /* Brand palette */
   --oman-sand: #efe1c9;
   --oman-sand-deep: #d8be98;
   --oman-terracotta: #9b4d31;
@@ -10,6 +11,27 @@
   --oman-ink: #2a211c;
   --oman-paper: rgba(255, 248, 238, 0.88);
   --oman-border: rgba(111, 49, 29, 0.15);
+
+  /* Semantic tokens (design system Phase 0) */
+  --color-bg-page: #f7efdf;
+  --color-bg-surface: var(--oman-paper);
+  --color-text: var(--oman-ink);
+  --color-text-muted: rgba(42, 33, 28, 0.75);
+  --color-primary: var(--oman-brass);
+  --color-secondary: var(--oman-terracotta);
+  --color-success: var(--oman-olive);
+  --color-warning: #b8860b;
+  --color-danger: var(--oman-terracotta-dark);
+  --color-info: var(--oman-brass);
+  --color-focus-ring: rgba(197, 154, 68, 0.55);
+
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 1.75rem;
+
+  --shadow-card: 0 18px 45px rgba(73, 39, 27, 0.08);
+  --space-page-x: 1rem;
 }
 
 html {

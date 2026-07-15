@@ -17,8 +17,7 @@ export const courseCatalog = [
     en: {
       title: "Frontend Engineering For Omani Graduates",
       subtitle: "Build modern web interfaces with HTML, CSS, JavaScript, React, and portfolio projects.",
-      summary:
-        "A practical frontend path for graduates who need stronger web development skills before applying for junior software roles.",
+      summary: "Frontend path for junior web development roles.",
       outcomes: [
         "Build responsive pages and React components",
         "Understand browser fundamentals and modern JavaScript",
@@ -42,8 +41,7 @@ export const courseCatalog = [
     en: {
       title: "Backend API Development With Database",
       subtitle: "Learn databases, authentication, storage, and API workflows using a practical backend stack.",
-      summary:
-        "A backend course focused on the skills junior developers need when working with application data, users, and secure access.",
+      summary: "Backend skills for data, users, APIs, and secure access.",
       outcomes: [
         "Design relational tables and API flows",
         "Use authentication and role-based access safely",
@@ -67,8 +65,7 @@ export const courseCatalog = [
     en: {
       title: "Applied AI For Business And Productivity",
       subtitle: "Use AI tools responsibly for research, automation, writing, analysis, and workplace productivity.",
-      summary:
-        "A practical AI literacy course for job seekers who want useful AI skills without needing advanced math first.",
+      summary: "Practical AI skills for work—without advanced math first.",
       outcomes: [
         "Use AI tools for structured work tasks",
         "Design better prompts and review AI outputs",
@@ -92,8 +89,7 @@ export const courseCatalog = [
     en: {
       title: "Cyber Security Foundations For Junior Roles",
       subtitle: "Learn security fundamentals, risk thinking, defensive basics, and practical entry-level workflows.",
-      summary:
-        "A foundation course for job seekers considering cyber security support, SOC, governance, or IT security roles.",
+      summary: "Cyber security foundations for junior IT and security roles.",
       outcomes: [
         "Understand common threats and controls",
         "Read security alerts and basic logs",
@@ -117,8 +113,7 @@ export const courseCatalog = [
     en: {
       title: "Data Analytics With Excel, SQL, And Dashboards",
       subtitle: "Turn raw data into useful reports, dashboards, and business insights.",
-      summary:
-        "A job-focused data analytics path for job seekers who want practical reporting and decision-support skills.",
+      summary: "Reporting and decision-support analytics skills.",
       outcomes: [
         "Clean and analyze data in Excel",
         "Write useful SQL queries",
@@ -142,8 +137,7 @@ export const courseCatalog = [
     en: {
       title: "Graduate Tech Job Readiness",
       subtitle: "Prepare your CV, portfolio, interviews, LinkedIn, and junior tech role strategy.",
-      summary:
-        "A job-readiness course for graduates who need to present their skills more clearly to employers.",
+      summary: "Present your skills clearly for employer applications.",
       outcomes: [
         "Improve your CV and LinkedIn profile",
         "Prepare for entry-level technical interviews",

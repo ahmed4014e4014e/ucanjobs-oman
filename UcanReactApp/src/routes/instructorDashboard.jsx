@@ -9,36 +9,36 @@ import { isSupabaseConfigured } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
 
 const creationKit = [
-  "Course title and target job seeker level",
-  "Career outcome the course supports",
-  "Course summary and learning outcomes",
-  "Module-by-module course outline",
-  "Required tools, software, and resources",
-  "Portfolio project or final practical task",
+  "Title and learner level",
+  "Career outcome",
+  "Summary and learning outcomes",
+  "Module outline",
+  "Required tools and resources",
+  "Final project or portfolio task",
 ];
 
 const publicationChecklist = [
-  "The course teaches a clear employability skill",
-  "Modules are structured and practical",
-  "Learning outcomes are specific and measurable",
-  "Any third-party materials are properly licensed",
-  "The course avoids misleading job guarantees",
-  "Admin review is completed before publication",
+  "Clear, job-relevant skill focus",
+  "Structured, practical modules",
+  "Measurable learning outcomes",
+  "Licensed third-party materials only",
+  "No false job guarantees",
+  "Admin review before go-live",
 ];
 
 const reviewSteps = [
-  "Prepare your course proposal and teaching materials.",
-  "Submit your course proposal from this dashboard.",
-  "UcanJobs reviews the instructor profile and course fit.",
-  "Admin requests edits if the proposal needs refinement.",
-  "Approved courses are prepared for job seeker enrollment.",
+  "Prepare proposal and materials.",
+  "Submit from this dashboard.",
+  "Admin reviews fit and quality.",
+  "Edit if requested.",
+  "Approved courses can enroll learners.",
 ];
 
 const futureTools = [
-  "Course publishing dashboard",
-  "Job Seeker enrollment overview",
-  "Course performance analytics",
-  "AI-assisted topic recommendations",
+  "Publishing dashboard",
+  "Enrollment overview",
+  "Performance analytics",
+  "Topic recommendations",
 ];
 
 const initialProposalForm = {
@@ -231,15 +231,13 @@ export default function InstructorDashboard() {
 
         <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
           <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Instructor Publishing
+            Publishing
           </p>
           <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
-            Build career-preparation courses for Oman&apos;s next tech workforce.
+            Build and publish courses
           </h2>
           <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">
-            UcanJobs is moving toward a controlled course marketplace. At this stage,
-            instructors submit course proposals while admin review keeps publishing
-            quality consistent before courses go live.
+            Submit proposals for admin review, then prepare content before courses go live.
           </p>
           <Link
             to="/instructor-courses/"

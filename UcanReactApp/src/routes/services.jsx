@@ -22,41 +22,35 @@ import { themeImages } from "../lib/themeImages";
 
 const services = [
   {
-    title: "Individual Course Support",
-    description:
-      "Job seekers can request focused course support when they need help understanding practical learning material.",
+    title: "Individual support",
+    description: "One-to-one help with course material.",
   },
   {
-    title: "Group Course Support",
-    description:
-      "Job seekers can learn together around shared course topics and practical career-preparation skills.",
+    title: "Group support",
+    description: "Learn shared topics with others.",
   },
   {
-    title: "Online Job Seeker Community",
-    description:
-      "Job seekers can ask questions, explain ideas, and help each other build practical AI-Powered Employability Training skills in a supportive space.",
+    title: "Community",
+    description: "Ask questions and share progress with peers.",
   },
   {
-    title: "Document Library",
-    description:
-      "Access course documents that help job seekers review lessons, assignments, and practical concepts more clearly.",
+    title: "Document library",
+    description: "Lesson notes, assignments, and reference files.",
   },
   {
-    title: "Useful Videos",
-    description:
-      "Find useful videos that improve practical skill understanding and make difficult career concepts easier to follow.",
+    title: "Videos",
+    description: "Short videos that clarify hard topics.",
   },
   {
-    title: "Course WhatsApp Groups",
-    description:
-      "Access collections of WhatsApp group chats made for specific AI-Powered Employability Training courses so job seekers can get help more easily.",
+    title: "Course WhatsApp groups",
+    description: "Course-specific chat groups for quick help.",
   },
 ];
 
 const serviceHighlights = [
-  { number: "Live", label: "instructors, courses, and filters loaded from database" },
-  { number: "2", label: "session types for private and group support" },
-  { number: "Saved", label: "support requests stored in the database" },
+  { number: "Live", label: "Instructors and courses from the database" },
+  { number: "2", label: "Private and group session types" },
+  { number: "Saved", label: "Support requests stored securely" },
 ];
 
 function getInstructorInitials(name) {

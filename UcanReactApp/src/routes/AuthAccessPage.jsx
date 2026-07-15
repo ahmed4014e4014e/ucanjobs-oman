@@ -37,6 +37,7 @@ export default function AuthAccessPage({
   allowSignup = true,
   accessImage,
   accessImageAlt,
+  accessImageFrameClassName = "oman-photo-frame aspect-[4/3]",
   signupPanel = null,
   landingContent = null,
   requireTermsAgreement = false,
@@ -571,7 +572,7 @@ export default function AuthAccessPage({
               </p>
             </div>
             <div className="oman-card rounded-3xl p-4 text-[var(--oman-ink)]">
-              <div className="oman-photo-frame aspect-[4/3]">
+              <div className={accessImageFrameClassName}>
                 <img
                   src={
                     accessImage ||

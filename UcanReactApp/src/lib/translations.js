@@ -28,8 +28,8 @@ export const translations = {
       services: "Courses",
       contact: "Contact",
       policies: "Policies",
-      studentAccess: "Job Seeker Access",
-      tutorAccess: "Instructor Access",
+      studentAccess: "Job Seeker Login",
+      tutorAccess: "Instructor Login",
       adminAccess: "Admin Access",
       dashboard: "Dashboard",
       adminDashboard: "Admin Dashboard",
@@ -49,162 +49,134 @@ export const translations = {
     },
     common: shared.en,
     home: {
-      heroKicker: "Welcome to UcanJobs",
-      heroTitle: "AI-Powered Employability Training built for Oman’s next generation of tech talent.",
+      heroKicker: "AI-Powered Employability Training",
+      heroTitle: "Job-ready tech skills for Oman.",
       heroText:
-        "UcanJobs helps fresh graduates and job seekers build practical skills for Oman’s technology sector through structured courses in software engineering, AI, cyber security, data analytics, and job readiness.",
+        "UcanJobs is AI-Powered Employability Training for software engineering, AI, cyber security, data analytics, and job readiness.",
       exploreServices: "Explore Courses",
-      cardKicker: "Omani Market, Modern Skills",
-      cardTitle:
-        "A commercial AI-Powered Employability Training platform shaped around employability, practical portfolios, and high-demand digital careers.",
+      cardKicker: "For Oman’s market",
+      cardTitle: "AI-Powered Employability Training with practical courses and clear career paths.",
       stats: [
-        { number: "Tech", label: "courses aligned with in-demand career paths" },
-        { number: "AI", label: "future recommendations shaped by market signals" },
-        { number: "Oman", label: "content tailored to local graduate employment needs" },
+        { number: "Tech", label: "In-demand career paths" },
+        { number: "AI", label: "Smarter course guidance" },
+        { number: "Oman", label: "Local job-market focus" },
       ],
-      featuresKicker: "Why Choose UcanJobs",
-      featuresTitle:
-        "A practical AI-Powered Employability Training platform for graduates who need job-ready technology skills.",
+      featuresKicker: "Why UcanJobs",
+      featuresTitle: "AI-Powered Employability Training that leads to work.",
       features: [
         {
-          title: "Career-Focused Courses",
-          description:
-            "Courses are designed around practical skills that help job seekers prepare for entry-level technology jobs.",
+          title: "Career-focused courses",
+          description: "Skills employers expect for junior tech roles.",
         },
         {
-          title: "Built For Oman",
-          description:
-            "UcanJobs focuses on the needs of Omani graduates, diploma holders, and job seekers entering the local tech sector.",
+          title: "Built for Oman",
+          description: "Designed for local graduates and job seekers.",
         },
         {
-          title: "Data-Informed Direction",
-          description:
-            "The AI-Powered Employability Training platform is being prepared to use AI, SEO, and open-data insights to identify high-demand skill paths.",
+          title: "AI-guided direction",
+          description: "Learning paths shaped by market demand and AI insights.",
         },
       ],
-      howKicker: "How It Works",
-      howTitle: "Three simple steps from learning to employability.",
+      howKicker: "How it works",
+      howTitle: "Three steps to get started.",
       steps: [
         {
-          title: "Choose A Career Path",
-          description:
-            "Explore practical paths such as frontend development, backend engineering, AI, cyber security, and data analytics.",
+          title: "Choose a path",
+          description: "Frontend, backend, AI, cyber security, or data.",
         },
         {
-          title: "Learn Practical Skills",
-          description:
-            "Study structured courses that focus on applied projects, tools, workflows, and concepts employers expect.",
+          title: "Learn by building",
+          description: "Projects, tools, and workflows used on the job.",
         },
         {
-          title: "Build Job Readiness",
-          description:
-            "Use your learning to strengthen your portfolio, confidence, interview preparation, and workplace readiness.",
+          title: "Get job-ready",
+          description: "Portfolio, interviews, and workplace confidence.",
         },
       ],
-      toolsKicker: "Career-Readiness Tools",
-      toolsTitle: "Digital tools that support career preparation and professional collaboration.",
-      toolsText:
-        "UcanJobs courses can use modern meeting, planning, and collaboration tools to help job seekers practice the same workflows used in real technology teams.",
+      toolsKicker: "Tools",
+      toolsTitle: "Professional collaboration tools.",
+      toolsText: "Courses may use the same meeting and planning tools used in tech teams.",
       toolGroups: [
         {
-          title: "Live Career Workshops",
-          description:
-            "Support live workshops, mentoring sessions, screen sharing, and instructor-led career preparation.",
+          title: "Live workshops",
+          description: "Mentoring, screen sharing, and instructor-led sessions.",
         },
         {
-          title: "Collaboration Tools",
-          description:
-            "Organize projects, explain technical ideas visually, and collaborate around practical career tasks.",
+          title: "Collaboration",
+          description: "Plan projects and work through tasks together.",
         },
       ],
-      tutorKicker: "Join Our Instructor Team",
-      tutorTitle: "Become an instructor and help prepare Oman’s next tech workforce.",
-      tutorText:
-        "UcanJobs will welcome instructors and industry practitioners who can teach practical, employment-focused digital skills.",
-      tutorAccess: "Instructor Access",
-      tutorCardTitle: "Log in or apply to create your instructor account.",
-      tutorCardText:
-        "Use the instructor page to apply, enter your protected dashboard, and prepare courses for job seekers.",
+      tutorKicker: "Instructors",
+      tutorTitle: "Teach on UcanJobs.",
+      tutorText: "Share practical digital skills with job seekers.",
+      tutorAccess: "Instructor login",
+      tutorCardTitle: "Log in or apply.",
+      tutorCardText: "Apply, open your dashboard, and prepare courses.",
       tutorButton: "Instructor Login / Apply",
-      studentKicker: "Job Seeker Access",
-      studentTitle: "Join as a job seeker and start building job-ready tech skills.",
-      studentText:
-        "Job Seekers can create an account to access career-focused courses, learning resources, and future personalized recommendations.",
-      studentCardTitle: "Log in or sign up to create your job seeker account.",
-      studentCardText:
-        "Use the job seeker account page to create your profile and prepare for the UcanJobs course marketplace.",
+      studentKicker: "Job seekers",
+      studentTitle: "Start learning.",
+      studentText: "Create an account to enroll and track progress.",
+      studentCardTitle: "Log in or sign up.",
+      studentCardText: "Open your job seeker account to get started.",
       studentButton: "Job Seeker Login / Sign Up",
-      ctaKicker: "Start Learning",
-      ctaTitle:
-        "Build the skills needed for Oman’s growing technology sector.",
+      ctaKicker: "Start learning",
+      ctaTitle: "Browse courses and pick a path.",
       ctaText:
-        "UcanJobs is transforming into a commercial AI-Powered Employability Training platform for software engineering, AI, cyber security, data analytics, and job readiness.",
+        "Start with AI-Powered Employability Training in software engineering, AI, cyber security, data analytics, and job readiness.",
       ctaButton: "Explore Courses",
     },
     about: {
-      heroKicker: "About UcanJobs",
-      heroTitle:
-        "An AI-Powered Employability Training platform focused on Oman’s graduate employability gap.",
-      heroText:
-        "UcanJobs is being built to help computer science graduates, diploma holders, and job seekers move from theory into practical, market-ready technology skills.",
+      heroKicker: "About",
+      heroTitle: "AI-Powered Employability Training for Oman.",
+      heroText: "UcanJobs helps graduates move from theory to job-ready tech skills.",
       ucf: "University of Central Florida",
-      ucfText:
-        "We imagine career preparation as practical, dignified, locally relevant, and connected to real employment outcomes.",
-      founderKicker: "Meet Our Founder",
+      ucfText: "Career preparation that is practical and locally relevant.",
+      founderKicker: "Founder",
       founderName: "Ahmed Mohammed Al Ruqaishi",
-      founderTextOne:
-        "Grew up in UK... Migrated to USA... and now in Oman. You know the rest of the story ... LETS GO EVERYONE!!",
+      founderTextOne: "UK → USA → Oman. Building UcanJobs from Muscat.",
       founderTextTwo:
-        'Ahmed is a 25 year old beginner software developer who was inspired by the movie "The Social Network" to create this platform to help graduates build practical confidence, digital skills, and AI-Powered Employability Training readiness.',
+        "Ahmed is a software developer building UcanJobs to help graduates gain practical skills and confidence.",
       founderLocation: "Qurum Beach, Muscat, Oman.",
       highlights: [
-        { number: "Career", label: "learning paths for technology roles" },
-        { number: "Data", label: "future insights from labor market signals" },
-        { number: "Local", label: "skills tailored to Oman’s employment needs" },
+        { number: "Career", label: "Tech learning paths" },
+        { number: "Data", label: "Market-informed topics" },
+        { number: "Local", label: "Oman job-market focus" },
       ],
-      missionKicker: "Our Mission",
-      missionTitle: "Help Omani tech graduates become more employable through practical online courses.",
+      missionKicker: "Mission",
+      missionTitle: "Make Omani tech graduates more employable.",
       missionTextOne:
-        "UcanJobs exists to bridge the gap between formal study and entry-level technology work by focusing on practical skills, projects, tools, and AI-Powered Employability Training.",
+        "We bridge formal study and entry-level tech work with practical courses and AI-Powered Employability Training.",
       missionTextTwo:
-        "The long-term vision is to use AI, SEO, and Oman open-data sources to identify what job seekers should study and which course topics matter most for the market.",
-      valuesKicker: "Core Values",
-      valuesTitle: "The ideas shaping UcanJobs' AI-Powered Employability Training marketplace.",
+        "AI and market data help guide which skills and courses matter most.",
+      valuesKicker: "Values",
+      valuesTitle: "What guides the product.",
       values: [
         {
-          title: "Employability First",
-          description:
-            "Courses should help job seekers build real capabilities that improve their chances in Oman’s technology job market.",
+          title: "Employability first",
+          description: "Teach skills that improve hiring outcomes.",
         },
         {
-          title: "Local Market Fit",
-          description:
-            "Learning paths should reflect the skills employers actually need from junior technology talent in Oman.",
+          title: "Local market fit",
+          description: "Match junior roles employers need in Oman.",
         },
         {
-          title: "AI-Guided Growth",
-          description:
-            "Future platform intelligence should help recommend courses, identify skill gaps, and guide new course creation.",
+          title: "Honest guidance",
+          description: "Clear paths, no false job guarantees.",
         },
       ],
-      communityKicker: "Our Job Seekers",
-      communityTitle:
-        "Graduates, job seekers, instructors, and employers connected by practical digital skills.",
-      communityText:
-        "UcanJobs is built for job seekers who want more than certificates: they need confidence, project experience, and skills that make sense in Oman’s job market.",
+      communityKicker: "Who it’s for",
+      communityTitle: "Job seekers, instructors, and partners.",
+      communityText: "For people who need real skills and project experience—not just certificates.",
     },
     contact: {
-      heroKicker: "Contact UcanJobs",
-      heroTitle:
-        "Reach an AI-Powered Employability Training platform built for Oman.",
+      heroKicker: "Contact",
+      heroTitle: "Contact UcanJobs.",
       heroText:
-        "Whether you are a job seeker, instructor, employer, or partner, use this page to contact UcanJobs about courses, skills, and digital learning opportunities.",
-      heroCardText:
-        "We want the platform to feel as dependable and recognizable as the landmarks that shape Oman's identity.",
-      formKicker: "Contact Form",
-      formTitle: "Send your message directly to UcanJobs.",
-      formText:
-        "Fill in the form below and your message will be saved in database so the team can review it properly.",
+        "Questions about AI-Powered Employability Training, courses, teaching, or partnerships? Send a message.",
+      heroCardText: "We review messages and respond as soon as we can.",
+      formKicker: "Contact form",
+      formTitle: "Send a message",
+      formText: "Your message is saved for the team to review.",
       labels: {
         fullName: "Full name",
         email: "Email",
@@ -220,89 +192,76 @@ export const translations = {
         role: "Select your role",
         subject: "How can we help you?",
         message: "Write your message here...",
-        attachmentNotes: "Optional: add a short note about the files you attached.",
+        attachmentNotes: "Optional note about attached files.",
       },
       roleStudent: "Job Seeker",
       roleTutor: "Instructor",
       feedbackTitle: "Contact form update",
       submitting: "Submitting...",
-      submit: "Submit Contact Form",
-      notConfigured:
-        "database is not configured yet, so the contact form cannot submit right now.",
-      success:
-        "Your message was submitted successfully. We will review it through database.",
+      submit: "Submit",
+      notConfigured: "Database is not configured, so the form cannot submit yet.",
+      success: "Message submitted. We will review it soon.",
       error: "We could not submit your message right now.",
-      methodsKicker: "Other Ways to Reach Us",
-      methodsTitle: "Clear ways to connect with the UcanJobs team.",
+      methodsKicker: "Other ways",
+      methodsTitle: "Direct contact",
       methods: [
         {
           title: "Email",
           value: "20258971@mcbs.edu.om",
-          description:
-            "Reach out with questions about courses, instructor opportunities, partnerships, or the UcanJobs AI-Powered Employability Training platform.",
+          description: "Courses, teaching, or partnerships.",
         },
         {
           title: "Location",
           value: "Qurum Beach, Muscat, Oman",
-          description:
-            "UcanJobs serves job seekers online while focusing on Oman’s graduate employment and digital skills needs.",
+          description: "Online platform based in Oman.",
         },
       ],
-      ctaKicker: "We Are Here to Help",
-      ctaTitle: "Reach out whenever you need better support for your AI-Powered Employability Training journey.",
-      ctaText:
-        "UcanJobs is here to help job seekers build practical digital skills for stronger career opportunities.",
+      ctaKicker: "Need help?",
+      ctaTitle: "Send a message anytime.",
+      ctaText: "We support job seekers and instructors using UcanJobs.",
     },
     servicesPage: {
       heroKicker: "Courses",
-      heroTitle:
-        "Career-focused courses for Oman’s technology job market.",
+      heroTitle: "AI-Powered Employability Training courses.",
       heroText:
-        "UcanJobs is transforming this page into a course marketplace for software engineering, AI, machine learning, cyber security, data analytics, and job readiness.",
-      heroCardText:
-        "Explore the first course categories and learning paths that will shape the future UcanJobs marketplace.",
+        "Software engineering, AI, cyber security, data analytics, and job readiness.",
+      heroCardText: "Browse categories and open a course for details and enrollment.",
       highlights: [
-        { number: "Skills", label: "learning paths for high-demand digital fields" },
-        { number: "AI", label: "future recommendations based on market statistics" },
-        { number: "Oman", label: "course strategy tailored to local employment needs" },
+        { number: "Skills", label: "High-demand digital fields" },
+        { number: "AI", label: "Smarter recommendations later" },
+        { number: "Oman", label: "Local employment focus" },
       ],
       cards: [
         {
-          kicker: "Course Marketplace",
-          title: "Browse career-focused courses by field and skill level.",
-          text:
-            "This section will evolve from the old instructor directory into a commercial course catalog.",
+          kicker: "Catalog",
+          title: "Browse by field and level.",
+          text: "Structured courses with clear outcomes.",
         },
         {
-          kicker: "Job Seeker Progress",
-          title: "Prepare for structured learning paths and course enrollment.",
-          text:
-            "Job Seekers will eventually enroll in courses, track progress, and build practical portfolios.",
+          kicker: "Progress",
+          title: "Enroll and track learning.",
+          text: "Follow lessons and complete practical work.",
         },
         {
-          kicker: "Market Intelligence",
-          title:
-            "Use AI and open-data signals to guide which courses UcanJobs should create and promote.",
-          text: "Future course planning can respond to actual labor-market demand and job seeker preferences.",
+          kicker: "Market fit",
+          title: "Topics that match demand.",
+          text: "Courses guided by real hiring needs.",
         },
       ],
       directoryStatus: "Directory Status",
-      requestAccess: "Job Seeker Access",
-      requestAccessText:
-        "You can explore the future course direction freely, but job seeker accounts will be needed for enrollment and personalized recommendations.",
+      requestAccess: "Job Seeker Login",
+      requestAccessText: "Browse freely. Sign in to enroll.",
       studentLogin: "Job Seeker Login",
       tutorLogin: "Instructor Login",
       private: {
         label: "Software Engineering",
-        title: "Explore practical software engineering learning paths.",
-        description:
-          "This area will become a course catalog for frontend, backend, and full-stack development.",
+        title: "Software engineering paths",
+        description: "Frontend, backend, and full-stack skills.",
       },
       group: {
         label: "Advanced Digital Skills",
-        title: "Explore future courses in AI, data, cyber security, and cloud skills.",
-        description:
-          "These subjects will support job seekers preparing for high-demand technology roles in Oman.",
+        title: "AI, data, cyber, and cloud",
+        description: "Skills for high-demand tech roles.",
       },
       tutorSection: {
         institute: "Organization",
@@ -313,126 +272,105 @@ export const translations = {
         allCourses: "All Courses",
         availableNow: "Available Now",
         tutorsAvailable: "{count} instructor{plural} available for {title}",
-        courseOfferings: "{count} course offering{plural} currently match your selected filters.",
-        profileRequiredTitle: "Complete your job seeker profile to view available instructors",
-        profileRequiredText:
-          "Add your job seeker name and organization name in your dashboard before sending a course request.",
+        courseOfferings: "{count} course offering{plural} match your filters.",
+        profileRequiredTitle: "Complete your profile to view instructors",
+        profileRequiredText: "Add your name and organization in the dashboard first.",
         profileRequiredButton: "Complete Job Seeker Profile",
-        loginTitle: "Please login / sign up to view available instructors",
-        loginText:
-          "Create an account or log in first to access the private and group instructor directory and send a course request.",
+        loginTitle: "Log in to view instructors",
+        loginText: "Sign in to open the instructor directory and send a request.",
         loadingTitle: "Loading instructor directory...",
-        loadingText: "Fetching instructors, courses, and available session types from database.",
-        selectInstituteTitle: "Select an organization to view courses",
-        selectInstituteText:
-          "Course options and instructor cards will appear only after an organization is selected.",
+        loadingText: "Fetching instructors and courses.",
+        selectInstituteTitle: "Select an organization",
+        selectInstituteText: "Courses and instructors appear after you select one.",
         profileLabel: "Instructor profile",
         multiInstitute: "Multi Institute",
         sessionType: "Session Type",
-        privateSession: "Private one-on-one career coaching",
-        groupSession: "Group AI-Powered Employability Training session",
+        privateSession: "Private one-on-one session",
+        groupSession: "Group session",
         availability: "Availability",
         courses: "Courses",
         offered: "{count} offered",
         sendRequest: "Send Support Request",
         loginToSend: "Log in to send support request",
-        loginNote:
-          "Please log in to your job seeker or instructor account before sending a support request.",
-        emptyTitle: "No instructor listed yet for this selection",
-        emptyText:
-          "Once more instructors and course offerings are added in database, this directory will update automatically.",
+        loginNote: "Log in before sending a support request.",
+        emptyTitle: "No instructors for this selection",
+        emptyText: "This list updates when instructors and courses are added.",
       },
-      otherKicker: "Future Course Areas",
-      otherTitle: "High-demand subjects UcanJobs can develop for Oman’s digital workforce.",
+      otherKicker: "Course areas",
+      otherTitle: "Subjects we focus on.",
       services: [
         {
-          title: "Frontend Software Engineering",
-          description:
-            "Courses can cover HTML, CSS, JavaScript, React, responsive design, accessibility, and practical portfolio projects.",
+          title: "Frontend engineering",
+          description: "HTML, CSS, JavaScript, React, and portfolio projects.",
         },
         {
-          title: "Backend Software Engineering",
-          description:
-            "Learning paths can cover APIs, databases, authentication, cloud deployment, testing, and production workflows.",
+          title: "Backend engineering",
+          description: "APIs, databases, auth, deployment, and testing.",
         },
         {
-          title: "AI And Machine Learning",
-          description:
-            "Courses can help job seekers understand Python, ML foundations, applied AI tools, model workflows, and responsible use.",
+          title: "AI and machine learning",
+          description: "Python, applied AI tools, and responsible workflows.",
         },
         {
-          title: "Cyber Security",
-          description:
-            "Cyber security courses can focus on fundamentals, defensive skills, governance, risk, and entry-level security practice.",
+          title: "Cyber security",
+          description: "Fundamentals, defense basics, and entry-level practice.",
         },
         {
-          title: "Data Analytics",
-          description:
-            "Data courses can cover Excel, SQL, dashboards, Python analytics, visualization, and business reporting.",
+          title: "Data analytics",
+          description: "Excel, SQL, dashboards, Python, and reporting.",
         },
         {
-          title: "Graduate Job Readiness",
-          description:
-            "Career courses can support CVs, portfolios, interviews, workplace communication, and junior tech role preparation.",
+          title: "Job readiness",
+          description: "CVs, portfolios, interviews, and junior-role prep.",
         },
       ],
-      whyKicker: "Why It Matters",
-      whyTitle:
-        "Many graduates need practical skills that match real entry-level technology work.",
-      whyTextOne:
-        "UcanJobs can use course data, job seeker behavior, SEO signals, and Oman open-data statistics to decide which learning paths matter most.",
-      whyTextTwo: "The current platform will be gradually transformed from service requests into courses, enrollments, and learning progress.",
-      ctaKicker: "Start Your Career Path",
-      ctaTitle: "Explore the first course categories for Oman’s digital economy.",
-      ctaText:
-        "UcanJobs is becoming a marketplace where job seekers can buy focused courses that improve employability in technology fields.",
+      whyKicker: "Why it matters",
+      whyTitle: "Employers hire for applied skill—not theory alone.",
+      whyTextOne: "We prioritize topics that match entry-level tech work.",
+      whyTextTwo: "Courses, enrollments, and progress live on one platform.",
+      ctaKicker: "Ready?",
+      ctaTitle: "Explore the course catalog.",
+      ctaText: "Pick a path and start building.",
       ctaButton: "Explore Courses",
       requestModal: {
         kicker: "Support Request",
         title: "Send a support request to {name}",
-        intro:
-          "Please save your support request below and attach any helpful files so the instructor can contact you directly and arrange the session with you.",
+        intro: "Save your request and attach files so the instructor can follow up.",
         studentAccount: "Job Seeker account",
         name: "Name:",
         email: "Email:",
-        accountNote:
-          "These details are pulled automatically from your logged-in job seeker account and shown to the instructor with this request.",
+        accountNote: "Pulled from your logged-in account and shared with this request.",
         titleLabel: "Title",
         titlePlaceholder: "Example: Help with MAT255 midterm review",
-        instituteLabel: "Job seeker organization name",
+        instituteLabel: "Organization name",
         institutePlaceholder: "Example: MCBS",
         courseLabel: "Course",
         topicsLabel: "Topics you need help with",
-        topicsPlaceholder:
-          "Describe the topics, concepts, assignments, or exam areas you need help with.",
+        topicsPlaceholder: "Topics, assignments, or exam areas.",
         attachFiles: "Attach files",
         attachmentNotes: "Attachment notes",
-        attachmentPlaceholder:
-          "Mention any files, screenshots, or notes you plan to include in your email.",
+        attachmentPlaceholder: "Optional note about your files.",
         feedbackTitle: "Support request update",
         saving: "Saving Request...",
         save: "Save Support Request",
       },
       messages: {
         directoryNotConfigured:
-          "database is not configured yet. Add your environment variables before using the live instructor directory.",
-        loginAndCourse: "Please log in and choose a course before submitting a request.",
-        requiredTitleInstitute: "Please complete the required title and job seeker institute fields.",
-        attachmentRequired:
-          "Please attach at least one file before submitting your support request.",
-        validCourse: "Please choose a valid course for this instructor.",
-        requestSuccess:
-          "Your support request was saved successfully. The instructor can now contact you directly to arrange the session.",
+          "Database is not configured. Add environment variables first.",
+        loginAndCourse: "Log in and choose a course before submitting.",
+        requiredTitleInstitute: "Title and organization are required.",
+        attachmentRequired: "Attach at least one file before submitting.",
+        validCourse: "Choose a valid course for this instructor.",
+        requestSuccess: "Request saved. The instructor can contact you next.",
         requestError: "We could not save your support request.",
       },
     },
     terms: {
-      heroKicker: "Platform Policies",
-      heroTitle: "UcanJobs User Agreement",
+      heroKicker: "Policies",
+      heroTitle: "UcanJobs user agreement",
       heroText:
-        "A simplified agreement for using UcanJobs as a job seeker or instructor in a career-focused AI-Powered Employability Training marketplace.",
-      heroCardText:
-        "This page summarizes the main rules for accounts, course access, payments, content, conduct, privacy, and platform safety.",
+        "Rules for job seekers and instructors using UcanJobs AI-Powered Employability Training.",
+      heroCardText: "Accounts, access, payments, content, conduct, and privacy.",
       documentKicker: "Simplified Legal Terms",
       documentTitle: "User agreement by account type",
       policies: [
@@ -591,26 +529,23 @@ export const translations = {
     },
     accessPages: {
       student: {
-        audienceLabel: "Job Seeker Access",
-        title: "Log in or sign up to access UcanJobs job seeker features.",
-        description:
-          "This page is designed for job seekers who want to create an account, access courses, and prepare for practical technology careers.",
+        audienceLabel: "Job Seeker Login",
+        title: "Log in or sign up.",
+        description: "Access courses, enrollment, and your learning dashboard.",
         signupHeading: "Create a job seeker account",
         imageAlt: "Middle East College campus in Oman",
       },
       tutor: {
-        audienceLabel: "Instructor Publishing",
-        title: "Create practical courses for Oman's future tech workforce.",
-        description:
-          "Approved instructors can log in here, while new instructors can apply with course ideas built around employability, practical projects, and career-ready technology skills.",
+        audienceLabel: "Instructor Login",
+        title: "Log in or apply to teach.",
+        description: "Approved instructors log in here. New instructors can apply.",
         signupHeading: "Instructor application",
         imageAlt: "Sohar University campus in Oman",
       },
       admin: {
         audienceLabel: "Admin Access",
-        title: "Log in to manage UcanJobs as an administrator.",
-        description:
-          "This page is for platform administrators who need access to submissions, account oversight, and future course marketplace tools.",
+        title: "Admin login",
+        description: "Manage applications, courses, enrollments, and platform operations.",
         imageAlt: "Admin access card for platform administrators",
       },
     },
@@ -682,30 +617,28 @@ export const translations = {
     },
     tutorApplicationPanel: {
       kicker: "Instructor Application",
-      title: "Apply before creating an instructor account",
-      text:
-        "Instructor signup is handled through a separate application review process. Submit your background, proposed teaching areas, and supporting documents first, then approved instructors can be onboarded into the platform.",
+      title: "Apply before instructor login",
+      text: "Submit your background and materials. Approved instructors are onboarded next.",
       needsTitle: "You will need",
       needs: [
-        "Full name and professional or training background",
-        "Your proposed course topics",
-        "Email and WhatsApp phone number",
-        "Supporting documents or portfolio links",
+        "Full name and professional background",
+        "Proposed course topics",
+        "Email and WhatsApp number",
+        "Portfolio link or supporting files",
       ],
       button: "Open Instructor Application Form",
     },
     studentDashboard: {
       fallbackName: "Job Seeker",
-      heroKicker: "Job Seeker Dashboard",
+      heroKicker: "Dashboard",
       welcome: "Welcome, {name}",
-      heroText:
-        "Complete your job seeker profile first, then use this protected dashboard as your home base for courses and career-focused learning.",
-      profileKicker: "Job Seeker Profile",
+      heroText: "Complete your profile, then manage courses and enrollment from here.",
+      profileKicker: "Profile",
       profileComplete: "Profile complete",
       completeProfile: "Complete your profile",
-      profileText: "Enter your job seeker name, university name, and target job role before enrolling in courses.",
-      feedbackTitle: "Job Seeker profile update",
-      studentName: "Job Seeker name",
+      profileText: "Name, university, and target job role are required before enrollment.",
+      feedbackTitle: "Profile update",
+      studentName: "Full name",
       studentNamePlaceholder: "Enter your full name",
       universityName: "University name",
       universityPlaceholder: "Example: MCBS",
@@ -716,26 +649,25 @@ export const translations = {
       roleStudent: "Job Seeker",
       notSet: "Not set",
       saving: "Saving Profile...",
-      save: "Save Job Seeker Profile",
-      actionsKicker: "Job Seeker Actions",
-      lockedTitle: "Complete your profile to unlock job seeker tools",
-      lockedText:
-        "Save your job seeker name, university name, and target job role first, then course tools will become available.",
+      save: "Save Profile",
+      actionsKicker: "Actions",
+      lockedTitle: "Complete your profile first",
+      lockedText: "Save name, university, and target role to unlock course tools.",
       messages: {
-        notConfigured: "Your job seeker profile cannot be saved until database is configured.",
-        required: "Please enter your job seeker name, university name, and target job role to complete your profile.",
-        success: "Your job seeker profile was saved. You can now enroll in courses.",
-        error: "We could not save your job seeker profile right now.",
+        notConfigured: "Profile cannot be saved until the database is configured.",
+        required: "Enter your name, university, and target job role.",
+        success: "Profile saved. You can enroll in courses.",
+        error: "We could not save your profile right now.",
       },
       quickLinks: [
         {
           title: "Explore Courses",
-          description: "Browse career-focused learning paths planned for Oman tech graduates.",
+          description: "Browse available learning paths.",
           action: "Open Courses",
         },
         {
           title: "Contact Support",
-          description: "Reach out if you need guidance finding the right course support.",
+          description: "Ask for help with courses or access.",
           action: "Contact UcanJobs",
         },
       ],
@@ -743,10 +675,9 @@ export const translations = {
     tutorDashboard: {
       fallbackName: "Instructor",
       notSet: "Not set yet",
-      heroKicker: "Instructor Dashboard",
+      heroKicker: "Dashboard",
       welcome: "Welcome, {name}",
-      heroText:
-        "This protected dashboard is your instructor home base for UcanJobs course publishing, content preparation, and platform updates.",
+      heroText: "Manage proposals, courses, and publishing from here.",
       profileKicker: "Profile",
       labels: {
         fullName: "Full name:",
@@ -759,10 +690,9 @@ export const translations = {
     adminDashboard: {
       fallbackName: "Admin",
       notSet: "Not set yet",
-      heroKicker: "Admin Dashboard",
+      heroKicker: "Dashboard",
       welcome: "Welcome, {name}",
-      heroText:
-        "This protected dashboard gives you one operating hub for UcanJobs content, job seekers, enrollments, market signals, and platform performance.",
+      heroText: "Operate courses, applications, enrollments, and support from one place.",
       profileKicker: "Profile",
       labels: {
         fullName: "Full name:",
@@ -771,67 +701,59 @@ export const translations = {
         role: "Role:",
       },
       role: "Admin",
-      toolsKicker: "Admin Tools",
+      toolsKicker: "Tools",
       tools: [
         {
-          title: "Submitted Contact Messages",
-          description:
-            "Open a separate admin page to review contact submissions and download any attached files.",
+          title: "Contact Messages",
+          description: "Review submissions and attachments.",
           action: "View Contact Messages",
         },
         {
           title: "Instructor Applications",
-          description:
-            "Open a separate admin page to review people applying to become instructors and check their verification documents.",
+          description: "Review applicants and verification files.",
           action: "View Instructor Applications",
         },
         {
-          title: "Courses Management",
-          description:
-            "Create, edit, publish, unpublish, and organize live UcanJobs courses.",
+          title: "Courses",
+          description: "Create, edit, publish, and organize courses.",
           action: "Manage Courses",
         },
         {
           title: "Enrollments",
-          description:
-            "Review job seeker course enrollments, payment readiness, progress status, and access issues.",
+          description: "Payments, access, and progress.",
           action: "View Enrollments",
         },
         {
           title: "Job Seeker Accounts",
-          description:
-            "Review job seeker profiles, account completion, access status, and support needs.",
+          description: "Profiles and account status.",
           action: "View Job Seekers",
         },
         {
           title: "Market Insights",
-          description:
-            "Track Omani job-market signals that should influence future course topics and learning paths.",
+          description: "Signals that guide course topics.",
           action: "View Insights",
         },
         {
-          title: "SEO/Course Performance",
-          description:
-            "Monitor course visibility, search positioning, page performance, and conversion signals.",
+          title: "SEO / Performance",
+          description: "Visibility and conversion signals.",
           action: "View Performance",
         },
       ],
-      workflowTitle: "Simple Admin Workflow",
-      workflowText:
-        "Use the dashboard as a compact control center for content quality, job seeker support, and market alignment.",
+      workflowTitle: "Admin workflow",
+      workflowText: "Keep content accurate, support users, and ship what the market needs.",
       contactWorkflowTitle: "Contact Messages",
       contactWorkflow: [
         "1. Open pending messages first.",
-        "2. Mark as reviewed after reading and deciding the next step.",
-        "3. Mark as scheduled if follow-up is arranged.",
-        "4. Mark as completed once the issue is fully handled.",
+        "2. Mark reviewed after you decide next steps.",
+        "3. Mark scheduled if follow-up is booked.",
+        "4. Mark completed when finished.",
       ],
-      platformWorkflowTitle: "Platform Operations",
+      platformWorkflowTitle: "Platform operations",
       platformWorkflow: [
-        "1. Review instructor applications and course proposals.",
-        "2. Keep live courses accurate, published, and aligned with job seeker demand.",
-        "3. Monitor enrollments and job seeker account readiness.",
-        "4. Use market and SEO signals to decide what UcanJobs should improve next.",
+        "1. Review instructor applications and proposals.",
+        "2. Keep live courses accurate and published.",
+        "3. Monitor enrollments and account readiness.",
+        "4. Use market signals to prioritize improvements.",
       ],
       statusTags: [
         "pending",
@@ -845,42 +767,37 @@ export const translations = {
     },
     adminPlaceholderPages: {
       enrollments: {
-        kicker: "Admin Records",
+        kicker: "Admin",
         title: "Enrollments",
-        text:
-          "This section is reserved for reviewing job seeker course enrollments, payment readiness, course access, and completion progress.",
+        text: "Review enrollments, payments, access, and completion.",
       },
       learnerAccounts: {
-        kicker: "Admin Records",
+        kicker: "Admin",
         title: "Job Seeker Accounts",
-        text:
-          "This section is reserved for reviewing job seeker profiles, account completion, access support, and role-related account checks.",
+        text: "Review profiles and account status.",
       },
       marketInsights: {
-        kicker: "Market Intelligence",
+        kicker: "Insights",
         title: "Market Insights",
-        text:
-          "This section is reserved for future AI/data work using Oman employment and education signals to guide course priorities.",
+        text: "Employment signals that guide course priorities.",
       },
       seoPerformance: {
-        kicker: "Growth Analytics",
-        title: "SEO/Course Performance",
-        text:
-          "This section is reserved for tracking course visibility, organic search performance, job seeker conversion signals, and content gaps.",
+        kicker: "Analytics",
+        title: "SEO / Course Performance",
+        text: "Visibility, search performance, and conversion gaps.",
       },
       back: "Back to Admin Dashboard",
-      comingSoon: "Workspace prepared",
-      comingSoonText:
-        "The dashboard route is ready. The next implementation step is connecting live database metrics and admin actions for this section.",
+      comingSoon: "Coming soon",
+      comingSoonText: "Route is ready. Live metrics and actions will connect next.",
     },
     resetPasswordPage: {
       recoveryPrompt: "Enter your new password below to complete the reset.",
-      supabaseMissing: "database is not configured yet.",
+      supabaseMissing: "Database is not configured yet.",
       shortPassword: "Your new password must be at least 6 characters.",
-      success: "Your password was updated successfully. You can now log in.",
+      success: "Password updated. You can log in now.",
       heroKicker: "Password Reset",
-      heroTitle: "Create a new password for your UcanJobs account.",
-      heroText: "Use this page after opening the database password recovery email.",
+      heroTitle: "Create a new password",
+      heroText: "Use this page after opening the reset email.",
       formKicker: "New Password",
       formTitle: "Reset your password",
       feedbackTitle: "Password reset update",
@@ -892,31 +809,28 @@ export const translations = {
     },
     tutorApplicationPage: {
       heroKicker: "Instructor Application",
-      heroTitle: "Apply separately before joining the UcanJobs instructor team.",
-      heroText:
-        "Complete this form with your professional background, proposed course topic, portfolio, and sample material so the platform can review your instructor application properly.",
-      heroCardText:
-        "Instructor applications are reviewed using your experience, proposed course idea, public work samples, and teaching evidence.",
+      heroTitle: "Apply to teach on UcanJobs",
+      heroText: "Share your background, course idea, portfolio, and a sample.",
+      heroCardText: "We review experience, topic fit, and teaching evidence.",
       formKicker: "Application Form",
-      formTitle: "Submit your instructor application",
-      back: "Back to Instructor Access",
+      formTitle: "Submit your application",
+      back: "Back to Instructor Login",
       feedbackTitle: "Instructor application update",
       fullName: "Full name",
       email: "Email",
       professionalBackground: "Professional background",
       professionalBackgroundPlaceholder:
-        "Summarize your work experience, technical expertise, certifications, and the audience you can teach.",
+        "Work experience, technical skills, certifications, and who you can teach.",
       portfolioUrl: "LinkedIn, GitHub, or portfolio link",
       portfolioUrlPlaceholder: "https://linkedin.com/in/your-name or https://github.com/username",
       courseTopicProposal: "Course topic proposal",
       courseTopicPlaceholder:
-        "Example: Frontend development for Omani CS graduates, including React projects, deployment, and portfolio preparation.",
+        "Example: Frontend for junior roles — React projects, deploy, portfolio.",
       teachingExperience: "Teaching experience",
       teachingExperiencePlaceholder:
-        "Mention previous teaching, mentoring, workshops, tutoring, training, public speaking, or content creation experience.",
+        "Teaching, mentoring, workshops, training, or content you have created.",
       paymentDetails: "Bank/payment details later",
-      paymentDetailsPlaceholder:
-        "Optional for now. You can add payment details later after approval.",
+      paymentDetailsPlaceholder: "Optional for now. Add after approval.",
       requiredAttachments: "Required Attachments",
       attachFiles: "Attach files",
       termsPrefix: "I have read and agree to the",
@@ -924,15 +838,15 @@ export const translations = {
       submitting: "Submitting Application...",
       submit: "Submit Instructor Application",
       attachments: [
-        "Sample teaching video, course outline, portfolio PDF, or other file that shows your ability to teach this topic",
+        "Sample video, course outline, portfolio PDF, or similar teaching evidence",
       ],
       messages: {
-        terms: "Please read and agree to the UcanJobs Platform Policies before submitting your instructor application.",
-        notConfigured: "database is not configured yet, so the instructor application cannot submit right now.",
-        files: "Please attach at least one sample video or file before submitting your instructor application.",
+        terms: "Please agree to the Platform Policies before submitting.",
+        notConfigured: "Database is not configured, so applications cannot submit yet.",
+        files: "Attach at least one sample file before submitting.",
         success:
-          "Your instructor application was submitted successfully. The UcanJobs team can now review your form and attachments. You will receive a reply in less than 24 hours.",
-        error: "We could not submit your instructor application right now.",
+          "Application submitted. We will review it and reply within 24 hours.",
+        error: "We could not submit your application right now.",
         applicationSubmittedBy: "Instructor application submitted by {name}.",
         email: "Email: {email}",
         courseTopic: "Course topic proposal: {topic}",
@@ -967,27 +881,24 @@ export const translations = {
         fetchError: "Unable to load contact messages right now.",
         statusSaved: "Contact message marked as {status}.",
         statusError: "Unable to update this contact message status right now.",
-        kicker: "Admin Records",
-        title: "Submitted Contact Messages",
-        description:
-          "Review messages from the public contact form and download any submitted files directly from this page.",
+        kicker: "Admin",
+        title: "Contact Messages",
+        description: "Review form submissions and download attachments.",
         back: "Back to Admin Dashboard",
         feedbackTitle: "Contact records update",
-        workflowTitle: "Message Workflow",
-        workflowText:
-          "Start with pending messages, move them to reviewed after checking them, then use scheduled or completed to reflect the outcome.",
+        workflowTitle: "Message workflow",
+        workflowText: "Pending → reviewed → scheduled → completed.",
         filter: "Filter by status",
         allStatuses: "All statuses",
         loadingTitle: "Loading contact messages...",
-        loadingText: "Fetching the latest submissions from database.",
+        loadingText: "Fetching submissions.",
         errorTitle: "Unable to load messages",
         emptyTitle: "No active contact messages",
-        emptyText:
-          "Completed contact messages are hidden from the dashboard, but still kept in database.",
+        emptyText: "Completed messages stay in the database but are hidden here.",
         noFilteredTitle: "No {status} messages",
-        noFilteredText: "Try another status filter to continue processing contact submissions.",
+        noFilteredText: "Try another status filter.",
         fromLine: "From {name} via {email}",
-        openHint: "Click to open this message in a separate popup window.",
+        openHint: "Open this message.",
         popupKicker: "Contact Submission",
         message: "Message",
       },
@@ -995,25 +906,23 @@ export const translations = {
         fetchError: "Unable to load support requests right now.",
         statusSaved: "Support request marked as {status}.",
         statusError: "Unable to update this support request status right now.",
-        kicker: "Instructor Records",
-        title: "Submitted Support Requests",
-        description:
-          "Open your assigned support requests in separate popup windows, update their status, and download the attached files directly from this page.",
+        kicker: "Instructor",
+        title: "Support Requests",
+        description: "Open assigned requests, update status, and download files.",
         back: "Back to Instructor Dashboard",
-        feedbackTitle: "Instructor request update",
+        feedbackTitle: "Request update",
         loadingTitle: "Loading support requests...",
-        loadingText: "Fetching the latest job seeker requests assigned to your instructor account.",
+        loadingText: "Fetching assigned requests.",
         errorTitle: "Unable to load support requests",
         emptyTitle: "No active support requests",
-        emptyText:
-          "Completed and cancelled support requests are hidden from the dashboard, but still remain stored in database.",
+        emptyText: "Completed and cancelled requests stay in the database but are hidden here.",
         studentLine: "Job Seeker {name} via {email}",
         student: "Job Seeker:",
-        studentInstitute: "Job Seeker organization:",
+        studentInstitute: "Organization:",
         sessionType: "Session Type:",
-        openHint: "Click to open this support request in a separate popup window.",
+        openHint: "Open this support request.",
         popupKicker: "Support Request",
-        topics: "Topics Need Help With",
+        topics: "Topics",
         courseFallback: "Course",
       },
     },

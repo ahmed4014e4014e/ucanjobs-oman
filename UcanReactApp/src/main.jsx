@@ -39,6 +39,9 @@ import AdminCourseProposals from "./routes/adminCourseProposals";
 import AdminCourseLessons from "./routes/adminCourseLessons";
 import AdminEnrollments from "./routes/adminEnrollments";
 import AdminPlaceholderPage from "./routes/adminPlaceholderPage";
+import MockCourseExperienceHub from "./routes/mockCourseExperienceHub";
+import MockInstructorCourseKit from "./routes/mockInstructorCourseKit";
+import MockLearnerPlayer from "./routes/mockLearnerPlayer";
 
 // Create a Router
 const router = createBrowserRouter([
@@ -70,9 +73,9 @@ const router = createBrowserRouter([
       {
         path: "learn/:slug",
         element: (
-          <RoleProtectedRoute allowedRole="learner">
+          <ProtectedRoute>
             <LearnCourse />
-          </RoleProtectedRoute>
+          </ProtectedRoute>
         ),
       },
       {
@@ -90,6 +93,18 @@ const router = createBrowserRouter([
       {
         path: "terms",
         element: <Terms />,
+      },
+      {
+        path: "mock/course-experience",
+        element: <MockCourseExperienceHub />,
+      },
+      {
+        path: "mock/instructor-course-kit",
+        element: <MockInstructorCourseKit />,
+      },
+      {
+        path: "mock/learn-player",
+        element: <MockLearnerPlayer />,
       },
       {
         path: "instructor-access",

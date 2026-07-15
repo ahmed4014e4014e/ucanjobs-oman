@@ -1,4 +1,4 @@
-import { isSupabaseConfigured, supabase } from "./supabase";
+import { isSupabaseConfigured, supabase } from "./supabase.js";
 
 const BUCKET = "course-content";
 const STORAGE_PREFIX = `storage://${BUCKET}/`;

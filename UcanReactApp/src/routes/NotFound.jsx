@@ -72,13 +72,13 @@ export default function NotFound() {
               to="/learner-access/"
               className="rounded-3xl oman-outline-panel px-5 py-6 font-semibold text-[var(--oman-ink)] transition hover:-translate-y-0.5 hover:text-[var(--oman-terracotta)]"
             >
-              Job Seeker Access
+              Job Seeker Login
             </Link>
             <Link
               to="/instructor-access/"
               className="rounded-3xl oman-outline-panel px-5 py-6 font-semibold text-[var(--oman-ink)] transition hover:-translate-y-0.5 hover:text-[var(--oman-terracotta)]"
             >
-              Instructor Access
+              Instructor Login
             </Link>
           </div>
         </div>
