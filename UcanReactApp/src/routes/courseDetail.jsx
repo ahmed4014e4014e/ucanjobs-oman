@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import ActionFeedback from "../components/ActionFeedback";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import {
@@ -12,6 +11,7 @@ import {
 import { findCourseBySlug } from "../lib/courseCatalog";
 import {
   createManualOrder,
+  fetchCourseOrder,
   getCoursePriceOmr,
   submitManualPayment,
   uploadPaymentProof,
@@ -23,6 +23,11 @@ import {
   validateUploadSelection,
 } from "../lib/fileUploadRules";
 import { themeImages } from "../lib/themeImages";
+import { Alert, Button, Card, Field } from "../components/ui";
+import { Hero, Page, PageHeader, Section, SiteFooter } from "../components/layout";
+import LecturePlayerPanel from "../components/domain/LecturePlayerPanel";
+import { fetchPublicCourseCurriculum } from "../lib/learningContentApi";
+import { isSupabaseConfigured } from "../lib/supabase";
 
 export default function CourseDetail() {
   const { slug } = useParams();
@@ -34,6 +39,7 @@ export default function CourseDetail() {
   const [enrolling, setEnrolling] = useState(false);
   const [updatingProgress, setUpdatingProgress] = useState(false);
   const [enrollment, setEnrollment] = useState(null);
+  const [courseOrder, setCourseOrder] = useState(null);
   const [loadingEnrollment, setLoadingEnrollment] = useState(false);
   const [courseLoadMessage, setCourseLoadMessage] = useState("");
   const [enrollmentFeedback, setEnrollmentFeedback] = useState({
@@ -43,8 +49,11 @@ export default function CourseDetail() {
   const [paymentProofFile, setPaymentProofFile] = useState(null);
   const [paymentReference, setPaymentReference] = useState("");
   const [submittingAccessRequest, setSubmittingAccessRequest] = useState(false);
-  const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
-  const jobSeekerName = profile?.full_name || user?.user_metadata?.full_name || user?.email || "Job seeker";
+  const [publicSections, setPublicSections] = useState([]);
+  const [freePreviewLectures, setFreePreviewLectures] = useState([]);
+  const [activePreviewId, setActivePreviewId] = useState("");
+  const jobSeekerName =
+    profile?.full_name || user?.user_metadata?.full_name || user?.email || "Job seeker";
 
   useEffect(() => {
     let active = true;
@@ -93,6 +102,37 @@ export default function CourseDetail() {
   useEffect(() => {
     let active = true;
 
+    async function loadPublicCurriculum() {
+      if (!isSupabaseConfigured || !slug) {
+        setPublicSections([]);
+        setFreePreviewLectures([]);
+        return;
+      }
+
+      try {
+        const result = await fetchPublicCourseCurriculum(slug);
+        if (!active) return;
+        setPublicSections(result.sections || []);
+        setFreePreviewLectures(result.freePreviewLectures || []);
+        setActivePreviewId(result.freePreviewLectures?.[0]?.id || "");
+      } catch {
+        if (active) {
+          setPublicSections([]);
+          setFreePreviewLectures([]);
+        }
+      }
+    }
+
+    loadPublicCurriculum();
+
+    return () => {
+      active = false;
+    };
+  }, [slug]);
+
+  useEffect(() => {
+    let active = true;
+
     async function loadEnrollment() {
       if (!user?.id || course?.source !== "database" || !course?.id) {
         setEnrollment(null);
@@ -102,13 +142,20 @@ export default function CourseDetail() {
       setLoadingEnrollment(true);
 
       try {
-        const nextEnrollment = await fetchCourseEnrollment({
-          learnerId: user.id,
-          courseId: course.id,
-        });
+        const [nextEnrollment, nextOrder] = await Promise.all([
+          fetchCourseEnrollment({
+            learnerId: user.id,
+            courseId: course.id,
+          }),
+          fetchCourseOrder({
+            learnerId: user.id,
+            courseId: course.id,
+          }),
+        ]);
 
         if (active) {
           setEnrollment(nextEnrollment);
+          setCourseOrder(nextOrder);
         }
       } catch (error) {
         if (active) {
@@ -189,11 +236,16 @@ export default function CourseDetail() {
         proofUrl: proofFile.path,
       });
 
+      setCourseOrder({
+        ...order,
+        status: "payment_submitted",
+      });
       setPaymentProofFile(null);
       setPaymentReference("");
       setEnrollmentFeedback({
         type: "success",
-        message: "Your access request was sent. The admin team can now review your payment proof and approve course access.",
+        message:
+          "Your access request was sent. The admin team can now review your payment proof and approve course access.",
       });
     } catch (error) {
       setEnrollmentFeedback({
@@ -204,6 +256,7 @@ export default function CourseDetail() {
       setSubmittingAccessRequest(false);
     }
   };
+
   const handleEnrollment = async () => {
     if (!user?.id) {
       navigate("/learner-access/");
@@ -238,10 +291,9 @@ export default function CourseDetail() {
       });
 
       setEnrollment(nextEnrollment);
-
       setEnrollmentFeedback({
         type: "success",
-        message: "You are enrolled. You can now view this course from your learner dashboard.",
+        message: "You are enrolled. You can now view this course from your job seeker dashboard.",
       });
     } catch (error) {
       setEnrollmentFeedback({
@@ -283,136 +335,170 @@ export default function CourseDetail() {
     }
   };
 
-
-
   if (!course && loadingCourse) {
     return (
-      <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
-        <section className="mx-auto max-w-3xl rounded-[1.75rem] oman-card p-6 text-center sm:p-8">
-          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Loading Course
-          </p>
-          <h1 className="oman-title-accent mt-4 text-3xl font-semibold">
-            Fetching course details...
-          </h1>
-        </section>
-      </main>
+      <Page className="px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
+        <Section spacing="none" className="max-w-3xl">
+          <Card variant="default" padding="lg" rounded="xl" className="text-center">
+            <PageHeader kicker="Loading course" title="Fetching course details..." align="center" />
+          </Card>
+        </Section>
+      </Page>
     );
   }
 
   if (!course) {
     return (
-      <main className="oman-page min-h-screen px-4 pb-16 pt-24 text-slate-900 sm:px-6 sm:pb-20 sm:pt-28">
-        <section className="mx-auto max-w-3xl rounded-[1.75rem] oman-card p-6 text-center sm:p-8">
-          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Course Not Found
-          </p>
-          <h1 className="oman-title-accent mt-4 text-3xl font-semibold">
-            We could not find this course.
-          </h1>
-          <Link
-            to="/courses/"
-            className="oman-button-primary mt-6 inline-flex rounded-2xl px-6 py-3 font-semibold transition"
-          >
-            Back to Courses
-          </Link>
-        </section>
-      </main>
+      <Page className="px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
+        <Section spacing="none" className="max-w-3xl">
+          <Card variant="default" padding="lg" rounded="xl" className="text-center">
+            <PageHeader
+              kicker="Course not found"
+              title="We could not find this course."
+              align="center"
+              actions={<Button to="/courses/" variant="primary">Back to Courses</Button>}
+            />
+          </Card>
+        </Section>
+      </Page>
     );
   }
 
   const content = course.en;
   const priceOmr = getCoursePriceOmr(course);
   const isPaidCourse = priceOmr > 0;
+  const paidRequestSubmitted = courseOrder?.status === "payment_submitted";
+  const paidRequestApproved = courseOrder?.status === "paid";
+  const paidRequestClosed = ["cancelled", "refunded"].includes(courseOrder?.status);
 
   return (
-    <main className="oman-page min-h-screen text-slate-900">
-      <section
-        className="oman-hero text-white"
-        style={{ backgroundImage: `url(${themeImages.mountainFort})` }}
-      >
-        <div className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
-          <div className="max-w-4xl text-center lg:text-left">
-            <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-              {course.category}
-            </p>
-            <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-              {content.title}
-            </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-[#f4e8d6] sm:text-lg sm:leading-8">
-              {content.subtitle}
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
-              {[course.price, course.duration, course.level, course.language].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full bg-[rgba(255,252,247,0.16)] px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/20"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-            {(loadingCourse || courseLoadMessage) && (
-              <div className="mt-6 inline-flex rounded-2xl bg-[rgba(255,252,247,0.14)] px-4 py-3 text-sm font-semibold text-white ring-1 ring-white/20">
-                {loadingCourse ? "Loading course details..." : courseLoadMessage}
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[1.75rem] oman-card p-6 sm:p-8">
-          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Overview
+    <Page>
+      <Hero backgroundImage={themeImages.mountainFort}>
+        <div className="max-w-4xl text-center lg:text-left">
+          <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
+            {course.category}
           </p>
-          <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
-            What Will You Learn?
-          </h2>
-          <p className="mt-4 text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
-            {content.summary}
+          <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+            {content.title}
+          </h1>
+          <p className="mt-5 max-w-3xl text-base leading-7 text-[#f4e8d6] sm:text-lg sm:leading-8">
+            {content.subtitle}
           </p>
-
-          <div className="mt-8 grid gap-4">
-            {content.outcomes.map((outcome) => (
-              <div key={outcome} className="rounded-2xl oman-outline-panel px-4 py-4">
-                <p className="font-semibold text-[var(--oman-ink)]">{outcome}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <aside className="rounded-[1.75rem] oman-card p-6 sm:p-8">
-          <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-            Course Content
-          </p>
-          <h2 className="oman-title-accent mt-4 text-2xl font-semibold">
-            Proposed Modules
-          </h2>
-          <ol className="mt-6 space-y-3">
-            {content.modules.map((module, index) => (
-              <li
-                key={module}
-                className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-4 text-[var(--oman-ink)]"
+          <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+            {[course.price, course.duration, course.level, course.language].map((item) => (
+              <span
+                key={item}
+                className="rounded-full bg-[rgba(255,252,247,0.16)] px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/20"
               >
-                <span className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-                  Module {index + 1}
-                </span>
-                <p className="mt-2 font-semibold">{module}</p>
-              </li>
+                {item}
+              </span>
             ))}
-          </ol>
-
-          {loadingEnrollment && (
-            <div className="mt-8 rounded-2xl oman-outline-panel px-4 py-4 text-sm font-semibold text-[var(--oman-ink)]/75">
-              Loading your enrollment status...
+          </div>
+          {(loadingCourse || courseLoadMessage) && (
+            <div className="mt-6 inline-flex rounded-2xl bg-[rgba(255,252,247,0.14)] px-4 py-3 text-sm font-semibold text-white ring-1 ring-white/20">
+              {loadingCourse ? "Loading course details..." : courseLoadMessage}
             </div>
           )}
+        </div>
+      </Hero>
 
-          {enrollment && (
-            <div className="mt-8 rounded-3xl oman-outline-panel p-5">
+      <Section
+        spacing="md"
+        className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]"
+      >
+        <Card variant="default" padding="lg" rounded="xl">
+          <PageHeader
+            kicker="Overview"
+            title="What will you learn?"
+            description={content.summary}
+            className="max-w-none"
+          />
+          <div className="mt-8 grid gap-4">
+            {content.outcomes.map((outcome) => (
+              <Card key={outcome} variant="outline" padding="sm" rounded="md">
+                <p className="font-semibold text-[var(--oman-ink)]">{outcome}</p>
+              </Card>
+            ))}
+          </div>
+        </Card>
+
+        <Card as="aside" variant="default" padding="lg" rounded="xl">
+          <PageHeader
+            kicker="Course content"
+            title={publicSections.length ? "Curriculum" : "Modules"}
+            className="max-w-none"
+          />
+          {publicSections.length ? (
+            <ol className="mt-6 space-y-4">
+              {publicSections.map((section, sectionIndex) => (
+                <li key={section.id}>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                    Section {sectionIndex + 1}: {section.title}
+                  </p>
+                  <ul className="mt-2 space-y-2">
+                    {section.lectures.map((lecture, lectureIndex) => {
+                      const isPreview = lecture.isPreview || lecture.is_preview;
+                      return (
+                        <li
+                          key={lecture.id}
+                          className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-3 text-[var(--oman-ink)]"
+                        >
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <p className="font-semibold">
+                              {lectureIndex + 1}. {lecture.title || lecture.title_en}
+                            </p>
+                            {isPreview ? (
+                              <button
+                                type="button"
+                                className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--oman-olive)]"
+                                onClick={() => setActivePreviewId(lecture.id)}
+                              >
+                                Free preview
+                              </button>
+                            ) : (
+                              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--oman-ink)]/50">
+                                Locked
+                              </span>
+                            )}
+                          </div>
+                          {(lecture.durationLabel || lecture.duration_label) && (
+                            <p className="mt-1 text-xs text-[var(--oman-ink)]/60">
+                              {lecture.durationLabel || lecture.duration_label}
+                            </p>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <ol className="mt-6 space-y-3">
+              {content.modules.map((module, index) => (
+                <li
+                  key={module}
+                  className="rounded-2xl bg-[rgba(244,232,214,0.42)] px-4 py-4 text-[var(--oman-ink)]"
+                >
+                  <span className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                    Module {index + 1}
+                  </span>
+                  <p className="mt-2 font-semibold">{module}</p>
+                </li>
+              ))}
+            </ol>
+          )}
+
+          {loadingEnrollment ? (
+            <Card variant="outline" padding="sm" rounded="md" className="mt-8 text-sm font-semibold text-[var(--oman-ink)]/75">
+              Loading your enrollment status...
+            </Card>
+          ) : null}
+
+          {enrollment ? (
+            <Card variant="outline" padding="md" rounded="lg" className="mt-8">
               <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                Your Progress
+                Your progress
               </p>
               <div className="mt-4 flex items-center justify-between gap-4">
                 <p className="text-lg font-semibold capitalize text-[var(--oman-ink)]">
@@ -428,12 +514,9 @@ export default function CourseDetail() {
                   style={{ width: `${enrollment.progressPercent}%` }}
                 />
               </div>
-              <Link
-                to={`/learn/${course.slug}/`}
-                className="oman-button-secondary mt-5 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition"
-              >
+              <Button to={`/learn/${course.slug}/`} variant="secondary" fullWidth className="mt-5">
                 Open Learning Page
-              </Link>
+              </Button>
               <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-5">
                 {[0, 25, 50, 75, 100].map((value) => (
                   <button
@@ -447,22 +530,51 @@ export default function CourseDetail() {
                   </button>
                 ))}
               </div>
-            </div>
-          )}
+            </Card>
+          ) : null}
 
-          {isPaidCourse && !enrollment && (
-            <div className="mt-8 rounded-3xl oman-outline-panel p-5">
+          {isPaidCourse && !enrollment && courseOrder ? (
+            <Card variant="outline" padding="md" rounded="lg" className="mt-8">
               <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                Bank Muscat Phone Payment
+                Access request status
+              </p>
+              <h3 className="mt-3 text-lg font-semibold capitalize text-[var(--oman-ink)]">
+                {courseOrder.status.replaceAll("_", " ")}
+              </h3>
+              <p className="mt-3 leading-7 text-[var(--oman-ink)]/75">
+                {paidRequestSubmitted
+                  ? "Your payment proof was submitted. Admin approval unlocks lessons."
+                  : paidRequestApproved
+                    ? "Payment approved. Open the learning page or dashboard if needed."
+                    : paidRequestClosed
+                      ? "This request is closed. Contact support if you need to resubmit."
+                      : "This order is waiting for proof of payment."}
+              </p>
+              <p className="mt-3 text-sm leading-6 text-[var(--oman-ink)]/70">
+                Order {courseOrder.orderNumber} · {courseOrder.totalLabel}
+              </p>
+              {paidRequestApproved ? (
+                <Button to={`/learn/${course.slug}/`} variant="primary" fullWidth className="mt-5">
+                  Open Learning Page
+                </Button>
+              ) : null}
+            </Card>
+          ) : null}
+
+          {isPaidCourse &&
+          !enrollment &&
+          !paidRequestSubmitted &&
+          !paidRequestApproved &&
+          !paidRequestClosed ? (
+            <Card variant="outline" padding="md" rounded="lg" className="mt-8">
+              <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
+                Bank Muscat phone payment
               </p>
               <form className="mt-4 space-y-4 text-sm leading-6 text-[var(--oman-ink)]/80" onSubmit={handleAccessRequestSubmit}>
                 <p>
-                  <span className="font-semibold text-[var(--oman-ink)]">Amount:</span>{" "}
-                  {course.price}
+                  <span className="font-semibold text-[var(--oman-ink)]">Amount:</span> {course.price}
                 </p>
-                <p>
-                  Send the course amount to the Bank Muscat phone number below using your own mobile banking app.
-                </p>
+                <p>Send the amount to the Bank Muscat phone number with your banking app.</p>
                 <div className="rounded-2xl bg-[rgba(244,232,214,0.5)] px-4 py-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta-dark)]">
                     {BANK_MUSCAT_PAYMENT_METHOD}
@@ -472,8 +584,8 @@ export default function CourseDetail() {
                   </p>
                 </div>
                 <ol className="list-decimal space-y-2 pl-5">
-                  <li>Send the requested amount from your bank mobile app.</li>
-                  <li>Attach a screenshot or receipt as proof of payment.</li>
+                  <li>Send the requested amount from your bank app.</li>
+                  <li>Attach a screenshot or receipt as proof.</li>
                   <li>Send your access request and wait for approval.</li>
                   <li>If access is not approved, request a full refund.</li>
                 </ol>
@@ -485,97 +597,146 @@ export default function CourseDetail() {
                   </p>
                   <p className="mt-2">
                     <span className="font-semibold text-[var(--oman-ink)]">Email:</span>{" "}
-                    {profile?.email || user?.email || "Not available"}
+                    {profile?.email || user?.email || t("common.notAvailable")}
                   </p>
                 </div>
 
-                <label className="flex flex-col gap-2">
-                  <span className="font-semibold text-[var(--oman-terracotta-dark)]">
-                    Attach proof of payment <span aria-hidden="true" className="text-[var(--oman-terracotta)]">*</span>
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-[var(--oman-ink)]">
+                    Attach proof of payment{" "}
+                    <span aria-hidden="true" className="text-[var(--oman-terracotta)]">
+                      *
+                    </span>
                   </span>
                   <input
                     type="file"
                     required
                     accept={ACCEPTED_UPLOAD_ATTRIBUTE}
                     onChange={handlePaymentProofChange}
-                    className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-sm text-[var(--oman-ink)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-[rgba(197,154,68,0.16)] file:px-4 file:py-2 file:font-semibold file:text-[var(--oman-terracotta-dark)] focus:border-[var(--oman-brass)] focus:bg-white"
+                    className="w-full rounded-2xl border border-[rgba(111,49,29,0.16)] bg-[rgba(255,252,247,0.92)] px-4 py-3 text-sm text-[var(--oman-ink)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-[rgba(197,154,68,0.16)] file:px-4 file:py-2 file:font-semibold file:text-[var(--oman-terracotta-dark)]"
                   />
-                  <span className="text-xs leading-5 text-[var(--oman-ink)]/65">
+                  <span className="mt-2 block text-xs leading-5 text-[var(--oman-ink)]/65">
                     Upload a screenshot or receipt. Max {FILE_SIZE_LIMIT_MB} MB.
                   </span>
-                  {paymentProofFile && (
-                    <span className="rounded-full bg-[rgba(255,252,247,0.98)] px-3 py-2 text-xs font-medium text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.12)]">
+                  {paymentProofFile ? (
+                    <span className="mt-2 inline-flex rounded-full bg-[rgba(255,252,247,0.98)] px-3 py-2 text-xs font-medium text-[var(--oman-ink)] ring-1 ring-[rgba(111,49,29,0.12)]">
                       {paymentProofFile.name}
                     </span>
-                  )}
+                  ) : null}
                 </label>
 
-                <label className="flex flex-col gap-2">
-                  <span className="font-semibold text-[var(--oman-terracotta-dark)]">
-                    Payment reference or note
-                  </span>
-                  <input
-                    type="text"
-                    value={paymentReference}
-                    onChange={(event) => setPaymentReference(event.target.value)}
-                    placeholder="Optional transaction reference, sender name, or note"
-                    className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  />
-                </label>
+                <Field
+                  label="Payment reference or note"
+                  name="paymentReference"
+                  type="text"
+                  value={paymentReference}
+                  onChange={(event) => setPaymentReference(event.target.value)}
+                  placeholder="Optional transaction reference, sender name, or note"
+                  controlClassName="min-h-12"
+                />
 
-                <button
-                  type="submit"
-                  disabled={submittingAccessRequest}
-                  className="oman-button-primary inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
-                >
+                <Button type="submit" variant="primary" fullWidth loading={submittingAccessRequest}>
                   {submittingAccessRequest ? "Sending Access Request..." : "Send Access Request"}
-                </button>
+                </Button>
               </form>
-            </div>
-          )}
+            </Card>
+          ) : null}
 
-          <ActionFeedback
+          <Alert
             type={enrollmentFeedback.type}
             message={enrollmentFeedback.message}
-            title="Enrollment Update"
+            title="Enrollment update"
             className="mt-8"
           />
 
-          {!isPaidCourse && (
+          {!isPaidCourse ? (
             <>
-              <button
+              <Button
                 type="button"
+                variant="primary"
+                fullWidth
+                className="mt-5"
+                loading={enrolling}
+                disabled={Boolean(enrollment)}
                 onClick={handleEnrollment}
-                disabled={enrolling || Boolean(enrollment)}
-                className="oman-button-primary mt-5 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {enrollment
                   ? "Already Enrolled"
                   : enrolling
                     ? "Enrolling..."
                     : user
-                      ? "Enroll For Free"
+                      ? "Enroll"
                       : "Sign In To Enroll"}
-              </button>
+              </Button>
               <p className="mt-4 text-sm leading-6 text-[var(--oman-ink)]/70">
-                Free courses enroll instantly.
+                Enrollment opens after course access is approved.
               </p>
             </>
-          )}
-        </aside>
-      </section>
+          ) : null}
+        </Card>
+      </Section>
 
-      <footer className="border-t border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.9)] px-4 py-8 text-center text-sm text-[var(--oman-ink)]/70 sm:px-6">
-        {footerText}
-      </footer>
-    </main>
+      {freePreviewLectures.length ? (
+        <Section spacing="md">
+          <PageHeader
+            kicker="Free preview"
+            title="Try a lecture before you enroll"
+            className="mb-6 max-w-none"
+          />
+          <div className="mb-4 flex flex-wrap gap-2">
+            {freePreviewLectures.map((lecture) => (
+              <Button
+                key={lecture.id}
+                type="button"
+                size="sm"
+                variant={activePreviewId === lecture.id ? "primary" : "ghost"}
+                onClick={() => setActivePreviewId(lecture.id)}
+              >
+                {lecture.title || lecture.title_en}
+              </Button>
+            ))}
+          </div>
+          <LecturePlayerPanel
+            lecture={
+              freePreviewLectures.find((item) => item.id === activePreviewId) ||
+              freePreviewLectures[0]
+            }
+            sectionTitle="Free preview"
+            showComplete={false}
+            hasPrev={false}
+            hasNext={false}
+            onPrev={() => {}}
+            onNext={() => {}}
+            onToggleComplete={() => {}}
+          />
+          {!enrollment ? (
+            <p className="mt-4 text-center text-sm text-[var(--oman-ink)]/70">
+              Enroll to unlock the full curriculum and track your progress.
+            </p>
+          ) : (
+            <div className="mt-4 text-center">
+              <Button to={`/learn/${course.slug}/`} variant="primary">
+                Open full learning player
+              </Button>
+            </div>
+          )}
+        </Section>
+      ) : null}
+
+      {enrollment ? (
+        <Section spacing="sm">
+          <Card variant="soft" padding="md" rounded="lg" className="text-center">
+            <p className="text-sm font-semibold text-[var(--oman-ink)]">
+              You are enrolled. Continue learning with the full sectioned player.
+            </p>
+            <Button to={`/learn/${course.slug}/`} variant="secondary" className="mt-4">
+              Go to course overview & player
+            </Button>
+          </Card>
+        </Section>
+      ) : null}
+
+      <SiteFooter />
+    </Page>
   );
 }
-
-
-
-
-
-
-
-

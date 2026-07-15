@@ -13,7 +13,8 @@ create table if not exists public.instructor_course_proposals (
   required_tools text,
   final_project text,
   suggested_duration text,
-  suggested_price_omr numeric(10, 3),
+  suggested_price_omr numeric(10, 3)
+    check (suggested_price_omr is null or (suggested_price_omr >= 8 and suggested_price_omr <= 15)),
   additional_notes text,
   status text not null default 'pending'
     check (status in ('pending', 'reviewed', 'approved', 'changes_requested', 'rejected', 'archived')),

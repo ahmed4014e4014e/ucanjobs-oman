@@ -1,4 +1,4 @@
--- Phase 8: Manual payment foundation for Ucan
+-- Phase 8: Manual payment foundation for UcanJobs
 -- Run this only after the course catalog and learner enrollments are working.
 --
 -- This creates the tables needed for a manual payment workflow:

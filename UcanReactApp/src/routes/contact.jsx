@@ -1,5 +1,4 @@
 import { useState } from "react";
-import ActionFeedback from "../components/ActionFeedback";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { createContactMessage, uploadContactAttachments } from "../lib/contactApi";
@@ -11,14 +10,8 @@ import {
 } from "../lib/fileUploadRules";
 import { isSupabaseConfigured } from "../lib/supabase";
 import { themeImages } from "../lib/themeImages";
-
-function RequiredLabel({ children }) {
-  return (
-    <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-      {children} <span aria-hidden="true" className="text-[var(--oman-terracotta)]">*</span>
-    </span>
-  );
-}
+import { Alert, Button, Card, Field } from "../components/ui";
+import { Hero, Page, PageHeader, Section, SiteFooter } from "../components/layout";
 
 export default function Contact() {
   const { user, profile } = useAuth();
@@ -27,7 +20,6 @@ export default function Contact() {
   const acceptedFilesText = t("common.acceptedFiles")
     .replace("{types}", ACCEPTED_UPLOAD_TYPES.join(", "))
     .replace("{size}", FILE_SIZE_LIMIT_MB);
-  const footerText = t("common.footer").replace("{year}", new Date().getFullYear());
   const [formValues, setFormValues] = useState({
     fullName: profile?.full_name || user?.user_metadata?.full_name || "",
     email: profile?.email || user?.email || "",
@@ -122,155 +114,123 @@ export default function Contact() {
   };
 
   return (
-    <main className="contact-page oman-page min-h-screen overflow-x-hidden text-slate-900">
-      <section
-        className="oman-hero text-white"
-        style={{ backgroundImage: `url(${themeImages.brandJourney})` }}
-      >
-        <div className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28">
-          <div className="contact-mobile-grid grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
-            <div className="min-w-0 text-center lg:text-left">
-              <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
-                {t("contact.heroKicker")}
-              </p>
-              <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:mx-0 lg:text-5xl">
-                {t("contact.heroTitle")}
-              </h1>
-              <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#f4e8d6] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
-                {t("contact.heroText")}
-              </p>
-            </div>
-
-            <div className="min-w-0 oman-card rounded-[1.75rem] p-4 text-[var(--oman-ink)] sm:p-5">
-              <div className="oman-photo-frame oman-photo-frame--contain aspect-[16/10]">
-                <img
-                  src={themeImages.brandWordmark}
-                  alt="UcanJobs employability bridge visual"
-                />
-              </div>
-              <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
-                {t("contact.heroCardText")}
-              </p>
-            </div>
+    <Page className="contact-page overflow-x-hidden">
+      <Hero backgroundImage={themeImages.brandJourney}>
+        <div className="contact-mobile-grid grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
+          <div className="min-w-0 text-center lg:text-left">
+            <p className="oman-kicker mb-4 text-xs font-semibold uppercase sm:text-sm">
+              {t("contact.heroKicker")}
+            </p>
+            <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:mx-0 lg:text-5xl">
+              {t("contact.heroTitle")}
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#f4e8d6] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
+              {t("contact.heroText")}
+            </p>
           </div>
-        </div>
-      </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+          <Card variant="default" padding="sm" rounded="xl" className="min-w-0 text-[var(--oman-ink)]">
+            <div className="oman-photo-frame oman-photo-frame--contain aspect-[16/10]">
+              <img src={themeImages.brandWordmark} alt="UcanJobs employability bridge visual" />
+            </div>
+            <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
+              {t("contact.heroCardText")}
+            </p>
+          </Card>
+        </div>
+      </Hero>
+
+      <Section spacing="md">
         <div className="contact-mobile-grid grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-10">
           <div className="min-w-0">
-            <div className="max-w-2xl text-center lg:text-left">
-              <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                {t("contact.formKicker")}
-              </p>
-              <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-                {t("contact.formTitle")}
-              </h2>
-              <p className="mt-4 text-base leading-7 text-[var(--oman-ink)]/75 sm:text-lg sm:leading-8">
-                {t("contact.formText")}
-              </p>
-            </div>
+            <PageHeader
+              kicker={t("contact.formKicker")}
+              title={t("contact.formTitle")}
+              description={t("contact.formText")}
+              className="max-w-none"
+            />
 
-            <form onSubmit={handleSubmit} className="mt-10 min-w-0 rounded-[1.75rem] oman-card p-6 sm:mt-12 sm:p-8">
+            <Card as="form" onSubmit={handleSubmit} variant="default" padding="lg" rounded="xl" className="mt-10 min-w-0 sm:mt-12">
               <p className="mb-5 text-sm leading-6 text-[var(--oman-ink)]/70">
                 {t("common.fieldsRequired")}
               </p>
               <div className="grid gap-4 md:grid-cols-2">
-                <label className="flex flex-col gap-2">
-                  <RequiredLabel>{t("contact.labels.fullName")}</RequiredLabel>
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={formValues.fullName}
-                    onChange={handleChange}
-                    required
-                    className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  />
-                </label>
-
-                <label className="flex flex-col gap-2">
-                  <RequiredLabel>{t("contact.labels.email")}</RequiredLabel>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formValues.email}
-                    onChange={handleChange}
-                    required
-                    className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  />
-                </label>
+                <Field
+                  label={t("contact.labels.fullName")}
+                  name="fullName"
+                  type="text"
+                  value={formValues.fullName}
+                  onChange={handleChange}
+                  required
+                  controlClassName="min-h-12"
+                />
+                <Field
+                  label={t("contact.labels.email")}
+                  name="email"
+                  type="email"
+                  value={formValues.email}
+                  onChange={handleChange}
+                  required
+                  controlClassName="min-h-12"
+                />
               </div>
 
               <div className="mt-4 grid gap-4">
-                <label className="flex flex-col gap-2">
-                  <RequiredLabel>{t("contact.labels.institute")}</RequiredLabel>
-                  <input
-                    type="text"
-                    name="institute"
-                    value={formValues.institute}
-                    onChange={handleChange}
-                    placeholder={t("contact.placeholders.institute")}
-                    required
-                    className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  />
-                </label>
+                <Field
+                  label={t("contact.labels.institute")}
+                  name="institute"
+                  type="text"
+                  value={formValues.institute}
+                  onChange={handleChange}
+                  placeholder={t("contact.placeholders.institute")}
+                  required
+                  controlClassName="min-h-12"
+                />
+                <Field
+                  as="select"
+                  label={t("contact.labels.role")}
+                  name="role"
+                  value={formValues.role}
+                  onChange={handleChange}
+                  required
+                  controlClassName="min-h-12"
+                >
+                  <option value="">{t("contact.placeholders.role")}</option>
+                  <option value="learner">{t("contact.roleStudent")}</option>
+                  <option value="instructor">{t("contact.roleTutor")}</option>
+                </Field>
+                <Field
+                  label={t("contact.labels.subject")}
+                  name="subject"
+                  type="text"
+                  value={formValues.subject}
+                  onChange={handleChange}
+                  required
+                  placeholder={t("contact.placeholders.subject")}
+                  controlClassName="min-h-12"
+                />
+                <Field
+                  as="textarea"
+                  label={t("contact.labels.message")}
+                  name="message"
+                  value={formValues.message}
+                  onChange={handleChange}
+                  rows={6}
+                  required
+                  placeholder={t("contact.placeholders.message")}
+                />
+                <Field
+                  as="textarea"
+                  label={t("contact.labels.attachmentNotes")}
+                  name="attachmentNotes"
+                  value={attachmentNotes}
+                  onChange={(event) => setAttachmentNotes(event.target.value)}
+                  rows={3}
+                  placeholder={t("contact.placeholders.attachmentNotes")}
+                />
 
-                <label className="flex flex-col gap-2">
-                  <RequiredLabel>{t("contact.labels.role")}</RequiredLabel>
-                  <select
-                    name="role"
-                    value={formValues.role}
-                    onChange={handleChange}
-                    required
-                    className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  >
-                    <option value="">{t("contact.placeholders.role")}</option>
-                    <option value="learner">{t("contact.roleStudent")}</option>
-                    <option value="instructor">{t("contact.roleTutor")}</option>
-                  </select>
-                </label>
-
-                <label className="flex flex-col gap-2">
-                  <RequiredLabel>{t("contact.labels.subject")}</RequiredLabel>
-                  <input
-                    type="text"
-                    name="subject"
-                    value={formValues.subject}
-                    onChange={handleChange}
-                    required
-                    placeholder={t("contact.placeholders.subject")}
-                    className="min-h-12 rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  />
-                </label>
-
-                <label className="flex flex-col gap-2">
-                  <RequiredLabel>{t("contact.labels.message")}</RequiredLabel>
-                  <textarea
-                    name="message"
-                    value={formValues.message}
-                    onChange={handleChange}
-                    rows={6}
-                    required
-                    placeholder={t("contact.placeholders.message")}
-                    className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  />
-                </label>
-
-                <label className="flex flex-col gap-2">
-                  <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
-                    {t("contact.labels.attachmentNotes")}
-                  </span>
-                  <textarea
-                    value={attachmentNotes}
-                    onChange={(event) => setAttachmentNotes(event.target.value)}
-                    rows={3}
-                    placeholder={t("contact.placeholders.attachmentNotes")}
-                    className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-[var(--oman-ink)] outline-none transition focus:border-[var(--oman-brass)] focus:bg-white"
-                  />
-                </label>
-
-                <label className="flex flex-col gap-2">
-                  <span className="text-sm font-semibold text-[var(--oman-terracotta-dark)]">
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-[var(--oman-ink)]">
                     {t("contact.labels.attachFiles")}
                   </span>
                   <input
@@ -278,13 +238,11 @@ export default function Contact() {
                     multiple
                     accept={ACCEPTED_UPLOAD_ATTRIBUTE}
                     onChange={handleFileChange}
-                    className="rounded-2xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,250,244,0.92)] px-4 py-3 text-sm text-[var(--oman-ink)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-[rgba(197,154,68,0.16)] file:px-4 file:py-2 file:font-semibold file:text-[var(--oman-terracotta-dark)] hover:file:bg-[rgba(197,154,68,0.24)]"
+                    className="w-full rounded-2xl border border-[rgba(111,49,29,0.16)] bg-[rgba(255,252,247,0.92)] px-4 py-3 text-sm text-[var(--oman-ink)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-[rgba(197,154,68,0.16)] file:px-4 file:py-2 file:font-semibold file:text-[var(--oman-terracotta-dark)] hover:file:bg-[rgba(197,154,68,0.24)]"
                   />
-                  <p className="text-sm leading-6 text-[var(--oman-ink)]/70">
-                    {acceptedFilesText}
-                  </p>
-                  {selectedFiles.length > 0 && (
-                    <div className="flex flex-wrap gap-2 pt-1">
+                  <p className="mt-2 text-sm leading-6 text-[var(--oman-ink)]/70">{acceptedFilesText}</p>
+                  {selectedFiles.length > 0 ? (
+                    <div className="flex flex-wrap gap-2 pt-2">
                       {selectedFiles.map((file) => (
                         <span
                           key={`${file.name}-${file.size}`}
@@ -294,61 +252,56 @@ export default function Contact() {
                         </span>
                       ))}
                     </div>
-                  )}
+                  ) : null}
                 </label>
               </div>
 
-              <ActionFeedback
+              <Alert
                 type={submitState.type}
                 message={submitState.message}
                 title={t("contact.feedbackTitle")}
                 className="mt-5"
               />
 
-              <button
-                type="submit"
-                disabled={submitState.loading}
-                className="oman-button-primary mt-6 inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-center font-semibold transition disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
-              >
+              <Button type="submit" variant="primary" loading={submitState.loading} className="mt-6 w-full sm:w-auto">
                 {submitState.loading ? t("contact.submitting") : t("contact.submit")}
-              </button>
-            </form>
+              </Button>
+            </Card>
           </div>
 
           <div className="min-w-0">
-            <div className="max-w-2xl text-center lg:text-left">
-              <p className="oman-section-kicker text-xs font-semibold uppercase sm:text-sm">
-                {t("contact.methodsKicker")}
-              </p>
-              <h2 className="oman-title-accent mt-4 text-2xl font-semibold sm:text-3xl">
-                {t("contact.methodsTitle")}
-              </h2>
-            </div>
-
+            <PageHeader
+              kicker={t("contact.methodsKicker")}
+              title={t("contact.methodsTitle")}
+              className="max-w-none"
+            />
             <div className="mt-10 grid gap-6 sm:mt-12 sm:gap-8">
               {contactMethods.map((method) => (
-                <article key={method.title} className="rounded-3xl oman-card p-6 sm:p-8">
+                <Card key={method.title} as="article" variant="default" padding="lg" rounded="lg">
                   <h3 className="text-xl font-semibold text-[var(--oman-ink)]">{method.title}</h3>
                   <p className="mt-4 break-words text-lg font-medium text-[var(--oman-terracotta)]">
                     {method.value}
                   </p>
                   <p className="mt-4 leading-7 text-[var(--oman-ink)]/75">{method.description}</p>
-                </article>
+                </Card>
               ))}
             </div>
           </div>
         </div>
-      </section>
+      </Section>
 
-      <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20">
-        <div className="contact-mobile-grid grid items-center gap-6 rounded-[1.75rem] oman-dark-panel px-6 py-10 text-white sm:px-8 sm:py-12 lg:grid-cols-[1fr_0.88fr]">
+      <Section spacing="tightBottom">
+        <Card
+          variant="dark"
+          padding="xl"
+          rounded="xl"
+          className="contact-mobile-grid grid items-center gap-6 lg:grid-cols-[1fr_0.88fr]"
+        >
           <div className="min-w-0 text-center lg:text-left">
             <p className="oman-kicker text-xs font-semibold uppercase sm:text-sm">
               {t("contact.ctaKicker")}
             </p>
-            <h2 className="mt-4 text-2xl font-semibold sm:text-3xl">
-              {t("contact.ctaTitle")}
-            </h2>
+            <h2 className="mt-4 text-2xl font-semibold sm:text-3xl">{t("contact.ctaTitle")}</h2>
             <p className="mt-6 max-w-3xl text-base leading-7 text-[#eadfcf] sm:text-lg sm:leading-8">
               {t("contact.ctaText")}
             </p>
@@ -359,12 +312,10 @@ export default function Contact() {
               alt="University campus building with landscaped lawn"
             />
           </div>
-        </div>
-      </section>
+        </Card>
+      </Section>
 
-      <footer className="border-t border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.9)] px-4 py-8 text-center text-sm text-[var(--oman-ink)]/70 sm:px-6">
-        {footerText}
-      </footer>
-    </main>
+      <SiteFooter />
+    </Page>
   );
 }

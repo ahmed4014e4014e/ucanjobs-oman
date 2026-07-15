@@ -1,4 +1,4 @@
-import { isSupabaseConfigured, supabase } from "./supabase";
+import { isSupabaseConfigured, supabase } from "./supabase.js";
 
 const BUCKET = "course-content";
 const STORAGE_PREFIX = `storage://${BUCKET}/`;
@@ -39,11 +39,11 @@ export async function uploadCourseMedia({
     throw new Error("A file, instructor, and course are required.");
   }
 
-  const maximumBytes = mediaType === "video" ? 100 * 1024 * 1024 : 20 * 1024 * 1024;
+  const maximumBytes = mediaType === "video" ? 500 * 1024 * 1024 : 20 * 1024 * 1024;
   if (file.size > maximumBytes) {
     throw new Error(
       mediaType === "video"
-        ? "Video files must be 100 MB or smaller."
+        ? "Video files must be 500 MB or smaller."
         : "Attachment files must be 20 MB or smaller."
     );
   }

@@ -193,7 +193,7 @@ select
   profiles.id,
   profiles.full_name,
   profiles.institute,
-  'Offers free tutoring support for selected MCBS courses through Ucan Oman.',
+  'Offers support for selected courses through UcanJobs.',
   'https://calendly.com/ahmed4014e/30min',
   true
 from public.profiles

@@ -24,6 +24,7 @@ import LearnerAccess from "./routes/learnerAccess";
 import AdminAccess from "./routes/adminAccess";
 import ResetPassword from "./routes/resetPassword";
 import Account from "./routes/account";
+import Profile from "./routes/profile";
 import LearnerDashboard from "./routes/learnerDashboard";
 import InstructorDashboard from "./routes/instructorDashboard";
 import InstructorCourses from "./routes/instructorCourses";
@@ -38,6 +39,9 @@ import AdminCourseProposals from "./routes/adminCourseProposals";
 import AdminCourseLessons from "./routes/adminCourseLessons";
 import AdminEnrollments from "./routes/adminEnrollments";
 import AdminPlaceholderPage from "./routes/adminPlaceholderPage";
+import MockCourseExperienceHub from "./routes/mockCourseExperienceHub";
+import MockInstructorCourseKit from "./routes/mockInstructorCourseKit";
+import MockLearnerPlayer from "./routes/mockLearnerPlayer";
 
 // Create a Router
 const router = createBrowserRouter([
@@ -69,9 +73,9 @@ const router = createBrowserRouter([
       {
         path: "learn/:slug",
         element: (
-          <RoleProtectedRoute allowedRole="learner">
+          <ProtectedRoute>
             <LearnCourse />
-          </RoleProtectedRoute>
+          </ProtectedRoute>
         ),
       },
       {
@@ -89,6 +93,18 @@ const router = createBrowserRouter([
       {
         path: "terms",
         element: <Terms />,
+      },
+      {
+        path: "mock/course-experience",
+        element: <MockCourseExperienceHub />,
+      },
+      {
+        path: "mock/instructor-course-kit",
+        element: <MockInstructorCourseKit />,
+      },
+      {
+        path: "mock/learn-player",
+        element: <MockLearnerPlayer />,
       },
       {
         path: "instructor-access",
@@ -127,6 +143,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Account />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         ),
       },

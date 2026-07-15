@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  /* Brand palette */
   --oman-sand: #efe1c9;
   --oman-sand-deep: #d8be98;
   --oman-terracotta: #9b4d31;
@@ -10,10 +11,32 @@
   --oman-ink: #2a211c;
   --oman-paper: rgba(255, 248, 238, 0.88);
   --oman-border: rgba(111, 49, 29, 0.15);
+
+  /* Semantic tokens (design system Phase 0) */
+  --color-bg-page: #f7efdf;
+  --color-bg-surface: var(--oman-paper);
+  --color-text: var(--oman-ink);
+  --color-text-muted: rgba(42, 33, 28, 0.75);
+  --color-primary: var(--oman-brass);
+  --color-secondary: var(--oman-terracotta);
+  --color-success: var(--oman-olive);
+  --color-warning: #b8860b;
+  --color-danger: var(--oman-terracotta-dark);
+  --color-info: var(--oman-brass);
+  --color-focus-ring: rgba(197, 154, 68, 0.55);
+
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 1.75rem;
+
+  --shadow-card: 0 18px 45px rgba(73, 39, 27, 0.08);
+  --space-page-x: 1rem;
 }
 
 html {
   scroll-behavior: smooth;
+  width: 100%;
 }
 
 body {
@@ -23,10 +46,16 @@ body {
     radial-gradient(circle at top, rgba(197, 154, 68, 0.16), transparent 30%),
     linear-gradient(180deg, #f7efdf 0%, #f2e3cc 100%);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-width: 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 #root {
   min-height: 100vh;
+  min-width: 0;
+  width: 100%;
+  overflow-x: clip;
 }
 
 .oman-page {
@@ -173,10 +202,44 @@ body {
   object-position: center top;
 }
 
+.lesson-player-frame {
+  position: relative;
+  z-index: 20;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: #000;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.lesson-player-media {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+  pointer-events: auto;
+}
+
 @media (max-width: 639px) {
   html,
   body {
+    width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
+  }
+
+  #root,
+  .oman-page {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip;
   }
 
   .oman-page::before {
@@ -185,8 +248,22 @@ body {
   }
 
   .oman-page > section {
+    width: 100%;
+    max-width: 100vw;
+    margin-left: auto;
+    margin-right: auto;
     padding-left: 1rem;
     padding-right: 1rem;
+    overflow-x: clip;
+  }
+
+  .oman-page :where(section, div, article, aside, header, footer, form, label, fieldset, ul, ol, li) {
+    min-width: 0;
+  }
+
+  .oman-page :where(.grid, .flex) {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .oman-page :where(.oman-card, .oman-outline-panel, .oman-dark-panel, .oman-photo-frame) {
@@ -194,12 +271,14 @@ body {
   }
 
   .oman-page :where(.oman-card, .oman-outline-panel, .oman-dark-panel) {
+    width: 100%;
+    max-width: 100%;
     box-shadow: 0 12px 32px rgba(73, 39, 27, 0.08);
   }
 
   .oman-hero > div {
-    padding-top: 5.75rem;
-    padding-bottom: 2.75rem;
+    width: 100%;
+    max-width: 100%;
   }
 
   .oman-hero h1 {
@@ -221,20 +300,48 @@ body {
     overflow-wrap: anywhere;
   }
 
-  .oman-page :where(input, select, textarea, button, a) {
+  .oman-page :where(input, select, textarea, button, a, [role="button"]) {
     touch-action: manipulation;
   }
 
-  .oman-page :where(input, select, textarea) {
+  .oman-page :where(input, select, textarea, input[type="file"]) {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     font-size: 1rem;
   }
 
-  .oman-page :where(button, a) {
+  .oman-page :where(button, a, [role="button"]) {
     min-height: 2.75rem;
+  }
+
+  .oman-page :where(img, video, canvas, svg) {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .oman-page :where(table) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
   }
 
   .oman-page :where(.rounded-3xl, .rounded-\[1\.75rem\]) {
     border-radius: 1.25rem;
+  }
+
+  .oman-page :where(.tracking-\[0\.14em\], .tracking-\[0\.28em\], .tracking-\[0\.3em\], .tracking-\[0\.35em\]) {
+    letter-spacing: 0.08em;
+  }
+
+  .oman-page :where(.px-6) {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .oman-page :where(.p-6) {
+    padding: 1rem;
   }
 
   .contact-page {
@@ -263,5 +370,31 @@ body {
   .contact-page .oman-dark-panel {
     margin-left: auto;
     margin-right: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .oman-page > section {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+
+  .oman-hero h1,
+  .oman-page h1 {
+    font-size: 1.75rem;
+    line-height: 1.18;
+  }
+
+  .oman-page h2 {
+    font-size: 1.45rem;
+  }
+
+  .oman-page :where(.oman-card, .oman-outline-panel, .oman-dark-panel) {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+
+  .oman-page :where(.inline-flex:is(a, button), button.inline-flex, a.inline-flex) {
+    width: 100%;
   }
 }

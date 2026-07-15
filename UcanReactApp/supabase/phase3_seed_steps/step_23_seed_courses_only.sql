@@ -44,7 +44,7 @@ join (
       'Beginner to Intermediate',
       '8 weeks',
       'English + Arabic support',
-      29.000,
+      12.000,
       10
     ),
     (
@@ -59,7 +59,7 @@ join (
       'Intermediate',
       '7 weeks',
       'English',
-      35.000,
+      15.000,
       20
     ),
     (
@@ -74,7 +74,7 @@ join (
       'Beginner',
       '5 weeks',
       'English + Arabic support',
-      25.000,
+      10.000,
       30
     ),
     (
@@ -89,7 +89,7 @@ join (
       'Beginner',
       '6 weeks',
       'English',
-      30.000,
+      13.000,
       40
     ),
     (
@@ -104,7 +104,7 @@ join (
       'Beginner to Intermediate',
       '7 weeks',
       'English + Arabic support',
-      32.000,
+      11.000,
       50
     ),
     (
@@ -119,7 +119,7 @@ join (
       'Beginner',
       '4 weeks',
       'English + Arabic support',
-      18.000,
+      8.000,
       60
     )
 ) as course_data (

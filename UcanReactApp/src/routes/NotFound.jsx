@@ -15,7 +15,7 @@ export default function NotFound() {
                 Page Not Found
               </p>
               <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:mx-0 lg:text-5xl">
-                This page does not exist in Ucan.
+                This page does not exist in UcanJobs.
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#f4e8d6] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
                 The link may be outdated, incomplete, or typed incorrectly. Use one of the buttons
@@ -46,7 +46,7 @@ export default function NotFound() {
                 />
               </div>
               <p className="mt-4 text-sm leading-7 text-[var(--oman-ink)]/80">
-                Ucan is still available. Let&apos;s get you back to the right page.
+                UcanJobs is still available. Let&apos;s get you back to the right page.
               </p>
             </div>
           </div>
@@ -66,26 +66,26 @@ export default function NotFound() {
               to="/about/"
               className="rounded-3xl oman-outline-panel px-5 py-6 font-semibold text-[var(--oman-ink)] transition hover:-translate-y-0.5 hover:text-[var(--oman-terracotta)]"
             >
-              About Ucan
+              About UcanJobs
             </Link>
             <Link
               to="/learner-access/"
               className="rounded-3xl oman-outline-panel px-5 py-6 font-semibold text-[var(--oman-ink)] transition hover:-translate-y-0.5 hover:text-[var(--oman-terracotta)]"
             >
-              Learner Access
+              Job Seeker Login
             </Link>
             <Link
               to="/instructor-access/"
               className="rounded-3xl oman-outline-panel px-5 py-6 font-semibold text-[var(--oman-ink)] transition hover:-translate-y-0.5 hover:text-[var(--oman-terracotta)]"
             >
-              Instructor Access
+              Instructor Login
             </Link>
           </div>
         </div>
       </section>
 
       <footer className="border-t border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.9)] px-4 py-8 text-center text-sm text-[var(--oman-ink)]/70 sm:px-6">
-        Copyright {new Date().getFullYear()} Ucan. Career-focused e-learning for Oman.
+        Copyright {new Date().getFullYear()} UcanJobs. AI-Powered Employability Training.
       </footer>
     </main>
   );

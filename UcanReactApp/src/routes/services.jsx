@@ -22,41 +22,35 @@ import { themeImages } from "../lib/themeImages";
 
 const services = [
   {
-    title: "Free Individual Tutoring",
-    description:
-      "Students can schedule individualized tutoring sessions for free when they need focused help in a course.",
+    title: "Individual support",
+    description: "One-to-one help with course material.",
   },
   {
-    title: "Free Group Tutoring",
-    description:
-      "Students can attend group tutoring sessions for free and learn together around shared course topics.",
+    title: "Group support",
+    description: "Learn shared topics with others.",
   },
   {
-    title: "Online Learner Community",
-    description:
-      "College students can ask questions, explain ideas, and help each other understand coursework in a supportive space.",
+    title: "Community",
+    description: "Ask questions and share progress with peers.",
   },
   {
-    title: "Document Library",
-    description:
-      "Access a free library of documents that helps students review lessons, assignments, and course concepts more clearly.",
+    title: "Document library",
+    description: "Lesson notes, assignments, and reference files.",
   },
   {
-    title: "Useful Videos",
-    description:
-      "Find useful videos that improve understanding of college course material and make difficult topics easier to follow.",
+    title: "Videos",
+    description: "Short videos that clarify hard topics.",
   },
   {
-    title: "Course WhatsApp Groups",
-    description:
-      "Access collections of WhatsApp group chats made for specific college courses so students can get help more easily.",
+    title: "Course WhatsApp groups",
+    description: "Course-specific chat groups for quick help.",
   },
 ];
 
 const serviceHighlights = [
-  { number: "Live", label: "tutors, courses, and filters loaded from database" },
-  { number: "2", label: "session types for private and group support" },
-  { number: "Saved", label: "tutoring requests stored in the database" },
+  { number: "Live", label: "Instructors and courses from the database" },
+  { number: "2", label: "Private and group session types" },
+  { number: "Saved", label: "Support requests stored securely" },
 ];
 
 function getInstructorInitials(name) {
@@ -625,7 +619,7 @@ export default function Services() {
         institute_name_snapshot: learnerInstitute.trim(),
         topics_needed_help_with: [
           `Title: ${requestTitle.trim()}`,
-          `Learner Institute: ${learnerInstitute.trim()}`,
+          `Job Seeker Institute: ${learnerInstitute.trim()}`,
           "",
           "Topics Need Help With:",
           topicsNeededHelpWith.trim(),

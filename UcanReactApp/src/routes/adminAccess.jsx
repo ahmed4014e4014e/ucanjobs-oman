@@ -15,6 +15,7 @@ export default function AdminAccess() {
       allowSignup={false}
       accessImage={themeImages.brandWordmark}
       accessImageAlt={copy.imageAlt}
+      accessImageFrameClassName="oman-photo-frame oman-photo-frame--contain aspect-[16/10]"
     />
   );
 }

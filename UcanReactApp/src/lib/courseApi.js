@@ -1,9 +1,11 @@
-import { courseCatalog } from "./courseCatalog";
-import { isSupabaseConfigured, supabase } from "./supabase";
+import { courseCatalog } from "./courseCatalog.js";
+import { formatCoursePriceOmr, normalizeCoursePriceOmr } from "./coursePricing.js";
+import { isSupabaseConfigured, supabase } from "./supabase.js";
 
 const COURSE_COLUMNS = `
   id,
   category_id,
+  instructor_id,
   slug,
   title_en,
   subtitle_en,
@@ -16,13 +18,7 @@ const COURSE_COLUMNS = `
 `;
 
 function formatPrice(price) {
-  const numericPrice = Number(price);
-
-  if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
-    return "Free";
-  }
-
-  return `${numericPrice.toFixed(0)} OMR`;
+  return formatCoursePriceOmr(price);
 }
 
 function sortByOrder(left, right) {
@@ -37,9 +33,10 @@ function mapCourseRow(row, outcomes = [], modules = []) {
   return {
     id: row.id,
     slug: row.slug,
+    instructor_id: row.instructor_id || null,
     category: categoryNameEn,
     level: row.level,
-    priceOmr: Number(row.price_omr) || 0,
+    priceOmr: normalizeCoursePriceOmr(row.price_omr),
     price: formatPrice(row.price_omr),
     duration: row.duration,
     language: row.language,
@@ -175,7 +172,7 @@ export async function enrollInCourse({ learnerId, courseId }) {
   }
 
   if (!learnerId || !courseId) {
-    throw new Error("A learner account and course are required before enrollment.");
+    throw new Error("A job seeker account and course are required before enrollment.");
   }
 
   const { data, error } = await supabase
@@ -200,12 +197,13 @@ export async function enrollInCourse({ learnerId, courseId }) {
   return mapEnrollmentRecord(data);
 }
 
-export async function fetchCourseEnrollment({ learnerId, courseId }) {
-  if (!isSupabaseConfigured || !supabase || !learnerId || !courseId) {
+export async function fetchCourseEnrollment({ learnerId, courseId, client = null }) {
+  const db = client || supabase;
+  if ((!client && !isSupabaseConfigured) || !db || !learnerId || !courseId) {
     return null;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("course_enrollments")
     .select("id, status, progress_percent, enrolled_at")
     .eq("learner_id", learnerId)
@@ -219,20 +217,26 @@ export async function fetchCourseEnrollment({ learnerId, courseId }) {
   return mapEnrollmentRecord(data);
 }
 
-export async function updateCourseProgress({ learnerId, courseId, progressPercent }) {
-  if (!isSupabaseConfigured || !supabase) {
+export async function updateCourseProgress({
+  learnerId,
+  courseId,
+  progressPercent,
+  client = null,
+}) {
+  const db = client || supabase;
+  if (!db || (!client && !isSupabaseConfigured)) {
     throw new Error("database is not configured yet.");
   }
 
   if (!learnerId || !courseId) {
-    throw new Error("A learner account and course are required before updating progress.");
+    throw new Error("A job seeker account and course are required before updating progress.");
   }
 
   const normalizedProgress = Math.max(0, Math.min(100, Number(progressPercent) || 0));
   const nextStatus =
     normalizedProgress >= 100 ? "completed" : normalizedProgress > 0 ? "in_progress" : "enrolled";
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("course_enrollments")
     .update({
       progress_percent: normalizedProgress,

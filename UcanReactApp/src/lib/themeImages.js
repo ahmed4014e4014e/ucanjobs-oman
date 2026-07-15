@@ -1,31 +1,30 @@
-import ucanjobsHeroImage from "../assets/brand-theme/ucanjobs-hero.jpg";
 import ucanjobsMarkImage from "../assets/brand-theme/ucanjobs-mark.jpg";
-import ucanjobsGraduatesImage from "../assets/brand-theme/ucanjobs-graduates.jpg";
-import ucanjobsWorkersImage from "../assets/brand-theme/ucanjobs-workers.jpg";
-import ucanjobsBridgeImage from "../assets/brand-theme/ucanjobs-bridge.jpg";
 import ucanjobsSloganImage from "../assets/brand-theme/ucanjobs-slogan.jpg";
 import ucanjobsWordmarkImage from "../assets/brand-theme/ucanjobs-wordmark.jpg";
-import ucanjobsJourneyImage from "../assets/brand-theme/ucanjobs-journey.jpg";
-import ucanjobsLearningEmployabilityImage from "../assets/brand-theme/ucanjobs-learning-employability.png";
+import ucanNeutralHeroImage from "../assets/brand-theme/ucan-neutral-hero.png";
+import ucanNeutralCoursesImage from "../assets/brand-theme/ucan-neutral-courses.png";
+import ucanDiverseLearnersCollaborationImage from "../assets/brand-theme/ucan-diverse-learners-collaboration.png";
+import ucanNeutralPoliciesImage from "../assets/brand-theme/ucan-neutral-policies.png";
+import ucanOmaniStudentsHowItWorksImage from "../assets/brand-theme/ucan-omani-students-how-it-works.png";
 
 export const themeImages = {
-  heroFort: ucanjobsHeroImage,
-  heritageFort: ucanjobsJourneyImage,
-  mountainFort: ucanjobsBridgeImage,
+  heroFort: ucanNeutralHeroImage,
+  heritageFort: ucanDiverseLearnersCollaborationImage,
+  mountainFort: ucanNeutralHeroImage,
   dhofarUniversity: ucanjobsWordmarkImage,
   aboutUsCard: ucanjobsSloganImage,
   ucfLogo: ucanjobsMarkImage,
-  contactBottomCampus: ucanjobsWorkersImage,
+  contactBottomCampus: ucanDiverseLearnersCollaborationImage,
   studentsLibrary: ucanjobsWordmarkImage,
-  studentsGroup: ucanjobsHeroImage,
-  studentsStudyHall: ucanjobsGraduatesImage,
-  policiesCampus: ucanjobsSloganImage,
-  brandHero: ucanjobsHeroImage,
+  studentsGroup: ucanNeutralHeroImage,
+  studentsStudyHall: ucanNeutralCoursesImage,
+  policiesCampus: ucanNeutralPoliciesImage,
+  brandHero: ucanNeutralHeroImage,
   brandMark: ucanjobsMarkImage,
-  brandGraduates: ucanjobsGraduatesImage,
-  brandWorkers: ucanjobsWorkersImage,
-  brandBridge: ucanjobsBridgeImage,
+  brandGraduates: ucanNeutralCoursesImage,
+  brandWorkers: ucanDiverseLearnersCollaborationImage,
+  brandBridge: ucanNeutralHeroImage,
   brandSlogan: ucanjobsSloganImage,
   brandWordmark: ucanjobsWordmarkImage,
-  brandJourney: ucanjobsLearningEmployabilityImage,
+  brandJourney: ucanOmaniStudentsHowItWorksImage,
 };

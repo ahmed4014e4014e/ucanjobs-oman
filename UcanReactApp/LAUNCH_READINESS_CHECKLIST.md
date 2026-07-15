@@ -1,6 +1,6 @@
-# Ucan Oman Launch Readiness Checklist
+# UcanJobs Launch Readiness Checklist
 
-This checklist is designed to help decide whether Ucan Oman is ready for:
+This checklist is designed to help decide whether UcanJobs is ready for:
 
 - a small pilot launch
 - a broader public launch
@@ -198,4 +198,3 @@ You are ready for nationwide promotion only if:
 - support operations are clearly defined
 - privacy handling is trustworthy
 - pilot results are positive
-

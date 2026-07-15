@@ -1,3 +1,4 @@
+import { normalizeCoursePriceOmr } from "./coursePricing";
 import { isSupabaseConfigured, supabase } from "./supabase";
 
 export const PAYMENT_PROOF_BUCKET = "payment-proofs";
@@ -78,11 +79,11 @@ export function getCoursePriceOmr(course) {
   const price = Number(course?.priceOmr);
 
   if (Number.isFinite(price)) {
-    return Math.max(0, price);
+    return normalizeCoursePriceOmr(price);
   }
 
   const parsedPrice = Number.parseFloat(String(course?.price || "").replace(/[^\d.]/g, ""));
-  return Number.isFinite(parsedPrice) ? Math.max(0, parsedPrice) : 0;
+  return normalizeCoursePriceOmr(parsedPrice);
 }
 
 export async function fetchLearnerOrders(learnerId) {
@@ -162,7 +163,7 @@ export async function createManualOrder({ learnerId, course }) {
   assertPaymentConfigured();
 
   if (!learnerId || !course?.id) {
-    throw new Error("A learner account and course are required before creating an order.");
+    throw new Error("A job seeker account and course are required before creating an order.");
   }
 
   const existingOrder = await fetchCourseOrder({ learnerId, courseId: course.id });
@@ -215,7 +216,7 @@ export async function uploadPaymentProof({ file, learnerId, orderId }) {
   assertPaymentConfigured();
 
   if (!file || !learnerId || !orderId) {
-    throw new Error("A proof file, learner account, and order are required before submitting an access request.");
+    throw new Error("A proof file, job seeker account, and order are required before submitting an access request.");
   }
 
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -241,7 +242,7 @@ export async function submitManualPayment({ order, learnerId, referenceNumber, p
   assertPaymentConfigured();
 
   if (!order?.id || !learnerId) {
-    throw new Error("An order and learner account are required before submitting payment details.");
+    throw new Error("An order and job seeker account are required before submitting payment details.");
   }
 
   const { data, error } = await supabase
@@ -369,7 +370,7 @@ export async function updateAdminOrderStatus({ order, status }) {
   }
 
   if (status === "paid") {
-    const { error: enrollmentError } = await supabase.from("course_enrollments").upsert(
+    const { data: enrollmentData, error: enrollmentError } = await supabase.from("course_enrollments").upsert(
       {
         learner_id: data.learner_id,
         course_id: data.course_id,
@@ -378,10 +379,73 @@ export async function updateAdminOrderStatus({ order, status }) {
       {
         onConflict: "learner_id,course_id",
       }
-    );
+    ).select("id").single();
 
     if (enrollmentError) {
       throw enrollmentError;
+    }
+
+    if (enrollmentData?.id && data.enrollment_id !== enrollmentData.id) {
+      const { error: orderLinkError } = await supabase
+        .from("orders")
+        .update({ enrollment_id: enrollmentData.id })
+        .eq("id", data.id);
+
+      if (orderLinkError) {
+        throw orderLinkError;
+      }
+
+      data.enrollment_id = enrollmentData.id;
+    }
+
+    const { error: paymentError } = await supabase
+      .from("payments")
+      .update({
+        status: "confirmed",
+        confirmed_at: new Date().toISOString(),
+        rejected_at: null,
+      })
+      .eq("order_id", data.id);
+
+    if (paymentError) {
+      throw paymentError;
+    }
+  }
+
+  if (status === "cancelled" || status === "refunded") {
+    const { error: enrollmentError } = await supabase
+      .from("course_enrollments")
+      .update({ status: "cancelled" })
+      .eq("learner_id", data.learner_id)
+      .eq("course_id", data.course_id);
+
+    if (enrollmentError) {
+      throw enrollmentError;
+    }
+
+    const paymentStatus = status === "refunded" ? "refunded" : "rejected";
+    const { error: paymentError } = await supabase
+      .from("payments")
+      .update({
+        status: paymentStatus,
+        rejected_at: paymentStatus === "rejected" ? new Date().toISOString() : null,
+      })
+      .eq("order_id", data.id);
+
+    if (paymentError) {
+      throw paymentError;
+    }
+  }
+
+  if (status === "payment_submitted") {
+    const { error: paymentError } = await supabase
+      .from("payments")
+      .update({ status: "under_review" })
+      .eq("order_id", data.id)
+      .eq("status", "submitted");
+
+    if (paymentError) {
+      throw paymentError;
     }
   }
 
