@@ -134,7 +134,7 @@ export default function AppShell() {
   }, [logoutMessage]);
 
   const profileLinkClass =
-    "flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[rgba(197,154,68,0.35)] bg-[rgba(244,232,214,0.72)] text-sm font-bold text-[var(--oman-terracotta-dark)] shadow-sm transition hover:border-[var(--oman-brass)] sm:h-11 sm:w-11";
+    "flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[rgba(197,154,68,0.35)] bg-[rgba(244,232,214,0.72)] text-sm font-bold text-[var(--oman-terracotta-dark)] shadow-sm transition hover:border-[var(--oman-brass)]";
 
   return (
     <>
@@ -270,7 +270,7 @@ export default function AppShell() {
           <div
             id="app-mobile-menu"
             className="app-shell-mobile-menu fixed inset-x-0 z-[115] max-h-[min(75vh,calc(100dvh-4.5rem))] w-full max-w-full overflow-x-hidden overflow-y-auto overscroll-contain border-b border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.99)] px-3 py-4 shadow-md sm:px-4 lg:hidden"
-            style={{ top: "max(3.75rem, calc(env(safe-area-inset-top, 0px) + 3.25rem))" }}
+            style={{ top: "max(4.25rem, calc(env(safe-area-inset-top, 0px) + 3.75rem))" }}
           >
             {isLoggedIn ? (
               <div className="mb-3 rounded-2xl border border-[rgba(197,154,68,0.22)] bg-[rgba(197,154,68,0.1)] px-4 py-3">
