@@ -149,16 +149,19 @@ export default function AppShell() {
       ) : null}
 
       <nav
-        className="app-shell-nav fixed inset-x-0 top-0 z-[100] w-full border-b border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.97)] shadow-sm backdrop-blur supports-[backdrop-filter]:bg-[rgba(255,248,238,0.92)]"
+        className="app-shell-nav border-b border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.97)] shadow-sm backdrop-blur supports-[backdrop-filter]:bg-[rgba(255,248,238,0.92)]"
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
-        <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-3 py-3 sm:gap-3 sm:px-6 sm:py-4">
-          {/* Brand: may shrink; never force the menu off-screen */}
-          <Link
-            to="/home/"
-            className="min-w-0 flex-1 overflow-hidden"
-            onClick={() => setOpen(false)}
-          >
+        <div
+          className={[
+            "app-shell-nav-inner mx-auto max-w-7xl py-3 sm:py-4",
+            isLoggedIn ? "" : "app-shell-nav-inner--guest",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          {/* Brand: constrained so it never pushes past the phone width */}
+          <Link to="/home/" className="min-w-0 overflow-hidden" onClick={() => setOpen(false)}>
             <p className="hidden truncate text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[var(--oman-terracotta)] sm:block sm:text-xs sm:tracking-[0.28em]">
               {t("brand.kicker")}
             </p>
@@ -167,7 +170,7 @@ export default function AppShell() {
             </h1>
           </Link>
 
-          {/* Desktop navigation */}
+          {/* Desktop navigation only */}
           <div className="hidden min-w-0 items-center gap-3 lg:flex xl:gap-5">
             {isLoggedIn ? (
               <div className="shrink-0 rounded-full border border-[rgba(197,154,68,0.24)] bg-[rgba(197,154,68,0.12)] px-3 py-1.5 text-sm font-medium capitalize text-[var(--oman-terracotta-dark)]">
@@ -200,110 +203,114 @@ export default function AppShell() {
               </>
             ) : null}
           </div>
+        </div>
+      </nav>
 
-          {/* Mobile controls: never shrink so the menu button stays visible after login */}
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:hidden">
+      {/*
+        Outside the nav so overflow clipping / wide page content cannot hide them.
+        Fixed to the real phone viewport top-right corner.
+      */}
+      <div className="app-shell-mobile-actions lg:hidden">
+        {isLoggedIn ? (
+          <Link
+            to="/profile/"
+            onClick={() => setOpen(false)}
+            className={profileLinkClass}
+            aria-label={t("nav.profile")}
+            title={t("nav.profile")}
+          >
+            {profilePhotoUrl ? (
+              <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span>{profileInitials}</span>
+            )}
+          </Link>
+        ) : null}
+
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          className="app-shell-menu-btn inline-flex items-center justify-center rounded-xl border border-[rgba(111,49,29,0.18)] bg-[rgba(255,252,247,0.98)] text-[var(--oman-ink)] shadow-sm transition hover:bg-[rgba(197,154,68,0.14)]"
+          aria-expanded={open}
+          aria-controls="app-mobile-menu"
+          aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")}
+        >
+          <span className="sr-only">{open ? t("nav.closeMenu") : t("nav.openMenu")}</span>
+          <span aria-hidden="true" className="relative block h-4 w-5">
+            <span
+              className={[
+                "absolute left-0 h-0.5 w-5 rounded-full bg-current transition",
+                open ? "top-2 rotate-45" : "top-0",
+              ].join(" ")}
+            />
+            <span
+              className={[
+                "absolute left-0 top-2 h-0.5 w-5 rounded-full bg-current transition",
+                open ? "opacity-0" : "opacity-100",
+              ].join(" ")}
+            />
+            <span
+              className={[
+                "absolute left-0 h-0.5 w-5 rounded-full bg-current transition",
+                open ? "top-2 -rotate-45" : "top-4",
+              ].join(" ")}
+            />
+          </span>
+        </button>
+      </div>
+
+      {open ? (
+        <>
+          <button
+            type="button"
+            className="fixed inset-0 z-[110] bg-black/25 lg:hidden"
+            aria-label={t("nav.closeMenu")}
+            onClick={() => setOpen(false)}
+          />
+          <div
+            id="app-mobile-menu"
+            className="app-shell-mobile-menu fixed inset-x-0 z-[115] max-h-[min(75vh,calc(100dvh-4.5rem))] w-full max-w-full overflow-x-hidden overflow-y-auto overscroll-contain border-b border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.99)] px-3 py-4 shadow-md sm:px-4 lg:hidden"
+            style={{ top: "max(3.75rem, calc(env(safe-area-inset-top, 0px) + 3.25rem))" }}
+          >
             {isLoggedIn ? (
-              <Link
-                to="/profile/"
-                onClick={() => setOpen(false)}
-                className={profileLinkClass}
-                aria-label={t("nav.profile")}
-                title={t("nav.profile")}
-              >
-                {profilePhotoUrl ? (
-                  <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <span>{profileInitials}</span>
-                )}
-              </Link>
+              <div className="mb-3 rounded-2xl border border-[rgba(197,154,68,0.22)] bg-[rgba(197,154,68,0.1)] px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                  {getVisibleRoleLabel(role, t)}
+                </p>
+                <p className="mt-1 truncate text-sm font-medium text-[var(--oman-ink)]">
+                  {profile?.full_name || user?.email || t("nav.profile")}
+                </p>
+              </div>
             ) : null}
 
-            <button
-              type="button"
-              onClick={() => setOpen((value) => !value)}
-              className="app-shell-menu-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[rgba(111,49,29,0.18)] bg-[rgba(255,252,247,0.98)] text-[var(--oman-ink)] shadow-sm transition hover:bg-[rgba(197,154,68,0.14)]"
-              aria-expanded={open}
-              aria-controls="app-mobile-menu"
-              aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")}
-            >
-              <span className="sr-only">{open ? t("nav.closeMenu") : t("nav.openMenu")}</span>
-              <span aria-hidden="true" className="relative block h-4 w-5">
-                <span
-                  className={[
-                    "absolute left-0 h-0.5 w-5 rounded-full bg-current transition",
-                    open ? "top-2 rotate-45" : "top-0",
-                  ].join(" ")}
-                />
-                <span
-                  className={[
-                    "absolute left-0 top-2 h-0.5 w-5 rounded-full bg-current transition",
-                    open ? "opacity-0" : "opacity-100",
-                  ].join(" ")}
-                />
-                <span
-                  className={[
-                    "absolute left-0 h-0.5 w-5 rounded-full bg-current transition",
-                    open ? "top-2 -rotate-45" : "top-4",
-                  ].join(" ")}
-                />
-              </span>
-            </button>
-          </div>
-        </div>
+            <div className="flex flex-col gap-1.5">
+              {mobileLinks.map((link) => (
+                <NavLink
+                  key={`${link.to}-${link.name}`}
+                  to={link.to}
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) =>
+                    [
+                      "rounded-2xl px-4 py-3 text-base font-medium transition",
+                      isActive
+                        ? "bg-[rgba(197,154,68,0.16)] text-[var(--oman-terracotta)]"
+                        : "text-[var(--oman-ink)] hover:bg-[rgba(197,154,68,0.08)] hover:text-[var(--oman-terracotta)]",
+                    ].join(" ")
+                  }
+                >
+                  {link.name}
+                </NavLink>
+              ))}
 
-        {open ? (
-          <>
-            <button
-              type="button"
-              className="fixed inset-0 z-[99] bg-black/25 lg:hidden"
-              aria-label={t("nav.closeMenu")}
-              onClick={() => setOpen(false)}
-            />
-            <div
-              id="app-mobile-menu"
-              className="relative z-[101] max-h-[min(75vh,calc(100dvh-4.5rem))] overflow-y-auto overscroll-contain border-t border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.99)] px-3 py-4 shadow-md sm:px-4 lg:hidden"
-            >
               {isLoggedIn ? (
-                <div className="mb-3 rounded-2xl border border-[rgba(197,154,68,0.22)] bg-[rgba(197,154,68,0.1)] px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
-                    {getVisibleRoleLabel(role, t)}
-                  </p>
-                  <p className="mt-1 truncate text-sm font-medium text-[var(--oman-ink)]">
-                    {profile?.full_name || user?.email || t("nav.profile")}
-                  </p>
-                </div>
+                <Button type="button" variant="secondary" fullWidth className="mt-2" onClick={handleLogout}>
+                  {t("nav.logout")}
+                </Button>
               ) : null}
-
-              <div className="flex flex-col gap-1.5">
-                {mobileLinks.map((link) => (
-                  <NavLink
-                    key={`${link.to}-${link.name}`}
-                    to={link.to}
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) =>
-                      [
-                        "rounded-2xl px-4 py-3 text-base font-medium transition",
-                        isActive
-                          ? "bg-[rgba(197,154,68,0.16)] text-[var(--oman-terracotta)]"
-                          : "text-[var(--oman-ink)] hover:bg-[rgba(197,154,68,0.08)] hover:text-[var(--oman-terracotta)]",
-                      ].join(" ")
-                    }
-                  >
-                    {link.name}
-                  </NavLink>
-                ))}
-
-                {isLoggedIn ? (
-                  <Button type="button" variant="secondary" fullWidth className="mt-2" onClick={handleLogout}>
-                    {t("nav.logout")}
-                  </Button>
-                ) : null}
-              </div>
             </div>
-          </>
-        ) : null}
-      </nav>
+          </div>
+        </>
+      ) : null}
 
       <Outlet />
     </>
