@@ -55,7 +55,29 @@ body {
   min-height: 100vh;
   min-width: 0;
   width: 100%;
-  overflow-x: clip;
+  /* Do not set overflow on #root — it creates a containing/scroll
+     context that makes position:fixed nav scroll away on mobile. */
+}
+
+/* Global top nav: always pin to the viewport above page content. */
+.app-shell-nav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+  transform: none;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.app-shell-nav .app-shell-menu-btn {
+  flex-shrink: 0;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
 }
 
 .oman-page {
@@ -235,10 +257,17 @@ body {
     overflow-x: hidden;
   }
 
-  #root,
+  /* Keep horizontal clipping on page content only — never on #root,
+     or the fixed top nav will scroll out of view on phones. */
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+  }
+
   .oman-page {
     width: 100%;
-    max-width: 100vw;
+    max-width: 100%;
     overflow-x: clip;
   }
 
@@ -249,7 +278,7 @@ body {
 
   .oman-page > section {
     width: 100%;
-    max-width: 100vw;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
     padding-left: 1rem;
@@ -346,12 +375,12 @@ body {
 
   .contact-page {
     width: 100%;
-    max-width: 100vw;
+    max-width: 100%;
   }
 
   .contact-page > section {
     width: 100%;
-    max-width: 100vw;
+    max-width: 100%;
     overflow-x: clip;
   }
 

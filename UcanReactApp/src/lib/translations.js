@@ -33,6 +33,7 @@ export const translations = {
       adminAccess: "Admin Access",
       dashboard: "Dashboard",
       adminDashboard: "Admin Dashboard",
+      profile: "Profile",
       logout: "Logout",
       openMenu: "Open menu",
       closeMenu: "Close menu",

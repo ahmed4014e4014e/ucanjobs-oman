@@ -54,12 +54,33 @@ function getProfilePhotoUrl(profile, user) {
 export default function AppShell() {
   const [open, setOpen] = useState(false);
   const [logoutMessage, setLogoutMessage] = useState("");
+  const location = useLocation();
   const navigate = useNavigate();
   const { user, profile, signOut, loading } = useAuth();
   const { t } = useLanguage();
   const role = getUserRole(profile, user);
   const profilePhotoUrl = getProfilePhotoUrl(profile, user);
   const profileInitials = getProfileInitials(profile, user);
+  const isLoggedIn = Boolean(!loading && user);
+
+  // Close the mobile menu whenever the route changes.
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  // Prevent background scroll while the mobile drawer is open.
+  useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
 
   const baseLinks = [
     { name: t("nav.home"), to: "/home/" },
@@ -73,9 +94,17 @@ export default function AppShell() {
     { name: t("nav.tutorAccess"), to: "/instructor-access/" },
     { name: t("nav.adminAccess"), to: "/admin-access/" },
   ];
-  const memberLinks = [{ name: t("nav.dashboard"), to: getDashboardPath(role) }];
-  const adminLinks = role === "admin" ? [{ name: t("nav.adminDashboard"), to: "/admin-dashboard/" }] : [];
-  const links = [...baseLinks, ...guestLinks, ...(user ? memberLinks : []), ...adminLinks];
+  const memberLinks = isLoggedIn
+    ? [
+        { name: t("nav.dashboard"), to: getDashboardPath(role) },
+        { name: t("nav.profile"), to: "/profile/" },
+        ...(role === "admin" ? [{ name: t("nav.adminDashboard"), to: "/admin-dashboard/" }] : []),
+      ]
+    : [];
+
+  // Guests see login links; members do not — they get dashboard/profile instead.
+  const desktopLinks = [...baseLinks, ...(isLoggedIn ? memberLinks : guestLinks)];
+  const mobileLinks = desktopLinks;
 
   const navLinkClass = ({ isActive }) =>
     [
@@ -105,7 +134,7 @@ export default function AppShell() {
   }, [logoutMessage]);
 
   const profileLinkClass =
-    "flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-[rgba(197,154,68,0.35)] bg-[rgba(244,232,214,0.72)] text-sm font-bold text-[var(--oman-terracotta-dark)] shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--oman-brass)]";
+    "flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[rgba(197,154,68,0.35)] bg-[rgba(244,232,214,0.72)] text-sm font-bold text-[var(--oman-terracotta-dark)] shadow-sm transition hover:border-[var(--oman-brass)] sm:h-11 sm:w-11";
 
   return (
     <>
@@ -115,29 +144,40 @@ export default function AppShell() {
           type="success"
           message={logoutMessage}
           title={t("feedback.sessionUpdate")}
-          className="fixed left-1/2 top-20 z-[80] w-[min(92vw,32rem)] -translate-x-1/2 px-5 py-4 shadow-lg backdrop-blur"
+          className="fixed left-1/2 top-20 z-[110] w-[min(92vw,32rem)] -translate-x-1/2 px-5 py-4 shadow-lg backdrop-blur"
         />
       ) : null}
 
-      <nav className="fixed left-0 top-0 z-50 w-full border-b border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.92)] shadow-sm backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 sm:py-4">
-          <Link to="/home/" className="min-w-0 shrink-0" onClick={() => setOpen(false)}>
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-[var(--oman-terracotta)] sm:text-xs sm:tracking-[0.35em]">
+      <nav
+        className="app-shell-nav fixed inset-x-0 top-0 z-[100] w-full border-b border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.97)] shadow-sm backdrop-blur supports-[backdrop-filter]:bg-[rgba(255,248,238,0.92)]"
+        style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+      >
+        <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-3 py-3 sm:gap-3 sm:px-6 sm:py-4">
+          {/* Brand: may shrink; never force the menu off-screen */}
+          <Link
+            to="/home/"
+            className="min-w-0 flex-1 overflow-hidden"
+            onClick={() => setOpen(false)}
+          >
+            <p className="hidden truncate text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[var(--oman-terracotta)] sm:block sm:text-xs sm:tracking-[0.28em]">
               {t("brand.kicker")}
             </p>
-            <h1 className="text-lg font-bold text-[var(--oman-ink)] sm:text-2xl">{t("brand.name")}</h1>
+            <h1 className="truncate text-lg font-bold leading-tight text-[var(--oman-ink)] sm:text-2xl">
+              {t("brand.name")}
+            </h1>
           </Link>
 
-          <div className="hidden items-center gap-3 lg:flex xl:gap-5">
-            {user ? (
-              <div className="rounded-full border border-[rgba(197,154,68,0.24)] bg-[rgba(197,154,68,0.12)] px-3 py-1.5 text-sm font-medium capitalize text-[var(--oman-terracotta-dark)]">
+          {/* Desktop navigation */}
+          <div className="hidden min-w-0 items-center gap-3 lg:flex xl:gap-5">
+            {isLoggedIn ? (
+              <div className="shrink-0 rounded-full border border-[rgba(197,154,68,0.24)] bg-[rgba(197,154,68,0.12)] px-3 py-1.5 text-sm font-medium capitalize text-[var(--oman-terracotta-dark)]">
                 {getVisibleRoleLabel(role, t)}
               </div>
             ) : null}
 
-            <ul className="flex items-center gap-4 text-sm xl:gap-6 xl:text-base">
-              {links.map((link) => (
-                <li key={link.name}>
+            <ul className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm xl:gap-x-6 xl:text-base">
+              {desktopLinks.map((link) => (
+                <li key={`${link.to}-${link.name}`}>
                   <NavLink to={link.to} className={navLinkClass}>
                     {link.name}
                   </NavLink>
@@ -145,9 +185,9 @@ export default function AppShell() {
               ))}
             </ul>
 
-            {!loading && user ? (
+            {isLoggedIn ? (
               <>
-                <Link to="/profile/" className={profileLinkClass} aria-label="Open profile" title="Profile">
+                <Link to="/profile/" className={profileLinkClass} aria-label={t("nav.profile")} title={t("nav.profile")}>
                   {profilePhotoUrl ? (
                     <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
                   ) : (
@@ -161,13 +201,15 @@ export default function AppShell() {
             ) : null}
           </div>
 
-          <div className="flex items-center gap-2 lg:hidden">
-            {!loading && user ? (
+          {/* Mobile controls: never shrink so the menu button stays visible after login */}
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:hidden">
+            {isLoggedIn ? (
               <Link
                 to="/profile/"
                 onClick={() => setOpen(false)}
                 className={profileLinkClass}
-                aria-label="Open profile"
+                aria-label={t("nav.profile")}
+                title={t("nav.profile")}
               >
                 {profilePhotoUrl ? (
                   <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
@@ -180,12 +222,13 @@ export default function AppShell() {
             <button
               type="button"
               onClick={() => setOpen((value) => !value)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[rgba(111,49,29,0.14)] bg-[rgba(255,252,247,0.85)] text-[var(--oman-ink)] transition hover:bg-[rgba(197,154,68,0.12)]"
+              className="app-shell-menu-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[rgba(111,49,29,0.18)] bg-[rgba(255,252,247,0.98)] text-[var(--oman-ink)] shadow-sm transition hover:bg-[rgba(197,154,68,0.14)]"
               aria-expanded={open}
+              aria-controls="app-mobile-menu"
               aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")}
             >
               <span className="sr-only">{open ? t("nav.closeMenu") : t("nav.openMenu")}</span>
-              <span aria-hidden="true" className="relative h-4 w-5">
+              <span aria-hidden="true" className="relative block h-4 w-5">
                 <span
                   className={[
                     "absolute left-0 h-0.5 w-5 rounded-full bg-current transition",
@@ -210,33 +253,55 @@ export default function AppShell() {
         </div>
 
         {open ? (
-          <div className="max-h-[calc(100vh-5rem)] overflow-y-auto border-t border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.98)] px-4 py-4 shadow-md lg:hidden">
-            <div className="flex flex-col gap-2">
-              {links.map((link) => (
-                <NavLink
-                  key={link.name}
-                  to={link.to}
-                  onClick={() => setOpen(false)}
-                  className={({ isActive }) =>
-                    [
-                      "rounded-2xl px-4 py-3 text-base font-medium transition",
-                      isActive
-                        ? "bg-[rgba(197,154,68,0.16)] text-[var(--oman-terracotta)]"
-                        : "text-[var(--oman-ink)] hover:bg-[rgba(197,154,68,0.08)] hover:text-[var(--oman-terracotta)]",
-                    ].join(" ")
-                  }
-                >
-                  {link.name}
-                </NavLink>
-              ))}
-
-              {!loading && user ? (
-                <Button type="button" variant="secondary" fullWidth onClick={handleLogout}>
-                  {t("nav.logout")}
-                </Button>
+          <>
+            <button
+              type="button"
+              className="fixed inset-0 z-[99] bg-black/25 lg:hidden"
+              aria-label={t("nav.closeMenu")}
+              onClick={() => setOpen(false)}
+            />
+            <div
+              id="app-mobile-menu"
+              className="relative z-[101] max-h-[min(75vh,calc(100dvh-4.5rem))] overflow-y-auto overscroll-contain border-t border-[rgba(111,49,29,0.12)] bg-[rgba(255,248,238,0.99)] px-3 py-4 shadow-md sm:px-4 lg:hidden"
+            >
+              {isLoggedIn ? (
+                <div className="mb-3 rounded-2xl border border-[rgba(197,154,68,0.22)] bg-[rgba(197,154,68,0.1)] px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--oman-terracotta)]">
+                    {getVisibleRoleLabel(role, t)}
+                  </p>
+                  <p className="mt-1 truncate text-sm font-medium text-[var(--oman-ink)]">
+                    {profile?.full_name || user?.email || t("nav.profile")}
+                  </p>
+                </div>
               ) : null}
+
+              <div className="flex flex-col gap-1.5">
+                {mobileLinks.map((link) => (
+                  <NavLink
+                    key={`${link.to}-${link.name}`}
+                    to={link.to}
+                    onClick={() => setOpen(false)}
+                    className={({ isActive }) =>
+                      [
+                        "rounded-2xl px-4 py-3 text-base font-medium transition",
+                        isActive
+                          ? "bg-[rgba(197,154,68,0.16)] text-[var(--oman-terracotta)]"
+                          : "text-[var(--oman-ink)] hover:bg-[rgba(197,154,68,0.08)] hover:text-[var(--oman-terracotta)]",
+                      ].join(" ")
+                    }
+                  >
+                    {link.name}
+                  </NavLink>
+                ))}
+
+                {isLoggedIn ? (
+                  <Button type="button" variant="secondary" fullWidth className="mt-2" onClick={handleLogout}>
+                    {t("nav.logout")}
+                  </Button>
+                ) : null}
+              </div>
             </div>
-          </div>
+          </>
         ) : null}
       </nav>
 
