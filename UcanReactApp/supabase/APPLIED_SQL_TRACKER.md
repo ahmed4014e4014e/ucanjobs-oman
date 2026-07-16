@@ -23,6 +23,7 @@ Status guide:
 | `tutoring_attachments_storage.sql` | confirmed applied | Needed for tutoring request attachments and tutor-side attachment downloads. |
 | `tutor_applicants_schema.sql` | Pending / not confirmed | Creates the dedicated tutor applicants table, indexes, RLS policies, and separate storage bucket policies. |
 | `ucan_course_marketplace_schema.sql` | Pending / not confirmed | Phase 3 course marketplace tables, public course read policies, learner enrollments, and starter course seed data. |
+| `profile_account_settings.sql` | Confirmed applied - 2026-07-16 | Profile settings: profiles columns, profile_preferences, profile_api_clients + RPC, account_deletion_requests, avatars bucket. Applied via Supabase MCP. |
 
 ## Update rule
 
